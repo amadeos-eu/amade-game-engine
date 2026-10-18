@@ -75,7 +75,7 @@ If a future game hits one of these walls, the design keeps the door open. As you
 flowchart LR
     A[Mines] --> B[Solitaire] --> C[Paddle] --> D[Bricks] --> E[…] --> F[Towers] --> G[Sands]
     A -. high scores, game menu .-> X((amade-game-engine))
-    B -. animation, drag and drop, undo .-> X
+    B -. animation, undo, game clock .-> X
     C -. game loop, keyboard, scenes .-> X
     D -. sprites, collision, sound .-> X
     G -. pathfinding, selection, save games .-> X

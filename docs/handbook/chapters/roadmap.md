@@ -10,14 +10,9 @@ The handbook grows with the games: a chapter is written when its game is finishe
 | [1. Why Our Own Engine](01-why-own-engine.md) | | |
 | [2. How a Game Is Built](02-structure.md) | | |
 | [10. Mines](10-mines.md) | Mines | High scores, game menus, high-score dialogs |
+| [11. Solitaire](11-solitaire.md) | Solitaire (Klondike) | Undo and redo, animation (easing, tweens, an animation timer), the game clock |
 
 ## Planned
-
-### Part I: Games that wait for you
-
-| Chapter | Game (in the style of) | New in the engine |
-|---|---|---|
-| 11 | **Solitaire** (Klondike) | Drag and drop, animation, undo as a command stack, cards drawn in code |
 
 ### Part II: Action
 

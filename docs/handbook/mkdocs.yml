@@ -65,4 +65,5 @@ nav:
       - 2. How a Game Is Built: 02-structure.md
   - "Part I: Games That Wait for You":
       - 10. Mines: 10-mines.md
+      - 11. Solitaire: 11-solitaire.md
   - The Road Ahead: roadmap.md

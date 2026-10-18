@@ -21,7 +21,7 @@ The handbook teaches game programming in Java by building the amadeOS games and 
   ```
 
   Paths start at the directory that holds the repositories, so the games must be checked out next to `amade-game-engine`. The book then always shows code that compiles and is tested.
-- The workflow `.github/workflows/handbook.yml` checks out each game at a fixed commit (`MINES_COMMIT`, …). Raise it when a chapter is updated for a newer state of the game.
+- The workflow `.github/workflows/handbook.yml` checks out each game at a fixed commit (`MINES_COMMIT`, `SOLITAIRE_COMMIT`, …). Raise it when a chapter is updated for a newer state of the game.
 
 ## Building locally
 

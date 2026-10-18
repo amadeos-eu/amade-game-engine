@@ -218,10 +218,10 @@ After each move, `update()` brings the counters, the face and the field up to da
 
 ### Time you can test
 
-The clock is a small model class of its own:
+The clock is a small model class of its own. Mines wrote it in its `domain` package; when Solitaire needed the same clock, it moved into the engine, where you find it today:
 
-```java title="amade-mines-game · domain/GameClock.java"
---8<-- "amade-mines-game/src/main/java/eu/amadeos/games/mines/domain/GameClock.java"
+```java title="amade-game-engine · time/GameClock.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/time/GameClock.java:clock"
 ```
 
 It does not read the system time directly. It asks a `LongSupplier`, which the game fills with `System::nanoTime` and a test with a number it controls. `System.nanoTime()` is the right source for durations: unlike the wall clock, it never jumps when the computer adjusts its time.
@@ -293,7 +293,7 @@ The icon itself was drawn with the same Java2D code as the field.
 | *New Game*, *High Scores*, *Exit*, *About* | `eu.amadeos.gameengine.swing.GameMenus` | Same keys and texts in every game |
 | High-score table and name question | `eu.amadeos.gameengine.swing.HighScoreDialog` | Same dialogs in every game |
 
-Everything else stays in the game: the field, its drawing, the counters, the face. Solitaire, the next game, will show which of it was more general than it looked.
+Everything else stays in the game: the field, its drawing, the counters, the face. Solitaire, the next game, showed that one more piece was more general than it looked: the `GameClock` moved into the engine (`eu.amadeos.gameengine.time`) as soon as a second game measured time.
 
 ## Exercises
 

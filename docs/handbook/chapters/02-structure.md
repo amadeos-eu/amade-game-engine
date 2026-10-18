@@ -24,7 +24,7 @@ All game code is under `eu.amadeos.games.mines`:
 | Package | Job | Classes in Mines |
 |---|---|---|
 | `bootstrap` | Start-up and wiring | `AmadeMinesApplication`, `MinesModule` |
-| `domain` | The rules, no user interface | `Board`, `Difficulty`, `Look`, `GameClock` |
+| `domain` | The rules, no user interface | `Board`, `Difficulty`, `Look` |
 | `repository` | Files on disk | `MinesSettings` |
 | `ui.main` | The window and its presenter | `MinesPresenter`, `MinesView`, `MinesWindow` |
 | `ui.view` | Components that draw themselves | `BoardView`, `Counter`, `FaceIcon`, `Face` |
@@ -63,14 +63,14 @@ How do the rules and the window talk to each other? Mines uses **Model-View-Pres
 flowchart LR
     W["<b>View</b><br/>MinesWindow<br/><i>Swing: shows, forwards</i>"]
     P["<b>Presenter</b><br/>MinesPresenter<br/><i>decides, no Swing</i>"]
-    M["<b>Model</b><br/>Board, GameClock<br/><i>the rules</i>"]
+    M["<b>Model</b><br/>Board, GameClock<br/><i>the rules and the time</i>"]
     W -- "player clicked cell 3,4" --> P
     P -- "open(3, 4)" --> M
     M -- "state, mines left" --> P
     P -- "showMinesLeft(9), showFace(WON)" --> W
 ```
 
-- The **model** is the domain: `Board` with its rules, `GameClock` for the time.
+- The **model** is the domain: `Board` with its rules, and the engine's `GameClock` for the time.
 - The **view** is the window. It shows what it is told and reports what the player does. It decides nothing.
 - The **presenter** sits between them. It receives the player's actions, changes the model and tells the view what to show. It is plain Java, **without Swing**.
 
