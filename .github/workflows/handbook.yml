@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 env:
-  MINES_COMMIT: 523b53b
+  MINES_COMMIT: 523b53b8f5237bfc3c6c3416f666ff588fbdc10f  # full hash: actions/checkout does not take short ones
 
 jobs:
   build:
