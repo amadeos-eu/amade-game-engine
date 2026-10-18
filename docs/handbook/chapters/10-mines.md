@@ -70,7 +70,7 @@ The two loops visit the 3 × 3 square around the cell, skip the cell itself (`dr
 
 ## Step 2: Laying the mines
 
-Laying 10 mines on 81 cells sounds easy: pick a random cell, put a mine there if it has none, repeat until there are 10. EuroMines did exactly that. It works, but it has two problems. On a nearly full field the loop keeps picking cells that are already taken. And the rule "not on or around the first cell" turns into more retries.
+Laying 10 mines on 81 cells sounds easy: pick a random cell, put a mine there if it has none, repeat until there are 10. Many programs do exactly that. It works, but it has two problems. On a nearly full field the loop keeps picking cells that are already taken. And the rule "not on or around the first cell" turns into more retries.
 
 A cleaner way is to **shuffle**. Make a list of all cells that may receive a mine, shuffle it, and take the first ten. We do not even need to shuffle all of it: the *Fisher–Yates* shuffle can stop after the first ten places.
 
@@ -101,7 +101,7 @@ The order matters:
 
 ### Flood fill without recursion
 
-Rule 3, the area opening, is a **flood fill**, like the paint bucket of a drawing program. The obvious version is recursive: open the cell, and if it is empty, call yourself for every neighbour. EuroMines did that.
+Rule 3, the area opening, is a **flood fill**, like the paint bucket of a drawing program. The obvious version is recursive: open the cell, and if it is empty, call yourself for every neighbour.
 
 The recursive version has a hidden danger: every call that has not finished yet takes a place on the **call stack**, which is limited. On a 30 × 16 field the open area can be hundreds of cells deep; on a larger custom field the program would end with a `StackOverflowError`. The robust version keeps its own list of cells still to visit:
 
@@ -162,7 +162,7 @@ The `Graphics` object is a pen for this component. Its coordinates start at the 
 Each cell is drawn at `x = column × cellSize`, `y = row × cellSize`. Closed cells get a raised 3D border from amade-commons (`AmadeUI.paintBevel`), open cells a flat background with a thin line. The colours come from `AmadeUI.theme()`, the desktop's current colour theme. When the user picks another theme in the Style Manager, amade-commons repaints all windows, `paintComponent` runs again, and the field takes the new colours without any code of ours.
 
 !!! tip "Cells that grow with the text"
-    `cellSize` is not a fixed 18 pixels as in EuroMines. The window computes it from the font size, about 1.7 times the height of the text. On a large screen with a large font, the field grows with it.
+    `cellSize` is not a fixed number of pixels. The window computes it from the font size, about 1.7 times the height of the text. On a large screen with a large font, the field grows with it.
 
 ### Drawing with shapes
 

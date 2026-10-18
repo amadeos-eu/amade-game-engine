@@ -27,8 +27,6 @@ The handbook grows with the games: a chapter is written when its game is finishe
 | 26 | **Blast** (Bomberman) | Two players on one keyboard, gamepads, timers, events, chain reactions |
 | 27 | **Jump** (platformer) | Scrolling camera, maps from the Tiled editor, gravity and jumping, parallax, saving progress |
 
-Several of these will be ports of the games in [EuroWorks](https://github.com/datazuul/euroworks) (Breakout, Asteroids, Invaders, Tetris and more) onto the engine, a good test of whether its API is any good.
-
 ### Part III: Strategy
 
 | Chapter | Game (in the style of) | New in the engine |

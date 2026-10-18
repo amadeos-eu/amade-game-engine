@@ -1,6 +1,6 @@
 # 2. How a Game Is Built
 
-A small game fits into one class: a window that paints the field, listens to the mouse and keeps the rules in a few fields. Many first games are written that way, and EuroMines, the ancestor of our Mines, was too. It works until you want to test the rules, change the look, add a second window or find a bug in a 900-line class.
+A small game fits into one class: a window that paints the field, listens to the mouse and keeps the rules in a few fields. Many first games are written that way. It works until you want to test the rules, change the look, add a second window or find a bug in a 900-line class.
 
 The amadeOS programs share one structure that avoids this. This chapter explains it with Mines as the example. You will meet the same packages in every game of this book and in every amadeOS application.
 
