@@ -1,0 +1,74 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+// JitPack publishes under com.github.<owner>; using the same coordinates locally lets a game's
+// composite build (includeBuild '../amade-game-engine') replace the JitPack dependency automatically.
+group = 'com.github.datazuul'
+version = '0.1.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+    withSourcesJar()
+    withJavadocJar()
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    // Theme, Motif look, start-up, XDG and i18n helpers; games get them through this library.
+    // With ../amade-commons checked out, settings.gradle builds that checkout instead (composite build).
+    api 'com.github.datazuul:amade-commons:fac730fed3'
+
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.17'
+}
+
+tasks.withType(Javadoc).configureEach {
+    options.addStringOption('Xdoclint:none', '-quiet')
+}
+
+test {
+    useJUnitPlatform()
+    // Tests compare English texts, whatever the language of the build machine.
+    systemProperty 'user.language', 'en'
+    systemProperty 'user.country', 'US'
+}
+
+jar {
+    manifest {
+        attributes(
+            'Implementation-Title': 'amade-game-engine',
+            'Implementation-Version': project.version,
+            'Automatic-Module-Name': 'eu.amadeos.gameengine'
+        )
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = 'amade-game-engine'
+            from components.java
+            pom {
+                name = 'amade-game-engine'
+                description = 'Game library for amadeOS games: high scores, game menu, later loop, rendering and input'
+                url = 'https://github.com/datazuul/amade-game-engine'
+                licenses {
+                    license {
+                        name = 'EUPL-1.2'
+                        url = 'https://interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12'
+                    }
+                }
+            }
+        }
+    }
+}
