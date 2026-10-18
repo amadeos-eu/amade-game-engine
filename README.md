@@ -7,11 +7,14 @@
 
 ## What it holds
 
-The library grows game by game: each game adds what it needs and leaves it here for the next one. So far:
+The library grows game by game: each game adds what it needs and leaves it here for the next one. So far (from Mines and Solitaire):
 
 - **High scores** (`eu.amadeos.gameengine.score`): the best ten results per table (difficulty or variant), lower or higher wins. Stored in `$XDG_DATA_HOME/amadeos/games/<game>/<table>.scores` (usually `~/.local/share/...`) as plain text, one entry per line. The name typed last time is offered again (`PlayerName`, in the game's configuration directory).
 - **Standard menu entries** (`eu.amadeos.gameengine.swing.GameMenus`): *Game → New Game* (F2), *High Scores...*, *Exit* (Ctrl+Q), *Help → About*, with the same texts and mnemonics in every game.
 - **High-score dialogs** (`HighScoreDialog`): the tables as tabs, and the question for the name after a good result.
+- **Undo and redo** (`eu.amadeos.gameengine.undo.History`): snapshots of the game state before each move; *Undo* (Ctrl+Z) and *Redo* (Ctrl+Y) in `GameMenus`.
+- **Animation** (`eu.amadeos.gameengine.anim`): `Easing` curves and `Tween`, the timing of one animation, without Swing; `swing.Animator` calls a frame function about 60 times a second while something moves.
+- **Game clock** (`eu.amadeos.gameengine.time.GameClock`): time of one game, with a replaceable time source for tests.
 - Texts in English, Deutsch, Français, Español and Italiano.
 
 Theme, Motif look, start-up, XDG directories and i18n come from [amade-commons](https://github.com/datazuul/amade-commons), which this library brings along.

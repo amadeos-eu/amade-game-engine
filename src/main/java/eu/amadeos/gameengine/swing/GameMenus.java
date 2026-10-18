@@ -46,6 +46,16 @@ public final class GameMenus {
         return item("menu.game.new", "game-new", KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), action);
     }
 
+    /** Ctrl+Z; enable it with {@link JMenuItem#setEnabled} while there is something to undo. */
+    public JMenuItem undo(Runnable action) {
+        return item("menu.game.undo", "game-undo", KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK), action);
+    }
+
+    /** Ctrl+Y. */
+    public JMenuItem redo(Runnable action) {
+        return item("menu.game.redo", "game-redo", KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK), action);
+    }
+
     public JMenuItem highScores(Runnable action) {
         return item("menu.game.scores", "game-scores", null, action);
     }
