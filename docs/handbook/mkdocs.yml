@@ -66,4 +66,6 @@ nav:
   - "Part I: Games That Wait for You":
       - 10. Mines: 10-mines.md
       - 11. Solitaire: 11-solitaire.md
+  - "Part II: Action":
+      - 20. Paddle: 20-paddle.md
   - The Road Ahead: roadmap.md

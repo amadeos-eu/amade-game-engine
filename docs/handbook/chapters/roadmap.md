@@ -11,6 +11,7 @@ The handbook grows with the games: a chapter is written when its game is finishe
 | [2. How a Game Is Built](02-structure.md) | | |
 | [10. Mines](10-mines.md) | Mines | High scores, game menus, high-score dialogs |
 | [11. Solitaire](11-solitaire.md) | Solitaire (Klondike) | Undo and redo, animation (easing, tweens, an animation timer), the game clock |
+| [20. Paddle](20-paddle.md) | Paddle (Pong) | Game loop with a fixed time step, active rendering in logical coordinates, keyboard input and controls, scenes |
 
 ## Planned
 
@@ -18,13 +19,12 @@ The handbook grows with the games: a chapter is written when its game is finishe
 
 | Chapter | Game (in the style of) | New in the engine |
 |---|---|---|
-| 20 | **Paddle** (Pong) | Game loop with a fixed time step, `BufferStrategy`, keyboard input, scenes (menu, game, pause), scaled low-resolution drawing, full screen |
 | 21 | **Bricks** (Breakout) | Sprites, rectangle collision, levels from files, sound effects |
 | 22 | **Snake** | A tick for the rules apart from the frame rate, deterministic random numbers |
 | 23 | **Rocks** (Asteroids) | Vectors, rotation, wrap-around, object pools, circle collision, particles |
 | 24 | **Swarm** (Galaga) | Sprite sheets and animation, entities and components, flight paths, waves, spatial grid, music |
 | 25 | **Maze** (Pac-Man) | Tile maps, movement on a grid, AI as state machines, breadth-first search and A* |
-| 26 | **Blast** (Bomberman) | Two players on one keyboard, gamepads, timers, events, chain reactions |
+| 26 | **Blast** (Bomberman) | Up to four players, gamepads, timers, events, chain reactions |
 | 27 | **Jump** (platformer) | Scrolling camera, maps from the Tiled editor, gravity and jumping, parallax, saving progress |
 
 ### Part III: Strategy
