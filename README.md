@@ -16,6 +16,10 @@ The library grows game by game: each game adds what it needs and leaves it here 
 
 Theme, Motif look, start-up, XDG directories and i18n come from [amade-commons](https://github.com/datazuul/amade-commons), which this library brings along.
 
+## Handbook
+
+The [Amade Game Developer's Handbook](https://datazuul.github.io/amade-game-engine/) teaches game programming with this engine, game by game. Its sources are in [`docs/handbook`](docs/handbook).
+
 ## Planned
 
 In the order the games need them: game loop with a fixed time step, rendering with `BufferStrategy`, keyboard input (with X11 auto-repeat filtered), scenes; then sprites, collision, sound mixer, tile maps, camera, pathfinding. Game rules stay plain Java without AWT, so they can be tested headless.

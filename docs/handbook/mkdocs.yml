@@ -1,0 +1,68 @@
+site_name: Amade Game Developer's Handbook
+site_description: Learn game programming in Java by building the amadeOS games and their engine, one game at a time.
+site_author: datazuul
+site_url: https://datazuul.github.io/amade-game-engine/
+repo_url: https://github.com/datazuul/amade-game-engine
+edit_uri: edit/main/docs/handbook/chapters/
+copyright: © 2026 datazuul.com · EUPL-1.2
+docs_dir: chapters
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.footer
+    - navigation.top
+    - toc.follow
+    - search.highlight
+    - content.code.copy
+    - content.action.edit
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue grey
+      accent: teal
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue grey
+      accent: teal
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.snippets:
+      # Code excerpts come from the game repositories, checked out next to amade-game-engine.
+      # Run mkdocs from docs/handbook; a missing file or section fails the build.
+      base_path: ["../../.."]
+      check_paths: true
+
+nav:
+  - Preface: index.md
+  - Getting Started:
+      - 0. Setting Up: 00-setup.md
+      - 1. Why Our Own Engine: 01-why-own-engine.md
+      - 2. How a Game Is Built: 02-structure.md
+  - "Part I: Games That Wait for You":
+      - 10. Mines: 10-mines.md
+  - The Road Ahead: roadmap.md

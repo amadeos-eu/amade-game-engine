@@ -1,0 +1,58 @@
+name: Handbook
+
+# Builds the Amade Game Developer's Handbook (docs/handbook) and publishes it on GitHub Pages.
+# The code excerpts come from the game repositories, checked out next to this one at the commits
+# below, the state the chapters describe. Raise a commit when a chapter is updated for it.
+
+on:
+  push:
+    branches: [main]
+    paths: ['docs/handbook/**', '.github/workflows/handbook.yml']
+  pull_request:
+    paths: ['docs/handbook/**', '.github/workflows/handbook.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  MINES_COMMIT: 523b53b
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: amade-game-engine
+      - uses: actions/checkout@v7
+        with:
+          repository: datazuul/amade-mines-game
+          ref: ${{ env.MINES_COMMIT }}
+          path: amade-mines-game
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Install MkDocs
+        run: pip install -r amade-game-engine/docs/handbook/requirements.txt
+      # Strict: a broken link or a missing code excerpt fails the build.
+      - name: Build
+        working-directory: amade-game-engine/docs/handbook
+        run: mkdocs build --strict --site-dir "$GITHUB_WORKSPACE/site"
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
