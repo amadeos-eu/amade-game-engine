@@ -7,7 +7,7 @@
 
 ## What it holds
 
-The library grows game by game: each game adds what it needs and leaves it here for the next one. So far (from Mines and Solitaire):
+The library grows game by game: each game adds what it needs and leaves it here for the next one. So far (from Mines, Solitaire and Paddle):
 
 - **High scores** (`eu.amadeos.gameengine.score`): the best ten results per table (difficulty or variant), lower or higher wins. Stored in `$XDG_DATA_HOME/amadeos/games/<game>/<table>.scores` (usually `~/.local/share/...`) as plain text, one entry per line. The name typed last time is offered again (`PlayerName`, in the game's configuration directory).
 - **Standard menu entries** (`eu.amadeos.gameengine.swing.GameMenus`): *Game → New Game* (F2), *High Scores...*, *Exit* (Ctrl+Q), *Help → About*, with the same texts and mnemonics in every game.
@@ -15,6 +15,10 @@ The library grows game by game: each game adds what it needs and leaves it here 
 - **Undo and redo** (`eu.amadeos.gameengine.undo.History`): snapshots of the game state before each move; *Undo* (Ctrl+Z) and *Redo* (Ctrl+Y) in `GameMenus`.
 - **Animation** (`eu.amadeos.gameengine.anim`): `Easing` curves and `Tween`, the timing of one animation, without Swing; `swing.Animator` calls a frame function about 60 times a second while something moves.
 - **Game clock** (`eu.amadeos.gameengine.time.GameClock`): time of one game, with a replaceable time source for tests.
+- **Game loop** (`eu.amadeos.gameengine.loop`): `GameLoop` runs commands, fixed update steps and frames on a thread of its own; `FixedStep` is its arithmetic, tested without a thread.
+- **Drawing** (`swing.GameCanvas`): active rendering with `BufferStrategy` in fixed logical coordinates, scaled to the window with black bars; unused keys reach Swing's menu shortcuts.
+- **Keyboard** (`eu.amadeos.gameengine.input`): `KeyState` (held keys, presses between two looks, X11 key repeat filtered), `Keyboard` (the AWT side, thread-safe), `Controls` (keys mapped to a game's actions).
+- **Scenes** (`eu.amadeos.gameengine.scene`): `Scene` and `SceneStack` (only the top scene moves, all are drawn: a pause screen over a frozen match).
 - Texts in English, Deutsch, Français, Español and Italiano.
 
 Theme, Motif look, start-up, XDG directories and i18n come from [amade-commons](https://github.com/datazuul/amade-commons), which this library brings along.
@@ -25,7 +29,7 @@ The [Amade Game Developer's Handbook](https://datazuul.github.io/amade-game-engi
 
 ## Planned
 
-In the order the games need them: game loop with a fixed time step, rendering with `BufferStrategy`, keyboard input (with X11 auto-repeat filtered), scenes; then sprites, collision, sound mixer, tile maps, camera, pathfinding. Game rules stay plain Java without AWT, so they can be tested headless.
+In the order the games need them: sprites, collision, sound mixer, tile maps, camera, pathfinding. Game rules stay plain Java without AWT, so they can be tested headless.
 
 ## Using it
 
