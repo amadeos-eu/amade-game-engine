@@ -7,7 +7,7 @@
 
 ## What it holds
 
-The library grows game by game: each game adds what it needs and leaves it here for the next one. So far (from Mines, Solitaire, Paddle, Bricks, Snake, Rocks and Swarm):
+The library grows game by game: each game adds what it needs and leaves it here for the next one. So far (from Mines, Solitaire, Paddle, Bricks, Snake, Rocks, Swarm and Maze):
 
 - **High scores** (`eu.amadeos.gameengine.score`): the best ten results per table (difficulty or variant), lower or higher wins. Stored in `$XDG_DATA_HOME/amadeos/games/<game>/<table>.scores` (usually `~/.local/share/...`) as plain text, one entry per line. The name typed last time is offered again (`PlayerName`, in the game's configuration directory).
 - **Standard menu entries** (`eu.amadeos.gameengine.swing.GameMenus`): *Game → New Game* (F2), *High Scores...*, *Exit* (Ctrl+Q), *Help → About*, with the same texts and mnemonics in every game.
@@ -27,6 +27,9 @@ The library grows game by game: each game adds what it needs and leaves it here 
 - **Outlines** (`eu.amadeos.gameengine.shape.Outline`): figures of straight lines, turned, scaled and drawn without creating objects.
 - **Object pools** (`eu.amadeos.gameengine.pool.Pool`): a fixed number of reusable objects, such as four shots, made once.
 - **Collision** (`eu.amadeos.gameengine.collision`): axis-aligned boxes, the swept test of a moving box against a resting one, and circles, also across the edge of a field without edges. `Grid` finds the things near a place without looking at all things.
+- **Tile maps** (`eu.amadeos.gameengine.tile`): `TileMap` (a grid of tiles, read from the rows of a data file, with wrapping steps and the neighbour mask for walls that join up), `Direction` and `Cell`, and `Walker`, which walks from tile centre to tile centre and asks at each centre which way to go.
+- **State machines** (`eu.amadeos.gameengine.ai.StateMachine`): the states of a character as an enum, the allowed changes between them, the time in the current state and a listener for each change.
+- **Pathfinding** (`eu.amadeos.gameengine.path`): `DistanceMap` (breadth-first search from one or more goals: the distance of every tile and the step downhill) and `AStar` (the cheapest way between two tiles, with costs per tile and a guess that knows about wrapping).
 - **Particles** (`eu.amadeos.gameengine.fx.Particles`): hundreds of splinters and sparks in arrays, without creating objects while the game runs.
 - **Sound** (`eu.amadeos.gameengine.audio`): sound effects made from tones (`Sound`), several at once through one `Mixer` thread, and music on a voice of its own, once or in a loop; tunes written in the Music Macro Language of the home computers (`Tune`), voices mixed into one sound. Silent without a sound card.
 - **Keyboard and mouse** (`eu.amadeos.gameengine.input`): `KeyState` (held keys, presses between two looks, X11 key repeat filtered), `Keyboard` (the AWT side, thread-safe), `Controls` (keys mapped to a game's actions), `Mouse` (position in logical coordinates, clicks between two looks, held buttons; `GameCanvas.toLogical` maps like the render mode draws).
@@ -41,7 +44,7 @@ The [Amade Game Developer's Handbook](https://datazuul.github.io/amade-game-engi
 
 ## Planned
 
-In the order the games need them: tile maps, pathfinding, gamepads, timers and events, camera. Game rules stay plain Java without AWT, so they can be tested headless.
+In the order the games need them: gamepads, timers and events, camera. Game rules stay plain Java without AWT, so they can be tested headless.
 
 ## Using it
 
