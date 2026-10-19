@@ -28,4 +28,17 @@ class MouseTest {
         assertFalse(mouse.wasPressed(MouseEvent.BUTTON1));
         assertEquals(100, mouse.x());   // the position stays
     }
+
+    @Test
+    void aHeldButtonIsDownUntilReleased() {
+        mouse.pressed(MouseEvent.BUTTON3);
+        mouse.poll();
+        assertTrue(mouse.isDown(MouseEvent.BUTTON3));
+        mouse.poll();
+        assertTrue(mouse.isDown(MouseEvent.BUTTON3), "still held");
+        assertFalse(mouse.wasPressed(MouseEvent.BUTTON3), "but pressed only once");
+        mouse.released(MouseEvent.BUTTON3);
+        mouse.poll();
+        assertFalse(mouse.isDown(MouseEvent.BUTTON3));
+    }
 }

@@ -22,6 +22,7 @@ env:
   PADDLE_COMMIT: d46a718b81ba36c4d567766c50f300655b86cf9f
   BRICKS_COMMIT: 1519d96fa8f5caeee40fa8f7a5b034ae39e98b6e
   SNAKE_COMMIT: 17ae70ec4d546683ed5d2a3dbf712b2c17cd5f71
+  ROCKS_COMMIT: eb73d9ea71d746dc56ec03372cda9ae1f4961c18
 
 jobs:
   build:
@@ -55,6 +56,11 @@ jobs:
           repository: datazuul/amade-snake-game
           ref: ${{ env.SNAKE_COMMIT }}
           path: amade-snake-game
+      - uses: actions/checkout@v7
+        with:
+          repository: datazuul/amade-rocks-game
+          ref: ${{ env.ROCKS_COMMIT }}
+          path: amade-rocks-game
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
