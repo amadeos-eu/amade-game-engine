@@ -41,6 +41,8 @@ test {
     // Tests compare English texts, whatever the language of the build machine.
     systemProperty 'user.language', 'en'
     systemProperty 'user.country', 'US'
+    // XInput is called through java.lang.foreign; without this, Java warns about it.
+    jvmArgs '--enable-native-access=ALL-UNNAMED'
 }
 
 jar {

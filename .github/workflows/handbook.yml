@@ -25,6 +25,7 @@ env:
   ROCKS_COMMIT: eb73d9ea71d746dc56ec03372cda9ae1f4961c18
   SWARM_COMMIT: e5c1b2e2953c68f8706993843d546cd73f9614f2
   MAZE_COMMIT: e5ad67702cfa42cd7216041294c9c31a48508c71
+  BLAST_COMMIT: 05cfb6c9ade2f8fb63852d2b8c86dac55cce2840
 
 jobs:
   build:
@@ -73,6 +74,11 @@ jobs:
           repository: datazuul/amade-maze-game
           ref: ${{ env.MAZE_COMMIT }}
           path: amade-maze-game
+      - uses: actions/checkout@v7
+        with:
+          repository: datazuul/amade-blast-game
+          ref: ${{ env.BLAST_COMMIT }}
+          path: amade-blast-game
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
