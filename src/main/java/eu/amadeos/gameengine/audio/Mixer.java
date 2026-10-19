@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Plays sound effects, several at once. A brick breaks while the ball hits the wall: both sounds must be
@@ -20,6 +21,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * block. For every block it adds up the samples of all sounds that are playing (that is all mixing is) and
  * clips the sum to the range a sample has. {@link #play} only puts the sound in a queue; the game loop never
  * waits for the sound card.
+ *
+ * <p>Besides the effects, the mixer plays one piece of <i>music</i>, once or again and again, on a voice of
+ * its own that no effect can push out. Muting turns the music down, it does not stop it: switched on again,
+ * it goes on where it would be.
  *
  * <p>Without a sound card (a server, a test machine) the mixer stays silent and the game plays on.
  */
@@ -43,8 +48,16 @@ public final class Mixer implements AutoCloseable {
         }
     }
 
+    /** A change of the music, from the game's thread to the mixer's; {@code sound} null stops it. */
+    private record MusicRequest(Sound sound, boolean loop) {
+    }
+
     private final Queue<Sound> requests = new ConcurrentLinkedQueue<>();
     private final List<Voice> voices = new ArrayList<>();
+    private final AtomicReference<MusicRequest> musicRequest = new AtomicReference<>();
+    /** The music playing, on the mixer thread only; {@code null} for none. */
+    private Voice music;
+    private boolean musicLoops;
     private volatile boolean running;
     private volatile boolean muted;
     private SourceDataLine line;
@@ -83,6 +96,21 @@ public final class Mixer implements AutoCloseable {
     }
     // --8<-- [end:play]
 
+    // --8<-- [start:music]
+    /**
+     * Plays {@code music} instead of the music playing now, from its start; with {@code loop}, again and
+     * again until {@link #stopMusic()}. Safe to call from any thread, never waits.
+     */
+    public void playMusic(Sound music, boolean loop) {
+        musicRequest.set(new MusicRequest(music, loop));
+    }
+
+    /** Stops the music at once. */
+    public void stopMusic() {
+        musicRequest.set(new MusicRequest(null, false));
+    }
+    // --8<-- [end:music]
+
     public boolean muted() {
         return muted;
     }
@@ -116,17 +144,34 @@ public final class Mixer implements AutoCloseable {
             if (voices.size() == VOICES) voices.removeFirst();
             voices.add(new Voice(s));
         }
+        MusicRequest change = musicRequest.getAndSet(null);
+        if (change != null) {
+            music = change.sound() == null ? null : new Voice(change.sound());
+            musicLoops = change.loop();
+        }
         for (int i = 0; i < block.length; i++) {
             int sum = 0;
             for (Voice v : voices) {
                 if (v.position < v.sound.length()) sum += v.sound.sample(v.position++);
             }
+            sum += music();
             // Two loud sounds together exceed what 16 bits can hold: clip instead of wrapping around.
             block[i] = (short) Math.clamp(sum, Short.MIN_VALUE, Short.MAX_VALUE);
         }
         voices.removeIf(v -> v.position >= v.sound.length());
     }
     // --8<-- [end:mix]
+
+    /** The music's next sample, silent while muted; at its end it starts again or stops. */
+    private int music() {
+        if (music == null) return 0;
+        int sample = music.sound.length() == 0 ? 0 : music.sound.sample(music.position);
+        if (++music.position >= music.sound.length()) {
+            if (musicLoops) music.position = 0;
+            else music = null;
+        }
+        return muted ? 0 : sample;
+    }
 
     // --8<-- [start:hiss]
     /**
@@ -143,6 +188,11 @@ public final class Mixer implements AutoCloseable {
         }
     }
     // --8<-- [end:hiss]
+
+    /** For tests: true while music plays, on the mixer thread. */
+    boolean playingMusic() {
+        return music != null;
+    }
 
     /** For tests: sounds playing or waiting. */
     int voices() {

@@ -71,6 +71,7 @@ nav:
       - 21. Bricks: 21-bricks.md
       - 22. Snake: 22-snake.md
       - 23. Rocks: 23-rocks.md
+      - 24. Swarm: 24-swarm.md
   - Appendices:
       - Java2D and X11 Pitfalls: appendix-java2d.md
   - The Road Ahead: roadmap.md

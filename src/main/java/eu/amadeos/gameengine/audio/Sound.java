@@ -67,6 +67,26 @@ public final class Sound {
         return new Sound(joined);
     }
 
+    // --8<-- [start:mix]
+    /**
+     * The sounds played at once, as one sound as long as the longest: the voices of a tune, melody and bass.
+     * The samples are added up and clipped, as the {@link Mixer} does while playing.
+     */
+    public static Sound mix(Sound... sounds) {
+        int n = 0;
+        for (Sound sound : sounds) n = Math.max(n, sound.samples.length);
+        short[] mixed = new short[n];
+        for (int i = 0; i < n; i++) {
+            int sum = 0;
+            for (Sound sound : sounds) {
+                if (i < sound.samples.length) sum += sound.samples[i];
+            }
+            mixed[i] = (short) Math.clamp(sum, Short.MIN_VALUE, Short.MAX_VALUE);
+        }
+        return new Sound(mixed);
+    }
+    // --8<-- [end:mix]
+
     public int length() {
         return samples.length;
     }

@@ -7,7 +7,7 @@
 
 ## What it holds
 
-The library grows game by game: each game adds what it needs and leaves it here for the next one. So far (from Mines, Solitaire, Paddle, Bricks, Snake and Rocks):
+The library grows game by game: each game adds what it needs and leaves it here for the next one. So far (from Mines, Solitaire, Paddle, Bricks, Snake, Rocks and Swarm):
 
 - **High scores** (`eu.amadeos.gameengine.score`): the best ten results per table (difficulty or variant), lower or higher wins. Stored in `$XDG_DATA_HOME/amadeos/games/<game>/<table>.scores` (usually `~/.local/share/...`) as plain text, one entry per line. The name typed last time is offered again (`PlayerName`, in the game's configuration directory).
 - **Standard menu entries** (`eu.amadeos.gameengine.swing.GameMenus`): *Game → New Game* (F2), *High Scores...*, *Exit* (Ctrl+Q), *Help → About*, with the same texts and mnemonics in every game.
@@ -19,13 +19,16 @@ The library grows game by game: each game adds what it needs and leaves it here 
 - **Random numbers that repeat** (`eu.amadeos.gameengine.random.SeededRandom`): the same seed gives the same numbers on every computer and Java version (SplitMix64, written out); `fork()` gives effects a generator of their own that never disturbs the rules'.
 - **Replays** (`eu.amadeos.gameengine.replay.Replay`): a game as its seed and the player's actions with their ticks, played back in order, as plain text.
 - **Drawing** (`swing.GameCanvas`): active rendering with `BufferStrategy` in fixed logical coordinates, scaled to the window with black bars; unused keys reach Swing's menu shortcuts. Two layers, the world and an overlay for score and texts; two render modes (`RenderMode`: direct, or pixel mode with whole factors and hard edges); a frame-time display (`loop.FrameTimes`, F12). Full screen with F11 (`FullScreen`).
-- **Sprites** (`eu.amadeos.gameengine.sprite.Sprite`): pictures with a size in logical coordinates, from image files or drawn in code, scaled once per screen size into compatible images.
+- **Sprites** (`eu.amadeos.gameengine.sprite.Sprite`): pictures with a size in logical coordinates, from image files or drawn in code, scaled once per screen size into compatible images; pixel art keeps hard edges. `SpriteSheet` cuts one image into many frames, `Animation` says which frame to show when (in a loop, once, or back and forth).
+- **Entities and components** (`eu.amadeos.gameengine.entity`): `Entity` (a thing made of components, looked up by their class), `Entities` (all of them, the walks of the systems over those with certain components, and changes that take effect between steps).
+- **Flight paths** (`eu.amadeos.gameengine.motion.FlightPath`): curves of cubic Bézier segments and lines, flown at an even speed by distance, mirrored and moved.
+- **Data files** (`eu.amadeos.gameengine.data.TextData`): a game's data as plain text, a line of words per thing, with errors that name the file and the line.
 - **Vectors and angles** (`eu.amadeos.gameengine.math`): `Vector` (an immutable 2D vector with rotation), `Angles` (the short way round between two angles), `Wrap` (a field without edges: wrapping, the shortest distance, drawing over an edge).
 - **Outlines** (`eu.amadeos.gameengine.shape.Outline`): figures of straight lines, turned, scaled and drawn without creating objects.
 - **Object pools** (`eu.amadeos.gameengine.pool.Pool`): a fixed number of reusable objects, such as four shots, made once.
-- **Collision** (`eu.amadeos.gameengine.collision`): axis-aligned boxes, the swept test of a moving box against a resting one, and circles, also across the edge of a field without edges.
+- **Collision** (`eu.amadeos.gameengine.collision`): axis-aligned boxes, the swept test of a moving box against a resting one, and circles, also across the edge of a field without edges. `Grid` finds the things near a place without looking at all things.
 - **Particles** (`eu.amadeos.gameengine.fx.Particles`): hundreds of splinters and sparks in arrays, without creating objects while the game runs.
-- **Sound** (`eu.amadeos.gameengine.audio`): sound effects made from tones (`Sound`), several at once through one `Mixer` thread; silent without a sound card.
+- **Sound** (`eu.amadeos.gameengine.audio`): sound effects made from tones (`Sound`), several at once through one `Mixer` thread, and music on a voice of its own, once or in a loop; tunes written in the Music Macro Language of the home computers (`Tune`), voices mixed into one sound. Silent without a sound card.
 - **Keyboard and mouse** (`eu.amadeos.gameengine.input`): `KeyState` (held keys, presses between two looks, X11 key repeat filtered), `Keyboard` (the AWT side, thread-safe), `Controls` (keys mapped to a game's actions), `Mouse` (position in logical coordinates, clicks between two looks, held buttons; `GameCanvas.toLogical` maps like the render mode draws).
 - **Scenes** (`eu.amadeos.gameengine.scene`): `Scene` and `SceneStack` (only the top scene moves, all are drawn: a pause screen over a frozen match).
 - Texts in English, Deutsch, Français, Español and Italiano.
@@ -38,7 +41,7 @@ The [Amade Game Developer's Handbook](https://datazuul.github.io/amade-game-engi
 
 ## Planned
 
-In the order the games need them: sprite sheets and animation, entities, tile maps, pathfinding, music, camera. Game rules stay plain Java without AWT, so they can be tested headless.
+In the order the games need them: tile maps, pathfinding, gamepads, timers and events, camera. Game rules stay plain Java without AWT, so they can be tested headless.
 
 ## Using it
 
