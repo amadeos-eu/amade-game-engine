@@ -426,9 +426,47 @@ The scene stack draws all worlds first, then all overlays, so a pause text lies 
 
 These rules, and the traps of Java2D on Linux behind them, are collected in the appendix [Java2D and X11 Pitfalls](appendix-java2d.md).
 
-## Step 8: Putting it together
+## Step 8: The mouse
 
-The running game has the same parts as Paddle: a loop, controls, scenes, and the `Arena` for the presenter. The play scene reads the keys, steps the game and passes the events to the effects; when the game ends, it hands the result to the Swing thread:
+A breakout game asks for the mouse: the hand moves, the paddle moves with it. Bricks can be played with both. The mouse steers the paddle, and a left click does what Enter or Space does: it starts a game, launches the ball, and continues after a pause or at the end.
+
+### Where is the mouse in the game?
+
+A mouse event says where the pointer is in the canvas, in the canvas's own units: 0 to 1920 across a full HD screen, say. The game thinks in 640 × 400. Between the two lie exactly the steps the canvas takes when it draws: the scale, the black bars, and in pixel mode a whole factor and whole-pixel offsets. So the conversion belongs to the canvas, and it does the same steps backwards:
+
+```java title="amade-game-engine · swing/GameCanvas.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/swing/GameCanvas.java:to-logical"
+```
+
+On a HiDPI screen the canvas's units are not its pixels, so the instance method first turns the event's units into pixels, as `toScreenPixels` does for drawing. A test checks both modes on a full HD screen: drawn directly, the picture is 2.7 times larger with bars of 96 pixels; in pixel mode it is twice as large with bars of 320 and 140 pixels.
+
+```java title="amade-game-engine · test/swing/GameCanvasTest.java"
+--8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/swing/GameCanvasTest.java:test-to-logical"
+```
+
+### The mouse as an input device
+
+For the game loop, the mouse is like the keyboard: the Swing thread reports what happens, the loop asks once per step. `Mouse` keeps the last position in logical coordinates and remembers moves and clicks until the next `poll`, so a short click between two steps is not lost:
+
+```java title="amade-game-engine · input/Mouse.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/input/Mouse.java:mouse"
+```
+
+A click into the canvas also gives it the keyboard focus, so after a click into the menu bar the keys reach the game again.
+
+### The paddle follows
+
+The rules get one new method, `Game.aim(x)`: the paddle's centre heads for `x`. It does not jump there. In each step it moves at most `Field.PADDLE_FOLLOW_SPEED`, 1600 units per second or about 13 units per step. That is fast enough to feel like a direct hold on the paddle, and slow enough that the paddle never jumps through a falling ball in one step: the collision rules of step 2 stay as they were. Whatever was used last steers. An arrow key forgets the mouse's aim, and the next move of the mouse sets it again.
+
+The window attaches the mouse to the canvas next to the keyboard (see `BricksWindow` above) and hides the pointer over the field: the paddle is the pointer. A test plays with the mouse alone:
+
+```java title="amade-bricks-game · test/ui/game/BricksGameTest.java"
+--8<-- "amade-bricks-game/src/test/java/eu/amadeos/games/bricks/ui/game/BricksGameTest.java:test-mouse"
+```
+
+## Step 9: Putting it together
+
+The running game has the same parts as Paddle: a loop, controls, scenes, and the `Arena` for the presenter. The play scene reads the keys and the mouse, steps the game and passes the events to the effects; when the game ends, it hands the result to the Swing thread:
 
 ```java title="amade-bricks-game · ui/game/BricksGame.java"
 --8<-- "amade-bricks-game/src/main/java/eu/amadeos/games/bricks/ui/game/BricksGame.java:play"
@@ -454,7 +492,7 @@ The title screen lets the computer play, as in Paddle. Its autopilot looks where
 
 <figure markdown>
 ![The start of a game](images/bricks/serve.png){ width="400" }
-<figcaption>The start of a level: the ball waits on the paddle until Space.</figcaption>
+<figcaption>The start of a level: the ball waits on the paddle until Space or a click.</figcaption>
 </figure>
 
 ## What moved into the engine
@@ -468,6 +506,7 @@ The title screen lets the computer play, as in Paddle. Its autopilot looks where
 | Frame times | `eu.amadeos.gameengine.loop.FrameTimes` | Measuring belongs in every game |
 | Render modes, the overlay, the frame-time display | `eu.amadeos.gameengine.swing.GameCanvas`, `RenderMode`, `GameMenus` | Pixel look and sharp text, in every game |
 | A scene's overlay | `eu.amadeos.gameengine.scene.Scene` | Score and texts over the world |
+| The mouse in logical coordinates | `eu.amadeos.gameengine.input.Mouse`, `GameCanvas.toLogical` | Pointing at the game, whatever the window size and render mode |
 
 What stays in the game: the field, the bricks and levels, the rules of the ball, the autopilot, the painters, the sounds and the scenes.
 
