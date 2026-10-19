@@ -46,7 +46,7 @@ Which is fastest depends on the driver. In our measurement for chapter 21 (Brick
 | OpenGL (software) | 77.4 ms |
 | X11 | 195.1 ms |
 
-With a real graphics card and a good OpenGL driver, the OpenGL pipeline can win, and with a bad one it can draw wrong pictures. Keep the default, and try the others with the benchmark when a game is too slow on a particular machine. On Windows the default is Direct3D, on macOS Metal.
+With a real graphics card and a good OpenGL driver, the OpenGL pipeline can win, and with a bad one it can draw wrong pictures. Keep the default, and try the others with the benchmark when a game is too slow on a particular machine. On Windows the default is Direct3D, on macOS Metal. Bricks on a Windows computer, 2560 × 1600, pixel mode, needed 6.5 ms per frame ([chapter 21](21-bricks.md#pixel-mode)).
 
 ## Screens
 

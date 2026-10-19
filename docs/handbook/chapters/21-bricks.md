@@ -379,6 +379,9 @@ In pixel mode the world costs 256,000 pixels to draw on any screen; only the fin
 | 1920 × 1080 | 5.9 ms | 4.0 ms |
 | 2560 × 1600 | 10.9 ms | 10.2 ms |
 | 3840 × 2160 | 19.0 ms | 16.9 ms |
+| 2560 × 1600, Windows with a graphics card | not measured | 6.5 ms |
+
+The last row is the same benchmark on real hardware: a Windows computer, where Java2D draws through Direct3D on the graphics card, with a 2560 × 1600 screen in pixel mode, enlarged three times. The frame-time display read 6.5 ms on average and 7.0 ms at most, at 62 frames per second. That is about a third less than Xvfb's 10.2 ms in the same mode and size, and the low maximum matters as much as the average: no frame of that second came close to the 16.7 ms budget. The 62 frames per second are the monitor's refresh rate, not the game's limit; a frame waits for the screen, and more than half of each frame's time is left over.
 
 The render modes are an engine enum, and `GameMenus.graphics` builds the submenu *Game → Graphics* for them:
 
