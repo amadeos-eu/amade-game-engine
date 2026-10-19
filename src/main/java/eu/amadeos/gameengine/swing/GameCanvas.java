@@ -13,6 +13,7 @@ import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferStrategy;
 import java.awt.image.VolatileImage;
 import java.util.Locale;
@@ -132,6 +133,36 @@ public final class GameCanvas extends Canvas {
         return Math.max(1, (int) Math.floor(scale(width, height, logicalWidth, logicalHeight) + 1e-9));
     }
     // --8<-- [end:whole-scale]
+
+    // --8<-- [start:to-logical]
+    /**
+     * Where a point of the component (a mouse event's {@code x} and {@code y}) lies in logical coordinates,
+     * placed exactly as the current render mode places the picture. Outside the picture, e.g. on a black
+     * bar, the result lies outside 0 … logical size.
+     */
+    public Point2D.Double toLogical(double x, double y) {
+        GraphicsConfiguration gc = getGraphicsConfiguration();
+        double ui = gc == null ? 1 : gc.getDefaultTransform().getScaleX();
+        return toLogical(x * ui, y * ui, (int) Math.round(getWidth() * ui), (int) Math.round(getHeight() * ui),
+                logicalWidth, logicalHeight, mode);
+    }
+
+    /** {@link #toLogical(double, double)} for a screen of {@code width} × {@code height} pixels. */
+    public static Point2D.Double toLogical(double x, double y, int width, int height,
+                                           int logicalWidth, int logicalHeight, RenderMode mode) {
+        if (mode == RenderMode.PIXEL) {
+            // Whole pixels, as in paintPixels: the picture starts at a whole pixel, each logical unit is n pixels.
+            int n = wholeScale(width, height, logicalWidth, logicalHeight);
+            int left = (width - logicalWidth * n) / 2;
+            int top = (height - logicalHeight * n) / 2;
+            return new Point2D.Double((x - left) / n, (y - top) / n);
+        }
+        double scale = scale(width, height, logicalWidth, logicalHeight);
+        double left = (width - logicalWidth * scale) / 2;
+        double top = (height - logicalHeight * scale) / 2;
+        return new Point2D.Double((x - left) / scale, (y - top) / scale);
+    }
+    // --8<-- [end:to-logical]
 
     // --8<-- [start:render]
     /** Draws one frame; called by the game loop on its thread. Does nothing while the canvas is not shown. */

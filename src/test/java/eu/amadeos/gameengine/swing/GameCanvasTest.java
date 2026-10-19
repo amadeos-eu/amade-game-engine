@@ -11,6 +11,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Robot;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
@@ -27,6 +28,28 @@ class GameCanvasTest {
     void close() throws Exception {
         if (frame != null) onEdt(frame::dispose);
     }
+
+    // --8<-- [start:test-to-logical]
+    @Test
+    void mousePositionsAreMappedLikeThePicture() {
+        // 1920 × 1080 drawn directly: scaled 2.7 times to 1728 × 1080, with black bars of 96 pixels left and right.
+        Point2D.Double p = GameCanvas.toLogical(96, 0, 1920, 1080, 640, 400, RenderMode.DIRECT);
+        assertEquals(0, p.x, 1e-9);
+        assertEquals(0, p.y, 1e-9);
+        p = GameCanvas.toLogical(960, 540, 1920, 1080, 640, 400, RenderMode.DIRECT);
+        assertEquals(320, p.x, 1e-9);
+        assertEquals(200, p.y, 1e-9);
+        // In pixel mode the same screen shows 2 × 640 × 400 = 1280 × 800, starting at 320, 140.
+        p = GameCanvas.toLogical(320, 140, 1920, 1080, 640, 400, RenderMode.PIXEL);
+        assertEquals(0, p.x, 1e-9);
+        assertEquals(0, p.y, 1e-9);
+        p = GameCanvas.toLogical(1599, 939, 1920, 1080, 640, 400, RenderMode.PIXEL);
+        assertEquals(639.5, p.x, 1e-9);
+        assertEquals(399.5, p.y, 1e-9);
+        // On a black bar: outside the field.
+        assertTrue(GameCanvas.toLogical(10, 540, 1920, 1080, 640, 400, RenderMode.PIXEL).x < 0);
+    }
+    // --8<-- [end:test-to-logical]
 
     // --8<-- [start:test-whole-scale]
     @Test

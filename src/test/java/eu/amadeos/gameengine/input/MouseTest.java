@@ -1,0 +1,31 @@
+package eu.amadeos.gameengine.input;
+
+import org.junit.jupiter.api.Test;
+
+import java.awt.event.MouseEvent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class MouseTest {
+    private final Mouse mouse = new Mouse();
+
+    @Test
+    void movesAndClicksCountUntilTheNextPoll() {
+        assertTrue(Double.isNaN(mouse.x()));
+        mouse.moved(100, 50);
+        mouse.pressed(MouseEvent.BUTTON1);
+        assertFalse(mouse.wasMoved());   // not before the poll
+        mouse.poll();
+        assertTrue(mouse.wasMoved());
+        assertTrue(mouse.wasPressed(MouseEvent.BUTTON1));
+        assertFalse(mouse.wasPressed(MouseEvent.BUTTON3));
+        assertEquals(100, mouse.x());
+        assertEquals(50, mouse.y());
+        mouse.poll();
+        assertFalse(mouse.wasMoved());
+        assertFalse(mouse.wasPressed(MouseEvent.BUTTON1));
+        assertEquals(100, mouse.x());   // the position stays
+    }
+}

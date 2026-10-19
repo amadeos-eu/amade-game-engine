@@ -21,7 +21,7 @@ The library grows game by game: each game adds what it needs and leaves it here 
 - **Collision** (`eu.amadeos.gameengine.collision`): axis-aligned boxes and the swept test of a moving box against a resting one.
 - **Particles** (`eu.amadeos.gameengine.fx.Particles`): hundreds of splinters and sparks in arrays, without creating objects while the game runs.
 - **Sound** (`eu.amadeos.gameengine.audio`): sound effects made from tones (`Sound`), several at once through one `Mixer` thread; silent without a sound card.
-- **Keyboard** (`eu.amadeos.gameengine.input`): `KeyState` (held keys, presses between two looks, X11 key repeat filtered), `Keyboard` (the AWT side, thread-safe), `Controls` (keys mapped to a game's actions).
+- **Keyboard and mouse** (`eu.amadeos.gameengine.input`): `KeyState` (held keys, presses between two looks, X11 key repeat filtered), `Keyboard` (the AWT side, thread-safe), `Controls` (keys mapped to a game's actions), `Mouse` (position in logical coordinates, clicks between two looks; `GameCanvas.toLogical` maps like the render mode draws).
 - **Scenes** (`eu.amadeos.gameengine.scene`): `Scene` and `SceneStack` (only the top scene moves, all are drawn: a pause screen over a frozen match).
 - Texts in English, Deutsch, Français, Español and Italiano.
 
