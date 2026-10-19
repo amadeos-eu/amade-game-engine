@@ -74,6 +74,7 @@ nav:
       - 24. Swarm: 24-swarm.md
       - 25. Maze: 25-maze.md
       - 26. Blast: 26-blast.md
+      - 27. Jump: 27-jump.md
   - Appendices:
       - Java2D and X11 Pitfalls: appendix-java2d.md
   - The Road Ahead: roadmap.md
