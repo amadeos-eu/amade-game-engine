@@ -245,6 +245,16 @@ Mixing itself is addition. Two sounds at once are the sum of their samples. Two 
 
 The latency of this design is the line's buffer, four blocks or 46 ms at most, usually less. Players notice delays from about 50 ms, so this is enough for effects. Music, which the roadmap brings in Swarm, can reuse the same mixer.
 
+Between the effects the mixer writes silence, and pure silence turned out to be a trap. Some wireless headsets and their dongles switch off after a few seconds of zeros, and they take ten seconds or more to wake up again. On the title screen there are only zeros, so the first sounds of every game got lost. A test program that played a blip after 20 seconds of zeros was never heard; the same program with one or two steps of noise added (out of 32768) played every blip. The mixer therefore adds this hiss to every block. Nobody can hear it, but the line is never silent:
+
+```java title="amade-game-engine · audio/Mixer.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/audio/Mixer.java:hiss"
+```
+
+```java title="amade-game-engine · test/audio/MixerTest.java"
+--8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/audio/MixerTest.java:test-hiss"
+```
+
 ## Step 7: How fast is it?
 
 So far everything in Bricks worked on the first try in a window. Then full screen on a large monitor: the game felt sluggish. Before changing anything, find out *what* is slow, and by how much. Programmers are notoriously bad at guessing where the time goes, and a guess that turns out wrong costs a day of work for nothing. This section shows that twice.

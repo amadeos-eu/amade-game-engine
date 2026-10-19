@@ -31,6 +31,27 @@ class MixerTest {
     }
     // --8<-- [end:test-mix]
 
+    // --8<-- [start:test-hiss]
+    @Test
+    void silenceIsNeverPureButFarBelowHearing() {
+        Mixer mixer = new Mixer();
+        short[] block = new short[Mixer.BLOCK];
+        mixer.mix(block);
+        mixer.hiss(block);
+        int loudest = 0;
+        int zeros = 0;
+        for (short s : block) {
+            loudest = Math.max(loudest, Math.abs(s));
+            if (s == 0) zeros++;
+        }
+        assertTrue(loudest <= 2, "inaudible: " + loudest);
+        assertTrue(zeros < Mixer.BLOCK / 2, "mostly not zero: " + zeros);
+        block[0] = Short.MAX_VALUE;
+        mixer.hiss(block);
+        assertTrue(block[0] >= Short.MAX_VALUE - 1, "clipped, not wrapped around");
+    }
+    // --8<-- [end:test-hiss]
+
     @Test
     void tooManySoundsReplaceTheOldest() {
         Mixer mixer = new Mixer();
