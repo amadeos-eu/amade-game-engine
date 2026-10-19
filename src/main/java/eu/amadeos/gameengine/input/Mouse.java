@@ -15,6 +15,7 @@ import java.awt.geom.Point2D;
  * mouse.poll();
  * if (mouse.wasMoved()) paddle.aim(mouse.x());
  * if (mouse.wasPressed(MouseEvent.BUTTON1)) launch();
+ * if (mouse.isDown(MouseEvent.BUTTON3)) thrust();
  * </pre>
  */
 // --8<-- [start:mouse]
@@ -25,6 +26,8 @@ public final class Mouse {
     private boolean moved;
     private int pressedSincePoll;   // one bit per button
     private int pressed;
+    private int downNow;     // one bit per button, as the Swing thread last saw it
+    private int down;
 
     /** Listens to the canvas; positions are converted the way the canvas currently draws. */
     public void attach(GameCanvas canvas) {
@@ -45,6 +48,11 @@ public final class Mouse {
                 canvas.requestFocusInWindow();   // a click into the game gives the keys to the game, too
                 pressed(e.getButton());
             }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                released(e.getButton());
+            }
         };
         canvas.addMouseListener(listener);
         canvas.addMouseMotionListener(listener);
@@ -57,13 +65,21 @@ public final class Mouse {
     }
 
     public synchronized void pressed(int button) {
-        if (button > 0 && button < 32) pressedSincePoll |= 1 << button;
+        if (button > 0 && button < 32) {
+            pressedSincePoll |= 1 << button;
+            downNow |= 1 << button;
+        }
+    }
+
+    public synchronized void released(int button) {
+        if (button > 0 && button < 32) downNow &= ~(1 << button);
     }
 
     /** Call once per update step on the game loop thread, before asking. */
     public synchronized void poll() {
         moved = movedSincePoll;
         pressed = pressedSincePoll;
+        down = downNow;
         movedSincePoll = false;
         pressedSincePoll = 0;
     }
@@ -85,6 +101,11 @@ public final class Mouse {
     /** True if the button ({@link MouseEvent#BUTTON1} …) went down between the last two polls. */
     public synchronized boolean wasPressed(int button) {
         return button > 0 && button < 32 && (pressed & 1 << button) != 0;
+    }
+
+    /** True if the button was held down at the last poll: for actions that last as long as it is held. */
+    public synchronized boolean isDown(int button) {
+        return button > 0 && button < 32 && (down & 1 << button) != 0;
     }
 }
 // --8<-- [end:mouse]
