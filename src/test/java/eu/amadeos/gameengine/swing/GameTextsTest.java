@@ -25,7 +25,7 @@ class GameTextsTest {
     /** The standard entries of the Game menu leave each other's letters alone in every language. */
     @Test
     void mnemonicsOfTheGameMenuAreUnique() {
-        List<String> keys = List.of("menu.game.new", "menu.game.undo", "menu.game.redo", "menu.game.scores",
+        List<String> keys = List.of("menu.game.new", "menu.game.undo", "menu.game.redo", "menu.game.full-screen", "menu.game.scores",
                 "menu.game.exit");
         Map<String, String> clashes = new HashMap<>();
         for (Language language : Language.values()) {

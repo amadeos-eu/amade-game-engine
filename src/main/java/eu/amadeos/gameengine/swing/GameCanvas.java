@@ -34,6 +34,8 @@ public final class GameCanvas extends Canvas {
     private final int logicalWidth;
     private final int logicalHeight;
     private final Painter painter;
+    /** Held while a frame is drawn, so the native window cannot vanish in the middle of one. */
+    private final Object frameLock = new Object();
 
     public GameCanvas(int logicalWidth, int logicalHeight, Painter painter) {
         this.logicalWidth = logicalWidth;
@@ -69,28 +71,40 @@ public final class GameCanvas extends Canvas {
     // --8<-- [start:render]
     /** Draws one frame; called by the game loop on its thread. Does nothing while the canvas is not shown. */
     public void render(double alpha) {
-        if (!isDisplayable() || getWidth() <= 0 || getHeight() <= 0) return;
-        BufferStrategy buffers = getBufferStrategy();
-        if (buffers == null) {
-            createBufferStrategy(2);
-            return;
-        }
-        // The buffers live in video memory and can be lost (another program, a mode switch): draw again.
-        do {
+        synchronized (frameLock) {
+            if (!isDisplayable() || getWidth() <= 0 || getHeight() <= 0) return;
+            BufferStrategy buffers = getBufferStrategy();
+            if (buffers == null) {
+                createBufferStrategy(2);
+                return;
+            }
+            // The buffers live in video memory and can be lost (another program, a mode switch): draw again.
             do {
-                Graphics2D g = (Graphics2D) buffers.getDrawGraphics();
-                try {
-                    paintScaled(g, alpha);
-                } finally {
-                    g.dispose();
-                }
-            } while (buffers.contentsRestored());
-            buffers.show();
-        } while (buffers.contentsLost());
-        // Without this, X11 may collect frames and show them in bursts.
-        Toolkit.getDefaultToolkit().sync();
+                do {
+                    Graphics2D g = (Graphics2D) buffers.getDrawGraphics();
+                    try {
+                        paintScaled(g, alpha);
+                    } finally {
+                        g.dispose();
+                    }
+                } while (buffers.contentsRestored());
+                buffers.show();
+            } while (buffers.contentsLost());
+            // Without this, X11 may collect frames and show them in bursts.
+            Toolkit.getDefaultToolkit().sync();
+        }
     }
     // --8<-- [end:render]
+
+    /**
+     * Runs a change on the Swing thread that takes the canvas off the screen for a moment, such as
+     * {@link FullScreen}'s switch. The game loop draws no frame meanwhile and continues with new buffers.
+     */
+    public void withoutFrames(Runnable change) {
+        synchronized (frameLock) {
+            change.run();
+        }
+    }
 
     // --8<-- [start:scaled]
     private void paintScaled(Graphics2D g, double alpha) {

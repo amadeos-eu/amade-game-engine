@@ -56,6 +56,11 @@ public final class GameMenus {
         return item("menu.game.redo", "game-redo", KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK), action);
     }
 
+    /** F11; the action is usually {@link FullScreen#toggle()}. */
+    public JMenuItem fullScreen(Runnable action) {
+        return item("menu.game.full-screen", "game-full-screen", KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0), action);
+    }
+
     public JMenuItem highScores(Runnable action) {
         return item("menu.game.scores", "game-scores", null, action);
     }
