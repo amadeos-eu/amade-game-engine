@@ -10,7 +10,7 @@ Part I's games waited for you. Nothing in Mines or Solitaire happened until you 
 
 !!! abstract "What you will learn"
     - The **game loop**: fixed time steps, why they matter, and drawing between steps
-    - **Active rendering** with `BufferStrategy`, in **logical coordinates** scaled to any window
+    - **Active rendering** with `BufferStrategy`, in **logical coordinates** scaled to any window, and **full screen**
     - **Physics** of a ball, and **swept collision** so fast objects cannot pass through each other
     - **Keyboard input** by polling: held keys, short taps, X11 key repeat, ghosting, configurable keys
     - A **computer opponent** that predicts the ball, and how to make it beatable by **tuning with self-play**
@@ -117,6 +117,34 @@ How large is the court? 640 × 400, always, as far as the game knows. Those are 
     ```
 
     That is why Paddle's pause key has no menu shortcut: P is the game's key, and the menu would see it too.
+
+### Full screen
+
+With logical coordinates, full screen costs the game nothing: the screen is just a very large window, and the canvas scales the court to it. F11 switches, in the *Game* menu as *Full Screen*. The work is in the engine's `FullScreen`, and it is mostly about the window, not the drawing.
+
+```java title="amade-game-engine · swing/FullScreen.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/swing/FullScreen.java:enter"
+```
+
+Three things in these lines need a word.
+
+**No frame, no menu bar.** A full-screen game should show the court and nothing else. A `JFrame` can only lose its title bar and border (`setUndecorated(true)`) while it has no native window, so the switch calls `dispose()` first and shows the window again afterwards. The menu bar is hidden too.
+
+**The screen keeps its resolution.** `GraphicsDevice` can also change the screen's resolution (`setDisplayMode`), which was the classic trick to make old PCs fast: fewer pixels, less to draw. Today it makes monitors flicker and go black for a second, rearranges the windows on the desktop, and on Linux often is not supported at all. The canvas scales anyway, so `FullScreen` never changes the mode. `setFullScreenWindow` is still worth calling instead of only covering the screen with a large window: it tells the window manager that this is a full-screen window, so the desktop's compositor can hand the screen straight to the game, and on Windows the buffers are then flipped instead of copied. Where full screen is not supported, the window simply covers the monitor.
+
+**The canvas gets a new native window.** `dispose()` takes away the canvas's native window and its buffers while the game loop may be drawing on them on its own thread. `withoutFrames` in `GameCanvas` makes the switch and the drawing of a frame wait for each other: both hold the same lock. After the switch, the next frame finds no buffers and creates new ones, exactly as at the start.
+
+!!! warning "Pitfall: the game ends on F11"
+    `dispose()` sends `windowClosed`, and Paddle used to end the program on `windowClosed`. The first test of F11 closed the game. `FullScreen` counts its own `dispose()` calls and passes on only the real closing: `window.whenClosed(...)` replaces the window listener in `AmadePaddleApplication`.
+
+!!! warning "Pitfall: a hidden menu bar has no shortcuts"
+    Swing ignores the shortcuts of a menu bar that is not showing. F2 and F3 would stop working in full screen, and so would F11, the only way back. While the menu bar is hidden, `FullScreen` puts every shortcut of the menu into the window's own key bindings, where it clicks the menu entry:
+
+    ```java title="amade-game-engine · swing/FullScreen.java"
+    --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/swing/FullScreen.java:mirror"
+    ```
+
+Switching also takes the focus away for a moment, so a running match pauses, as it does whenever the window loses the focus.
 
 ## Step 3: The rules of the ball
 
@@ -358,6 +386,7 @@ The loop itself is two lines in `PaddleGame`. It updates the scenes 120 times a 
 |---|---|---|
 | Fixed time step and the loop thread | `eu.amadeos.gameengine.loop` | Every real-time game needs exactly this |
 | Active rendering in logical coordinates | `eu.amadeos.gameengine.swing.GameCanvas` | Same buffers, scaling and pitfalls everywhere |
+| Full screen with F11 | `eu.amadeos.gameengine.swing.FullScreen` | Every real-time game can fill the screen |
 | Held keys, taps, X11 key repeat | `eu.amadeos.gameengine.input.KeyState`, `Keyboard` | Keyboards behave the same in every game |
 | Keys mapped to actions | `eu.amadeos.gameengine.input.Controls` | Configurable keys for every game |
 | Scenes and the scene stack | `eu.amadeos.gameengine.scene` | Title, pause and end screens everywhere |
@@ -368,9 +397,8 @@ What stays in the game: the court, the match, the computer player, the painter a
 
 1. **Sound.** Paddle is silent; the original went *blip*. Generate a short square wave with `javax.sound.sampled` (a `SourceDataLine` and a few hundred samples) and play it on every hit. Which thread should play it? (The next chapter builds a proper sound mixer.)
 2. **Mouse control.** Let the right paddle follow the mouse's vertical position. You need to turn the mouse position from real pixels into logical coordinates: use `GameCanvas.scale`.
-3. **Full screen.** F11 toggles a full-screen window with `GraphicsDevice.setFullScreenWindow`. Why does the game need no change at all? (Hint: logical coordinates.)
-4. **An opponent with a style.** Make a fourth difficulty that likes to hit the ball with its paddle edge on purpose. What does the computer need to know to aim the ball, not just reach it?
-5. **Replay.** Because the rules are deterministic with a seeded random generator, a match can be replayed from the seed and the recorded inputs alone. Record the inputs of a match and play it back. How large is the recording for one minute?
+3. **An opponent with a style.** Make a fourth difficulty that likes to hit the ball with its paddle edge on purpose. What does the computer need to know to aim the ball, not just reach it?
+4. **Replay.** Because the rules are deterministic with a seeded random generator, a match can be replayed from the seed and the recorded inputs alone. Record the inputs of a match and play it back. How large is the recording for one minute?
 
 ---
 

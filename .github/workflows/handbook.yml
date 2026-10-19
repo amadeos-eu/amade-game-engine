@@ -19,7 +19,7 @@ env:
   # Full hashes: actions/checkout does not take short ones.
   MINES_COMMIT: f6e2311f742e34058532ac88447daafbda666c53
   SOLITAIRE_COMMIT: a66304918ac690a5b2a359fb9135e02006dc372f
-  PADDLE_COMMIT: 8d04aa813890109d0d6636c8533cc11ec1315b91
+  PADDLE_COMMIT: 4708e21768971b1c18d5e0d2aff9dd9daef37abb
 
 jobs:
   build:
