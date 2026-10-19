@@ -15,6 +15,7 @@ The handbook grows with the games: a chapter is written when its game is finishe
 | [21. Bricks](21-bricks.md) | Bricks (Breakout) | Swept box collision, sprites with a cache per screen size, particles, frame times, pixel mode and an overlay layer |
 | [22. Snake](22-snake.md) | Snake | A ticker for rules with a pace of their own, random numbers that repeat, replays |
 | [23. Rocks](23-rocks.md) | Rocks (Asteroids) | Vectors and angles, outlines that turn, a field without edges, object pools, circle collision, held mouse buttons |
+| [24. Swarm](24-swarm.md) | Swarm (Galaga) | Sprite sheets and animation, entities and components, flight paths, data files, a spatial grid, music |
 | [Java2D and X11 Pitfalls](appendix-java2d.md) | | The rules for fast and correct drawing, collected |
 
 ## Planned
@@ -23,7 +24,6 @@ The handbook grows with the games: a chapter is written when its game is finishe
 
 | Chapter | Game (in the style of) | New in the engine |
 |---|---|---|
-| 24 | **Swarm** (Galaga) | Sprite sheets and animation, entities and components, flight paths, waves, spatial grid, music |
 | 25 | **Maze** (Pac-Man) | Tile maps, movement on a grid, AI as state machines, breadth-first search and A* |
 | 26 | **Blast** (Bomberman) | Up to four players, gamepads, timers, events, chain reactions |
 | 27 | **Jump** (platformer) | Scrolling camera, maps from the Tiled editor, gravity and jumping, parallax, saving progress |

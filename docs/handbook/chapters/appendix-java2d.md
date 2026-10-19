@@ -18,7 +18,7 @@ Every rule below is a rule of thumb. Your computer, your graphics driver and you
 
 **Turned pictures skip every cache.** A sprite drawn with a rotated transform is scaled and turned pixel by pixel in every frame, and a cached copy is only good for one angle. For things that turn freely, draw outlines of lines, which cost a few multiplications per corner, or turn the pictures in advance at a fixed number of angles and count the memory first ([chapter 23](23-rocks.md#pictures-or-lines)).
 
-**Antialiasing costs.** Smooth edges for shapes and text are computed per pixel, and on most Linux setups in software. Keep it for what needs it (text, round shapes), or draw such shapes once into a cached image.
+**Antialiasing costs.** Smooth edges for shapes and text are computed per pixel, and on most Linux setups in software. Keep it for what needs it (text, round shapes), or draw such shapes once into a cached image. Turn it off for straight-edged fills: a full-screen black rectangle cost three times as much with antialiasing on, and in Swarm that was half of each frame ([chapter 24](24-swarm.md#a-black-rectangle)).
 
 **Don't create objects in the frame loop.** `new Color`, `new Font`, `deriveFont`, `new BasicStroke`, `String.format`: each is cheap, but hundreds per frame, sixty times a second, keep the garbage collector busy and cause the occasional long frame. Make them once (chapter 21, `Particles` and `Hud`).
 

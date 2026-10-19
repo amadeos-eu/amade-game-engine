@@ -23,6 +23,7 @@ env:
   BRICKS_COMMIT: 1519d96fa8f5caeee40fa8f7a5b034ae39e98b6e
   SNAKE_COMMIT: 17ae70ec4d546683ed5d2a3dbf712b2c17cd5f71
   ROCKS_COMMIT: eb73d9ea71d746dc56ec03372cda9ae1f4961c18
+  SWARM_COMMIT: e5c1b2e2953c68f8706993843d546cd73f9614f2
 
 jobs:
   build:
@@ -61,6 +62,11 @@ jobs:
           repository: datazuul/amade-rocks-game
           ref: ${{ env.ROCKS_COMMIT }}
           path: amade-rocks-game
+      - uses: actions/checkout@v7
+        with:
+          repository: datazuul/amade-swarm-game
+          ref: ${{ env.SWARM_COMMIT }}
+          path: amade-swarm-game
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
