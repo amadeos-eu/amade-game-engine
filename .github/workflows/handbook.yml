@@ -20,6 +20,7 @@ env:
   MINES_COMMIT: f6e2311f742e34058532ac88447daafbda666c53
   SOLITAIRE_COMMIT: a66304918ac690a5b2a359fb9135e02006dc372f
   PADDLE_COMMIT: 4708e21768971b1c18d5e0d2aff9dd9daef37abb
+  BRICKS_COMMIT: fa050e7b5756586f7cf17d48b94fd002cec33796
 
 jobs:
   build:
@@ -43,6 +44,11 @@ jobs:
           repository: datazuul/amade-paddle-game
           ref: ${{ env.PADDLE_COMMIT }}
           path: amade-paddle-game
+      - uses: actions/checkout@v7
+        with:
+          repository: datazuul/amade-bricks-game
+          ref: ${{ env.BRICKS_COMMIT }}
+          path: amade-bricks-game
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'

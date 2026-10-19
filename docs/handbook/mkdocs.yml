@@ -68,4 +68,7 @@ nav:
       - 11. Solitaire: 11-solitaire.md
   - "Part II: Action":
       - 20. Paddle: 20-paddle.md
+      - 21. Bricks: 21-bricks.md
+  - Appendices:
+      - Java2D and X11 Pitfalls: appendix-java2d.md
   - The Road Ahead: roadmap.md
