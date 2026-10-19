@@ -1,6 +1,6 @@
 # 21. Bricks
 
-In Paddle, the ball flew between two players. In **Bricks** it flies against a wall: a paddle at the bottom, a wall of coloured bricks at the top, and every brick the ball touches breaks. Clear the wall, and the next one is waiting. The idea is as old as Paddle's, and it brings three new things into our games at once: **many objects** on the screen, **pictures** instead of white rectangles, and **sound**.
+In Paddle, the ball flew between two players. In **Bricks** it flies against a wall: a paddle at the bottom, a wall of coloured bricks at the top, and every brick the ball touches breaks. Clear the wall, and the next one is waiting. The idea is as old as Paddle's, and it brings two new things into our games at once: **many objects** on the screen and **pictures** instead of white rectangles. Paddle's few beeps become a whole set of sounds.
 
 <figure markdown>
 ![The title screen, where the computer plays](images/bricks/title.png){ width="400" }
@@ -16,7 +16,7 @@ With pictures and splinters, drawing a frame begins to cost real time, and on a 
     - **Events**: the rules report what happened, the user interface decides what it looks and sounds like
     - **Sprites**: pictures with a size in logical coordinates, from image files or drawn in code
     - **Particles**: hundreds of splinters without hundreds of objects
-    - **Sound effects** made from tones, and a **mixer** that plays several at once
+    - More **sound effects**: noise for a crash, melodies, and many sounds at once through the mixer
     - **Measuring** frame times, finding what is slow, and fixing it: a sprite cache, a pixel mode, and an idea that did not work
 
 The complete game is in [amade-bricks-game](https://github.com/datazuul/amade-bricks-game).
@@ -202,58 +202,13 @@ The splinters of a brick start where the brick was, fly outward and up, and grav
 
 ## Step 6: Sound
 
-The arcade games of the 1970s did not play recordings. Their sounds were made by the machine: a tone, a slide in pitch, a burst of noise. We do the same, and need no sound files.
-
-A sound card plays **samples**: 44,100 numbers per second, each one the position of the loudspeaker's membrane. A tone is a wave of these numbers. A square wave (high, low, high, low) gives the hard *blip* of the arcade; a triangle wave sounds softer; random numbers sound like a crash. `Sound.tone` computes one, sliding from one pitch to another, and fades it in and out over five milliseconds, because a membrane that jumps from rest to full swing clicks:
-
-```java title="amade-game-engine · audio/Sound.java"
---8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/audio/Sound.java:tone"
-```
-
-The sounds of Bricks are a handful of lines, made once when the game starts:
+Bricks reuses what [Paddle](20-paddle.md#step-8-sound) introduced: tones computed from numbers, and the mixer that plays them. Bricks needs it more than Paddle did: a brick can break while the ball hits the wall, and splinters fly while the next brick goes. The sounds of Bricks are a handful of lines, made once when the game starts. Square beeps for bricks, paddle and walls, a clear triangle ping for silver, a long falling tone for a lost ball, noise when the last one is gone, and little melodies for a cleared level and the end:
 
 ```java title="amade-bricks-game · ui/game/SoundBank.java"
 --8<-- "amade-bricks-game/src/main/java/eu/amadeos/games/bricks/ui/game/SoundBank.java:sounds"
 ```
 
-### The mixer
-
-Java can play a sound with a `Clip`, one per sound. But a brick breaking while the ball hits the wall means two sounds at once, and a `Clip` that is still playing cannot start again. The engine therefore has a **mixer**: one line to the sound card, fed by a thread of its own. The game only queues a sound and never waits:
-
-```java title="amade-game-engine · audio/Mixer.java"
---8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/audio/Mixer.java:play"
-```
-
-The mixer thread fills blocks of 512 samples (11.6 ms) and writes them to the line. `write` waits while the sound card's buffer is full; that waiting is what paces the thread, so it needs no clock:
-
-```java title="amade-game-engine · audio/Mixer.java"
---8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/audio/Mixer.java:run"
-```
-
-Mixing itself is addition. Two sounds at once are the sum of their samples. Two loud sounds can exceed what 16 bits hold, and then the sum must be *clipped* to the largest value, not left to wrap around into a large negative number, which would crack in the loudspeaker:
-
-```java title="amade-game-engine · audio/Mixer.java"
---8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/audio/Mixer.java:mix"
-```
-
-```java title="amade-game-engine · test/audio/MixerTest.java"
---8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/audio/MixerTest.java:test-mix"
-```
-
-!!! warning "Pitfall: a computer without sound"
-    Servers and build machines have no sound card, and some desktops have one that another program holds. `AudioSystem.getSourceDataLine` then throws. The mixer catches that, logs one line and stays silent; `play` does nothing. The game must never fail because it cannot make noise. The tests run the same way: they test the mixing without a sound card at all.
-
-The latency of this design is the line's buffer, four blocks or 46 ms at most, usually less. Players notice delays from about 50 ms, so this is enough for effects. Music, which the roadmap brings in Swarm, can reuse the same mixer.
-
-Between the effects the mixer writes silence, and pure silence turned out to be a trap. Some wireless headsets and their dongles switch off after a few seconds of zeros, and they take ten seconds or more to wake up again. On the title screen there are only zeros, so the first sounds of every game got lost. A test program that played a blip after 20 seconds of zeros was never heard; the same program with one or two steps of noise added (out of 32768) played every blip. The mixer therefore adds this hiss to every block. Nobody can hear it, but the line is never silent:
-
-```java title="amade-game-engine · audio/Mixer.java"
---8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/audio/Mixer.java:hiss"
-```
-
-```java title="amade-game-engine · test/audio/MixerTest.java"
---8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/audio/MixerTest.java:test-hiss"
-```
+As in Paddle, the rules only report events, and the effects decide what they sound like (see [Step 3](#step-3-events)).
 
 ## Step 7: How fast is it?
 
@@ -512,7 +467,6 @@ The title screen lets the computer play, as in Paddle. Its autopilot looks where
 | Boxes and swept collision | `eu.amadeos.gameengine.collision` | Every action game needs to know what hits what |
 | Sprites with a cache per screen size | `eu.amadeos.gameengine.sprite` | Pictures in logical coordinates, fast on any screen |
 | Particles in arrays | `eu.amadeos.gameengine.fx` | Splinters, sparks, explosions, without garbage |
-| Tones and a mixer | `eu.amadeos.gameengine.audio` | Several sound effects at once, never waiting |
 | Frame times | `eu.amadeos.gameengine.loop.FrameTimes` | Measuring belongs in every game |
 | Render modes, the overlay, the frame-time display | `eu.amadeos.gameengine.swing.GameCanvas`, `RenderMode`, `GameMenus` | Pixel look and sharp text, in every game |
 | A scene's overlay | `eu.amadeos.gameengine.scene.Scene` | Score and texts over the world |

@@ -16,6 +16,7 @@ Part I's games waited for you. Nothing in Mines or Solitaire happened until you 
     - A **computer opponent** that predicts the ball, and how to make it beatable by **tuning with self-play**
     - **Scenes**: title, match, pause and end as a stack
     - **Two threads, one game**: the loop thread, the Swing thread, and how they talk safely
+    - **Sound** made from numbers: samples, waves and their overtones, envelopes, and a **mixer** that plays several sounds at once
 
 The complete game is in [amade-paddle-game](https://github.com/datazuul/amade-paddle-game).
 
@@ -360,7 +361,135 @@ The presenter is tested with a fake `Arena` that only records commands, and a fa
 !!! warning "Pitfall: fast taps in tests"
     The first version of the pause test tapped P twice within a few microseconds of real time. The keyboard took the second press for an X11 key repeat and ignored it. Correct behaviour, and nobody types that fast, but the test failed. The cure was the replaceable clock: the test's keyboard runs on a counter that moves one step per game step, so time in the test is as slow as the test says.
 
-## Step 8: Putting it together
+## Step 8: Sound
+
+The arcade original did not play recordings. Its beeps came from the circuit board itself: a tone when the ball hit a paddle, a lower one off the walls, a longer one for a point. Paddle does the same, and needs no sound files. This section explains how a program makes a sound from nothing but numbers, which shapes of wave sound how, and how several sounds play at once.
+
+### What a sound card plays
+
+A loudspeaker is a membrane that moves back and forth. A sound card moves it by **samples**: numbers that say where the membrane should be, many thousand times a second. The engine uses CD quality: **44,100 samples per second**, each a 16-bit number between -32768 and 32767. A sampling rate can carry frequencies up to half its value (the *Nyquist frequency*), here 22,050 Hz, a little above what human ears hear.
+
+A tone is a wave that repeats. How often it repeats per second is its **frequency** in hertz (Hz), and we hear it as **pitch**: 440 Hz is the A that orchestras tune to, twice the frequency is the same note an **octave** higher, half the frequency an octave lower. How far the wave swings is its **amplitude**, which we hear as loudness.
+
+### The shape of the wave
+
+The same pitch sounds different depending on the shape of one repetition. That is why a flute and a violin playing the same note are easy to tell apart. Early sound chips had only a few shapes, and so do we:
+
+<figure>
+<svg viewBox="0 0 600 130" width="600" role="img" aria-label="One square wave, one triangle wave and noise, side by side" style="max-width: 100%; color: currentColor">
+  <g fill="none" stroke="currentColor" stroke-width="2">
+    <polyline points="20,22 20,22 60,22 60,98 100,98 100,22 140,22 140,98 180,98"/>
+    <polyline points="220,98 240,22 280,98 320,22 360,98 380,60"/>
+    <polyline points="420,40 424,63 428,50 432,68 436,70 440,27 444,23 448,86 452,42 456,40 460,98 464,58 468,86 472,58 476,71 480,33 484,70 488,88 492,62 496,78 500,73 504,27 508,80 512,67 516,45 520,24 524,88 528,58 532,77 536,89 540,76 544,92 548,52 552,83 556,56 560,93 564,89 568,29 572,32 576,38 580,95"/>
+  </g>
+  <g stroke="currentColor" stroke-opacity="0.3"><line x1="15" y1="60" x2="185" y2="60"/><line x1="215" y1="60" x2="385" y2="60"/><line x1="415" y1="60" x2="585" y2="60"/></g>
+  <g fill="currentColor" font-size="14" text-anchor="middle"><text x="100" y="122">square</text><text x="300" y="122">triangle</text><text x="500" y="122">noise</text></g>
+</svg>
+<figcaption>Two repetitions of a square wave and a triangle wave, and a stretch of noise.</figcaption>
+</figure>
+
+| Wave | Shape | Sounds | Where we use it |
+|---|---|---|---|
+| **Square** | Jumps between full up and full down | Hard, buzzing, the classic arcade *beep* | Paddle's beeps, Bricks' bricks |
+| **Triangle** | Rises and falls in straight lines | Soft, round, a little like a flute | Melodies, Snake's apple |
+| **Noise** | Random numbers | A hiss; short and loud, a crash | Bricks' last ball, Snake's crash |
+| Sine | The smooth curve of a pendulum | Pure, almost dull | (not in the engine) |
+| Sawtooth | Rises slowly, drops at once | Bright and brassy | (an exercise below) |
+
+Why do they sound so different? Every repeating wave can be built from sine waves: one at its own frequency (the *fundamental*) and others at 2, 3, 4… times that frequency, the **overtones** or *harmonics*. Their mix is the colour of the sound. A square wave contains the odd harmonics (3, 5, 7… times the frequency) at 1/3, 1/5, 1/7 of the strength; so many strong high overtones sound hard. A triangle wave contains the same odd harmonics but much weaker, at 1/9, 1/25, 1/49; it sounds soft. A sawtooth has all harmonics; a sine has none. Noise has every frequency at once, which is why it suits crashes.
+
+The shape also changes how loud a sound *feels*. A square wave spends all its time at full swing; a triangle passes through the middle most of the time. At the same amplitude the triangle carries only about 58 % of the square's energy. Snake learned this when its apple turned from a square into a triangle: to be heard as well, the softer wave needed a little more volume.
+
+### From a formula to samples
+
+`Sound.tone` computes a tone sample by sample. It keeps the **phase**, how far along one repetition the wave is (0 to 1), and moves it forward by `hz / RATE` each sample. From the phase it takes the value of the chosen wave. Adding up the phase instead of computing `frequency × time` lets the pitch change smoothly while the tone plays: a **slide** from one pitch to another, the *pew* of a laser or the falling tone of a lost point.
+
+Finally the tone gets an **envelope**: how its loudness changes over time. A membrane that jumps from rest to full swing clicks, so every tone fades in and out over five milliseconds. Synthesizers use a longer envelope with four parts, *attack, decay, sustain, release* (ADSR); our effects are short enough for a simple fade.
+
+```java title="amade-game-engine · audio/Sound.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/audio/Sound.java:tone"
+```
+
+Noise uses a tiny random generator of its own (*xorshift*) with a fixed seed, so a crash sounds the same every time. `then` joins sounds into a little melody.
+
+### Paddle's sounds
+
+With that, Paddle's sounds are four lines, made once when the game starts. Like the original, the wall sound is an octave below the paddle sound, and a point gets a longer tone, here falling by an octave:
+
+```java title="amade-paddle-game · ui/game/SoundBank.java"
+--8<-- "amade-paddle-game/src/main/java/eu/amadeos/games/paddle/ui/game/SoundBank.java:sounds"
+```
+
+The rules must not play sounds themselves: `Match` knows nothing of loudspeakers, and the title screen, where the computer plays itself, should stay quiet. So the match only **reports** what happened in a step:
+
+```java title="amade-paddle-game · domain/Match.java"
+--8<-- "amade-paddle-game/src/main/java/eu/amadeos/games/paddle/domain/Match.java:events"
+```
+
+```java title="amade-paddle-game · test/domain/MatchTest.java"
+--8<-- "amade-paddle-game/src/test/java/eu/amadeos/games/paddle/domain/MatchTest.java:test-events"
+```
+
+and the match scene turns the events into sounds after every step:
+
+```java title="amade-paddle-game · ui/game/PaddleGame.java"
+--8<-- "amade-paddle-game/src/main/java/eu/amadeos/games/paddle/ui/game/PaddleGame.java:play"
+```
+
+*Game → Sound* switches the sound off and on; the choice is saved with the other settings.
+
+### The mixer
+
+Java can play a sound with a `Clip`, one per sound. But a point can end with the ball bouncing off a wall, and the winning point brings the fanfare: two sounds at once, and a `Clip` that is still playing cannot start again. The engine therefore has a **mixer**: one line to the sound card, fed by a thread of its own. The game only queues a sound and never waits:
+
+```java title="amade-game-engine · audio/Mixer.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/audio/Mixer.java:play"
+```
+
+The mixer thread fills blocks of 512 samples (11.6 ms) and writes them to the line. `write` waits while the sound card's buffer is full; that waiting is what paces the thread, so it needs no clock:
+
+```java title="amade-game-engine · audio/Mixer.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/audio/Mixer.java:run"
+```
+
+Mixing itself is addition. Two sounds at once are the sum of their samples. Two loud sounds can exceed what 16 bits hold, and then the sum must be *clipped* to the largest value, not left to wrap around into a large negative number, which would crack in the loudspeaker:
+
+```java title="amade-game-engine · audio/Mixer.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/audio/Mixer.java:mix"
+```
+
+```java title="amade-game-engine · test/audio/MixerTest.java"
+--8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/audio/MixerTest.java:test-mix"
+```
+
+!!! warning "Pitfall: a computer without sound"
+    Servers and build machines have no sound card, and some desktops have one that another program holds. `AudioSystem.getSourceDataLine` then throws. The mixer catches that, logs one line and stays silent; `play` does nothing. The game must never fail because it cannot make noise. The tests run the same way: they test the mixing without a sound card at all.
+
+The latency of this design is the line's buffer, four blocks or 46 ms at most, usually less. Players notice delays from about 50 ms, so this is enough for effects. Music, which the roadmap brings in Swarm, can reuse the same mixer.
+
+Between the effects the mixer writes silence, and pure silence turned out to be a trap. Some wireless headsets and their dongles switch off after a few seconds of zeros, and they take ten seconds or more to wake up again. On the title screen there are only zeros, so the first sounds of every game got lost. A test program that played a blip after 20 seconds of zeros was never heard; the same program with one or two steps of noise added (out of 32768) played every blip. The mixer therefore adds this hiss to every block. Nobody can hear it, but the line is never silent:
+
+```java title="amade-game-engine · audio/Mixer.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/audio/Mixer.java:hiss"
+```
+
+```java title="amade-game-engine · test/audio/MixerTest.java"
+--8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/audio/MixerTest.java:test-hiss"
+```
+
+`main` starts the mixer before anything else and closes it with the game (see Step 9).
+
+### Further reading
+
+- Wikipedia on the waves and their overtones: [Square wave](https://en.wikipedia.org/wiki/Square_wave), [Triangle wave](https://en.wikipedia.org/wiki/Triangle_wave), [Sawtooth wave](https://en.wikipedia.org/wiki/Sawtooth_wave), [White noise](https://en.wikipedia.org/wiki/White_noise), [Harmonic](https://en.wikipedia.org/wiki/Harmonic).
+- [Envelope (music)](https://en.wikipedia.org/wiki/Envelope_(music)): attack, decay, sustain and release.
+- [Nyquist–Shannon sampling theorem](https://en.wikipedia.org/wiki/Nyquist%E2%80%93Shannon_sampling_theorem): why 44,100 samples a second are enough, and why a perfect square wave is not possible in samples.
+- [Java Sound API tutorial](https://docs.oracle.com/javase/tutorial/sound/) (Oracle): lines, formats and mixers in `javax.sound.sampled`.
+- [NESdev wiki: APU](https://www.nesdev.org/wiki/APU): the sound chip of an 8-bit console, with its square, triangle and noise channels, much like ours.
+- [sfxr](https://www.drpetter.se/project_sfxr.html) by DrPetter and its browser version [jsfxr](https://sfxr.me/): game sound effects from waves, slides and envelopes, with sliders to try them out.
+- Andy Farnell, *Designing Sound* (MIT Press, 2010): sound effects made by computation, from first principles.
+
+## Step 9: Putting it together
 
 The window holds the menu and the canvas:
 
@@ -368,7 +497,7 @@ The window holds the menu and the canvas:
 --8<-- "amade-paddle-game/src/main/java/eu/amadeos/games/paddle/ui/main/PaddleWindow.java:canvas"
 ```
 
-and `main` starts the loop only after the window is visible, because a canvas that is not on the screen cannot get its buffers:
+and `main` starts the mixer first and the loop only after the window is visible, because a canvas that is not on the screen cannot get its buffers. The mixer closes with the game:
 
 ```java title="amade-paddle-game · bootstrap/AmadePaddleApplication.java"
 --8<-- "amade-paddle-game/src/main/java/eu/amadeos/games/paddle/bootstrap/AmadePaddleApplication.java:main"
@@ -390,16 +519,17 @@ The loop itself is two lines in `PaddleGame`. It updates the scenes 120 times a 
 | Held keys, taps, X11 key repeat | `eu.amadeos.gameengine.input.KeyState`, `Keyboard` | Keyboards behave the same in every game |
 | Keys mapped to actions | `eu.amadeos.gameengine.input.Controls` | Configurable keys for every game |
 | Scenes and the scene stack | `eu.amadeos.gameengine.scene` | Title, pause and end screens everywhere |
+| Tones and a mixer | `eu.amadeos.gameengine.audio` | Several sound effects at once, never waiting |
 
-What stays in the game: the court, the match, the computer player, the painter and the scenes themselves. Bricks, the next game, will reuse the loop, the canvas, the keyboard and the scenes unchanged, and add what Paddle did not need: images instead of rectangles, many objects colliding, and sound.
+What stays in the game: the court, the match and its events, the computer player, the painter, the sounds and the scenes themselves. Bricks, the next game, will reuse the loop, the canvas, the keyboard, the scenes and the mixer unchanged, and add what Paddle did not need: images instead of rectangles and many objects colliding.
 
 ## Exercises
 
-1. **Sound.** Paddle is silent; the original went *blip*. Generate a short square wave with `javax.sound.sampled` (a `SourceDataLine` and a few hundred samples) and play it on every hit. Which thread should play it? (The next chapter builds a proper sound mixer.)
+1. **A sawtooth.** Add `SAWTOOTH` to `Sound.Wave`: it rises from -1 to 1 within one repetition and drops back at once. Use it for the paddle sound and compare it with the square. Which one is harsher, and why, going by the overtones?
 2. **Mouse control.** Let the right paddle follow the mouse's vertical position. You need to turn the mouse position from real pixels into logical coordinates: use `GameCanvas.scale`.
 3. **An opponent with a style.** Make a fourth difficulty that likes to hit the ball with its paddle edge on purpose. What does the computer need to know to aim the ball, not just reach it?
 4. **Replay.** Because the rules are deterministic with a seeded random generator, a match can be replayed from the seed and the recorded inputs alone. Record the inputs of a match and play it back. How large is the recording for one minute?
 
 ---
 
-In the next game, **Bricks**, the ball breaks a wall of bricks: many objects, images instead of rectangles, and sound.
+In the next game, **Bricks**, the ball breaks a wall of bricks: many objects, images instead of rectangles, and many more sounds.
