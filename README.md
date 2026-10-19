@@ -7,7 +7,7 @@
 
 ## What it holds
 
-The library grows game by game: each game adds what it needs and leaves it here for the next one. So far (from Mines, Solitaire, Paddle and Bricks):
+The library grows game by game: each game adds what it needs and leaves it here for the next one. So far (from Mines, Solitaire, Paddle, Bricks and Snake):
 
 - **High scores** (`eu.amadeos.gameengine.score`): the best ten results per table (difficulty or variant), lower or higher wins. Stored in `$XDG_DATA_HOME/amadeos/games/<game>/<table>.scores` (usually `~/.local/share/...`) as plain text, one entry per line. The name typed last time is offered again (`PlayerName`, in the game's configuration directory).
 - **Standard menu entries** (`eu.amadeos.gameengine.swing.GameMenus`): *Game → New Game* (F2), *High Scores...*, *Exit* (Ctrl+Q), *Help → About*, with the same texts and mnemonics in every game.
@@ -15,7 +15,9 @@ The library grows game by game: each game adds what it needs and leaves it here 
 - **Undo and redo** (`eu.amadeos.gameengine.undo.History`): snapshots of the game state before each move; *Undo* (Ctrl+Z) and *Redo* (Ctrl+Y) in `GameMenus`.
 - **Animation** (`eu.amadeos.gameengine.anim`): `Easing` curves and `Tween`, the timing of one animation, without Swing; `swing.Animator` calls a frame function about 60 times a second while something moves.
 - **Game clock** (`eu.amadeos.gameengine.time.GameClock`): time of one game, with a replaceable time source for tests.
-- **Game loop** (`eu.amadeos.gameengine.loop`): `GameLoop` runs commands, fixed update steps and frames on a thread of its own; `FixedStep` is its arithmetic, tested without a thread.
+- **Game loop** (`eu.amadeos.gameengine.loop`): `GameLoop` runs commands, fixed update steps and frames on a thread of its own; `FixedStep` is its arithmetic, tested without a thread. `Ticker` gives rules a slower pace of their own (a snake's cell per tick), changeable while the game runs, with the progress between two ticks for smooth drawing.
+- **Random numbers that repeat** (`eu.amadeos.gameengine.random.SeededRandom`): the same seed gives the same numbers on every computer and Java version (SplitMix64, written out); `fork()` gives effects a generator of their own that never disturbs the rules'.
+- **Replays** (`eu.amadeos.gameengine.replay.Replay`): a game as its seed and the player's actions with their ticks, played back in order, as plain text.
 - **Drawing** (`swing.GameCanvas`): active rendering with `BufferStrategy` in fixed logical coordinates, scaled to the window with black bars; unused keys reach Swing's menu shortcuts. Two layers, the world and an overlay for score and texts; two render modes (`RenderMode`: direct, or pixel mode with whole factors and hard edges); a frame-time display (`loop.FrameTimes`, F12). Full screen with F11 (`FullScreen`).
 - **Sprites** (`eu.amadeos.gameengine.sprite.Sprite`): pictures with a size in logical coordinates, from image files or drawn in code, scaled once per screen size into compatible images.
 - **Collision** (`eu.amadeos.gameengine.collision`): axis-aligned boxes and the swept test of a moving box against a resting one.
@@ -33,7 +35,7 @@ The [Amade Game Developer's Handbook](https://datazuul.github.io/amade-game-engi
 
 ## Planned
 
-In the order the games need them: tile maps, camera, pathfinding, music. Game rules stay plain Java without AWT, so they can be tested headless.
+In the order the games need them: vectors and object pools, tile maps, pathfinding, music, camera. Game rules stay plain Java without AWT, so they can be tested headless.
 
 ## Using it
 
