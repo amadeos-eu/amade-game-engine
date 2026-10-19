@@ -7,7 +7,7 @@
 
 ## What it holds
 
-The library grows game by game: each game adds what it needs and leaves it here for the next one. So far (from Mines, Solitaire, Paddle, Bricks and Snake):
+The library grows game by game: each game adds what it needs and leaves it here for the next one. So far (from Mines, Solitaire, Paddle, Bricks, Snake and Rocks):
 
 - **High scores** (`eu.amadeos.gameengine.score`): the best ten results per table (difficulty or variant), lower or higher wins. Stored in `$XDG_DATA_HOME/amadeos/games/<game>/<table>.scores` (usually `~/.local/share/...`) as plain text, one entry per line. The name typed last time is offered again (`PlayerName`, in the game's configuration directory).
 - **Standard menu entries** (`eu.amadeos.gameengine.swing.GameMenus`): *Game → New Game* (F2), *High Scores...*, *Exit* (Ctrl+Q), *Help → About*, with the same texts and mnemonics in every game.
@@ -20,10 +20,13 @@ The library grows game by game: each game adds what it needs and leaves it here 
 - **Replays** (`eu.amadeos.gameengine.replay.Replay`): a game as its seed and the player's actions with their ticks, played back in order, as plain text.
 - **Drawing** (`swing.GameCanvas`): active rendering with `BufferStrategy` in fixed logical coordinates, scaled to the window with black bars; unused keys reach Swing's menu shortcuts. Two layers, the world and an overlay for score and texts; two render modes (`RenderMode`: direct, or pixel mode with whole factors and hard edges); a frame-time display (`loop.FrameTimes`, F12). Full screen with F11 (`FullScreen`).
 - **Sprites** (`eu.amadeos.gameengine.sprite.Sprite`): pictures with a size in logical coordinates, from image files or drawn in code, scaled once per screen size into compatible images.
-- **Collision** (`eu.amadeos.gameengine.collision`): axis-aligned boxes and the swept test of a moving box against a resting one.
+- **Vectors and angles** (`eu.amadeos.gameengine.math`): `Vector` (an immutable 2D vector with rotation), `Angles` (the short way round between two angles), `Wrap` (a field without edges: wrapping, the shortest distance, drawing over an edge).
+- **Outlines** (`eu.amadeos.gameengine.shape.Outline`): figures of straight lines, turned, scaled and drawn without creating objects.
+- **Object pools** (`eu.amadeos.gameengine.pool.Pool`): a fixed number of reusable objects, such as four shots, made once.
+- **Collision** (`eu.amadeos.gameengine.collision`): axis-aligned boxes, the swept test of a moving box against a resting one, and circles, also across the edge of a field without edges.
 - **Particles** (`eu.amadeos.gameengine.fx.Particles`): hundreds of splinters and sparks in arrays, without creating objects while the game runs.
 - **Sound** (`eu.amadeos.gameengine.audio`): sound effects made from tones (`Sound`), several at once through one `Mixer` thread; silent without a sound card.
-- **Keyboard and mouse** (`eu.amadeos.gameengine.input`): `KeyState` (held keys, presses between two looks, X11 key repeat filtered), `Keyboard` (the AWT side, thread-safe), `Controls` (keys mapped to a game's actions), `Mouse` (position in logical coordinates, clicks between two looks; `GameCanvas.toLogical` maps like the render mode draws).
+- **Keyboard and mouse** (`eu.amadeos.gameengine.input`): `KeyState` (held keys, presses between two looks, X11 key repeat filtered), `Keyboard` (the AWT side, thread-safe), `Controls` (keys mapped to a game's actions), `Mouse` (position in logical coordinates, clicks between two looks, held buttons; `GameCanvas.toLogical` maps like the render mode draws).
 - **Scenes** (`eu.amadeos.gameengine.scene`): `Scene` and `SceneStack` (only the top scene moves, all are drawn: a pause screen over a frozen match).
 - Texts in English, Deutsch, Français, Español and Italiano.
 
@@ -35,7 +38,7 @@ The [Amade Game Developer's Handbook](https://datazuul.github.io/amade-game-engi
 
 ## Planned
 
-In the order the games need them: vectors and object pools, tile maps, pathfinding, music, camera. Game rules stay plain Java without AWT, so they can be tested headless.
+In the order the games need them: sprite sheets and animation, entities, tile maps, pathfinding, music, camera. Game rules stay plain Java without AWT, so they can be tested headless.
 
 ## Using it
 
