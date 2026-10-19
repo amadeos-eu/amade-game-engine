@@ -49,6 +49,8 @@ public final class Mixer implements AutoCloseable {
     private volatile boolean muted;
     private SourceDataLine line;
     private Thread thread;
+    /** The state of the hiss's random numbers; only the mixer thread touches it. */
+    private long noise = 0x2545F4914F6CDD1DL;
 
     /** Opens the sound card; if there is none, the mixer stays silent. */
     public synchronized void start() {
@@ -96,6 +98,7 @@ public final class Mixer implements AutoCloseable {
         byte[] bytes = new byte[BLOCK * 2];
         while (running) {
             mix(block);
+            hiss(block);
             for (int i = 0; i < BLOCK; i++) {
                 bytes[2 * i] = (byte) block[i];             // little endian: low byte first
                 bytes[2 * i + 1] = (byte) (block[i] >> 8);
@@ -124,6 +127,22 @@ public final class Mixer implements AutoCloseable {
         voices.removeIf(v -> v.position >= v.sound.length());
     }
     // --8<-- [end:mix]
+
+    // --8<-- [start:hiss]
+    /**
+     * Adds a hiss of one or two steps out of 32768, far below hearing, so the line never carries pure
+     * silence. Some wireless headsets and their dongles switch off after a few seconds of zeros and take
+     * many more seconds to wake up again: the first sounds of a game would be lost.
+     */
+    void hiss(short[] block) {
+        for (int i = 0; i < block.length; i++) {
+            noise ^= noise << 13;
+            noise ^= noise >>> 7;
+            noise ^= noise << 17;
+            block[i] = (short) Math.clamp(block[i] + (noise & 3) - 1, Short.MIN_VALUE, Short.MAX_VALUE);
+        }
+    }
+    // --8<-- [end:hiss]
 
     /** For tests: sounds playing or waiting. */
     int voices() {

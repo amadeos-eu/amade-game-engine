@@ -67,3 +67,5 @@ With a real graphics card and a good OpenGL driver, the OpenGL pipeline can win,
 ## Sound
 
 **No sound card is normal.** Servers, build machines and some desktops have none, or another program holds it. Catch `LineUnavailableException` and play on in silence, as the engine's `Mixer` does ([chapter 21](21-bricks.md#the-mixer)).
+
+**Never feed the line pure silence.** Some wireless headsets switch off after a few seconds of zeros and lose the next sounds while they wake up. An inaudible hiss of one or two steps keeps them awake ([chapter 21](21-bricks.md#the-mixer)).
