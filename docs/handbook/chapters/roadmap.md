@@ -11,8 +11,8 @@ The handbook grows with the games: a chapter is written when its game is finishe
 | [2. How a Game Is Built](02-structure.md) | | |
 | [10. Mines](10-mines.md) | Mines | High scores, game menus, high-score dialogs |
 | [11. Solitaire](11-solitaire.md) | Solitaire (Klondike) | Undo and redo, animation (easing, tweens, an animation timer), the game clock |
-| [20. Paddle](20-paddle.md) | Paddle (Pong) | Game loop with a fixed time step, active rendering in logical coordinates, full screen, keyboard input and controls, scenes |
-| [21. Bricks](21-bricks.md) | Bricks (Breakout) | Swept box collision, sprites with a cache per screen size, particles, sound effects and a mixer, frame times, pixel mode and an overlay layer |
+| [20. Paddle](20-paddle.md) | Paddle (Pong) | Game loop with a fixed time step, active rendering in logical coordinates, full screen, keyboard input and controls, scenes, sound effects and a mixer |
+| [21. Bricks](21-bricks.md) | Bricks (Breakout) | Swept box collision, sprites with a cache per screen size, particles, frame times, pixel mode and an overlay layer |
 | [22. Snake](22-snake.md) | Snake | A ticker for rules with a pace of their own, random numbers that repeat, replays |
 | [Java2D and X11 Pitfalls](appendix-java2d.md) | | The rules for fast and correct drawing, collected |
 
