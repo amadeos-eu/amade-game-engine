@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class XInputTest {
     @Test
@@ -16,14 +16,20 @@ class XInputTest {
         assertEquals(1, XInput.axis(Short.MAX_VALUE));
     }
 
-    /** On Windows the real XInput: it loads, and asking for pads that are not there does no harm. */
+    /**
+     * On Windows the real XInput: it loads, and asking for pads that are not there does no harm. Elsewhere
+     * there is no XInput library, and opening it fails with a clear error, which Gamepads turns into no pads.
+     */
     @Test
-    void onWindowsXInputLoadsAndPolls() {
-        assumeTrue(System.getProperty("os.name").startsWith("Windows"), "Windows only");
-        try (Gamepads gamepads = Gamepads.open()) {
-            assertNotEquals("none", gamepads.backend());
-            gamepads.poll();
-            gamepads.poll();
+    void xinputLoadsOnWindowsOnly() {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            try (Gamepads gamepads = Gamepads.open()) {
+                assertNotEquals("none", gamepads.backend());
+                gamepads.poll();
+                gamepads.poll();
+            }
+        } else {
+            assertThrows(IllegalStateException.class, XInput::open);
         }
     }
 }
