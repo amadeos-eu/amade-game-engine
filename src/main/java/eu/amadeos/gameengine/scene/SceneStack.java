@@ -48,5 +48,11 @@ public final class SceneStack implements Scene {
         // A copy: a scene may push or pop while the frame is drawn.
         for (Scene scene : List.copyOf(scenes)) scene.render(g, alpha);
     }
+
+    /** The overlays of all scenes, bottom first, after all worlds: a pause text lies over the match's score. */
+    @Override
+    public void renderOverlay(Graphics2D g, double alpha) {
+        for (Scene scene : List.copyOf(scenes)) scene.renderOverlay(g, alpha);
+    }
 }
 // --8<-- [end:stack]
