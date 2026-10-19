@@ -49,7 +49,7 @@ import java.util.zip.CRC32;
  * amade-save 1
  * level.1.best=71.25
  * level.1.coins=34
- * unlocked=2
+ * open=2
  * crc32 5e1f0c2a
  * </pre>
  *

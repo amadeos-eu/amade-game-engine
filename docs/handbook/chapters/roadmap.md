@@ -18,15 +18,10 @@ The handbook grows with the games: a chapter is written when its game is finishe
 | [24. Swarm](24-swarm.md) | Swarm (Galaga) | Sprite sheets and animation, entities and components, flight paths, data files, a spatial grid, music |
 | [25. Maze](25-maze.md) | Maze (Pac-Man) | Tile maps and walking on a grid, state machines, breadth-first search and A* |
 | [26. Blast](26-blast.md) | Blast (Bomberman) | Gamepads on Linux and Windows, timers, an event queue for chain reactions |
+| [27. Jump](27-jump.md) | Jump (platformer) | Scrolling camera, maps from the Tiled editor, gravity and jumping, parallax, saving progress |
 | [Java2D and X11 Pitfalls](appendix-java2d.md) | | The rules for fast and correct drawing, collected |
 
 ## Planned
-
-### Part II: Action
-
-| Chapter | Game (in the style of) | New in the engine |
-|---|---|---|
-| 27 | **Jump** (platformer) | Scrolling camera, maps from the Tiled editor, gravity and jumping, parallax, saving progress |
 
 ### Part III: Strategy
 
