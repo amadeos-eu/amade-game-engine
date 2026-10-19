@@ -17,6 +17,7 @@ The handbook grows with the games: a chapter is written when its game is finishe
 | [23. Rocks](23-rocks.md) | Rocks (Asteroids) | Vectors and angles, outlines that turn, a field without edges, object pools, circle collision, held mouse buttons |
 | [24. Swarm](24-swarm.md) | Swarm (Galaga) | Sprite sheets and animation, entities and components, flight paths, data files, a spatial grid, music |
 | [25. Maze](25-maze.md) | Maze (Pac-Man) | Tile maps and walking on a grid, state machines, breadth-first search and A* |
+| [26. Blast](26-blast.md) | Blast (Bomberman) | Gamepads on Linux and Windows, timers, an event queue for chain reactions |
 | [Java2D and X11 Pitfalls](appendix-java2d.md) | | The rules for fast and correct drawing, collected |
 
 ## Planned
@@ -25,7 +26,6 @@ The handbook grows with the games: a chapter is written when its game is finishe
 
 | Chapter | Game (in the style of) | New in the engine |
 |---|---|---|
-| 26 | **Blast** (Bomberman) | Up to four players, gamepads, timers, events, chain reactions |
 | 27 | **Jump** (platformer) | Scrolling camera, maps from the Tiled editor, gravity and jumping, parallax, saving progress |
 
 ### Part III: Strategy
