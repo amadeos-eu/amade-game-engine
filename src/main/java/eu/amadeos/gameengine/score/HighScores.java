@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -124,7 +125,7 @@ public final class HighScores {
                 Files.writeString(temp, text, StandardCharsets.UTF_8);
                 try {
                     Files.move(temp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-                } catch (AtomicMoveNotSupportedException e) {
+                } catch (AtomicMoveNotSupportedException | AccessDeniedException e) {
                     Files.move(temp, file, StandardCopyOption.REPLACE_EXISTING);
                 }
             } finally {
