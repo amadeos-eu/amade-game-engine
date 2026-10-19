@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="4" height="3" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="4">
+ <properties>
+  <property name="name" value="Test Meadow"/>
+  <property name="time" type="int" value="90"/>
+ </properties>
+ <tileset firstgid="1" name="ground" tilewidth="16" tileheight="16" tilecount="4" columns="2">
+  <image source="ground.png" width="32" height="32"/>
+  <tile id="0" type="solid"/>
+  <tile id="1" type="coin">
+   <properties>
+    <property name="points" type="int" value="10"/>
+   </properties>
+   <animation>
+    <frame tileid="1" duration="150"/>
+    <frame tileid="3" duration="150"/>
+   </animation>
+   <objectgroup draworder="index">
+    <object id="1" x="4" y="4" width="8" height="8"/>
+   </objectgroup>
+  </tile>
+ </tileset>
+ <layer id="1" name="ground" width="4" height="3">
+  <data encoding="csv">
+0,0,2,0,
+0,0,0,0,
+1,1,2147483649,1
+</data>
+ </layer>
+ <objectgroup id="2" name="things">
+  <object id="1" name="start" type="start" x="8" y="16" width="16" height="16"/>
+  <object id="2" class="walker" x="40" y="32" width="16" height="16">
+   <properties>
+    <property name="direction" value="left"/>
+    <property name="note">two
+lines</property>
+   </properties>
+  </object>
+  <object id="3" type="coin" gid="2" x="48" y="32" width="16" height="16"/>
+ </objectgroup>
+</map>

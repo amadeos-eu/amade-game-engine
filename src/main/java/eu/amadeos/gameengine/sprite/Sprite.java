@@ -48,6 +48,12 @@ public final class Sprite {
     /** The picture at its size on the screen; made by the first frame that needs it. */
     private BufferedImage cached;
     private boolean cachedSmooth;
+    /** The pictures of {@link #drawSeamless}: a tile on a screen of 2.7 pixels per unit is 43 or 44 wide. */
+    private final BufferedImage[] seamless = new BufferedImage[4];
+    private final boolean[] seamlessSmooth = new boolean[4];
+    private int nextSeamless;
+    /** What the source's pixels need of transparency; 0 until the first picture is cached. */
+    private int sourceTransparency;
 
     private Sprite(double width, double height, BufferedImage source, Drawing drawing, boolean hard) {
         if (width <= 0 || height <= 0) throw new IllegalArgumentException("empty sprite");
@@ -131,6 +137,54 @@ public final class Sprite {
     }
     // --8<-- [end:draw]
 
+    // --8<-- [start:seamless]
+    /**
+     * Draws the sprite so that it covers exactly the screen pixels from {@code x} to {@code x + width} and
+     * from {@code y} to {@code y + height}, each edge rounded to the nearest pixel. Tiles drawn side by side
+     * this way meet without a gap and without overlapping, whatever the scale.
+     *
+     * <p>{@link #draw} copies one cached picture of the rounded size, and that is not enough for tiles: at
+     * 2.7 screen pixels per unit, a tile of 16 units is 43.2 pixels wide. Copied 43 pixels wide at rounded
+     * positions, every fifth tile leaves a gap of one pixel, a line that flickers through the scrolling
+     * ground. So here the width is worked out from both rounded edges, 43 or 44 pixels, and both pictures
+     * are cached.
+     */
+    public void drawSeamless(Graphics2D g, double x, double y) {
+        AffineTransform t = g.getTransform();
+        int rotated = AffineTransform.TYPE_MASK_ROTATION | AffineTransform.TYPE_GENERAL_TRANSFORM;
+        if (UNCACHED || (t.getType() & rotated) != 0) {
+            drawScaled(g, x, y);
+            return;
+        }
+        long left = Math.round(t.getTranslateX() + x * t.getScaleX());
+        long right = Math.round(t.getTranslateX() + (x + width) * t.getScaleX());
+        long top = Math.round(t.getTranslateY() + y * t.getScaleY());
+        long bottom = Math.round(t.getTranslateY() + (y + height) * t.getScaleY());
+        int w = (int) Math.max(1, right - left);
+        int h = (int) Math.max(1, bottom - top);
+        boolean smooth = !hard && g.getRenderingHint(RenderingHints.KEY_INTERPOLATION)
+                != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
+        BufferedImage image = null;
+        for (int i = 0; i < seamless.length; i++) {
+            BufferedImage candidate = seamless[i];
+            if (candidate != null && candidate.getWidth() == w && candidate.getHeight() == h
+                    && seamlessSmooth[i] == smooth) {
+                image = candidate;
+                break;
+            }
+        }
+        if (image == null) {
+            image = render(g.getDeviceConfiguration(), w, h, smooth);
+            seamless[nextSeamless] = image;
+            seamlessSmooth[nextSeamless] = smooth;
+            nextSeamless = (nextSeamless + 1) % seamless.length;
+        }
+        g.setTransform(AffineTransform.getTranslateInstance(left, top));
+        g.drawImage(image, 0, 0, null);
+        g.setTransform(t);
+    }
+    // --8<-- [end:seamless]
+
     private void drawScaled(Graphics2D g, double x, double y) {
         Graphics2D copy = (Graphics2D) g.create();
         try {
@@ -149,9 +203,11 @@ public final class Sprite {
     // --8<-- [start:render]
     /** The picture scaled once to {@code w} × {@code h} screen pixels, in the screen's own pixel format. */
     private BufferedImage render(GraphicsConfiguration gc, int w, int h, boolean smooth) {
+        int transparency = transparency(smooth);
         BufferedImage image = gc != null
-                ? gc.createCompatibleImage(w, h, Transparency.TRANSLUCENT)
-                : new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB_PRE);
+                ? gc.createCompatibleImage(w, h, transparency)
+                : new BufferedImage(w, h, transparency == Transparency.OPAQUE
+                ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB_PRE);
         Graphics2D g = image.createGraphics();
         try {
             g.setComposite(AlphaComposite.Src);
@@ -176,6 +232,38 @@ public final class Sprite {
     }
     // --8<-- [end:render]
 
+    // --8<-- [start:transparency]
+    /**
+     * The least transparency the cached picture needs, because copying it costs accordingly: an opaque
+     * picture is copied as it is, one whose pixels are either seen or not (a {@code BITMASK}) only skips
+     * the unseen ones, and only a translucent one is blended with what lies below, pixel by pixel. A sky
+     * the size of the screen costs a quarter as much when it is known to be opaque.
+     *
+     * <p>Pictures drawn in code have soft edges and stay translucent. An image is looked at once: opaque if
+     * every pixel is, a bitmask if every pixel is either opaque or invisible. Smooth scaling mixes the
+     * edges of a bitmask with the invisible pixels around them, so then it is translucent too.
+     */
+    private int transparency(boolean smooth) {
+        if (source == null) return Transparency.TRANSLUCENT;
+        if (sourceTransparency == 0) sourceTransparency = transparencyOf(source);
+        if (sourceTransparency == Transparency.BITMASK && smooth) return Transparency.TRANSLUCENT;
+        return sourceTransparency;
+    }
+
+    static int transparencyOf(BufferedImage image) {
+        if (!image.getColorModel().hasAlpha()) return Transparency.OPAQUE;
+        boolean seeThrough = false;
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                int alpha = image.getRGB(x, y) >>> 24;
+                if (alpha != 0 && alpha != 255) return Transparency.TRANSLUCENT;
+                seeThrough |= alpha == 0;
+            }
+        }
+        return seeThrough ? Transparency.BITMASK : Transparency.OPAQUE;
+    }
+    // --8<-- [end:transparency]
+
     /**
      * Bicubic scaling looks only at the nearest source pixels; shrinking to less than half in one go skips
      * pixels and looks rough. So shrink in halves first, until one more step is less than half.
@@ -195,8 +283,20 @@ public final class Sprite {
         return current;
     }
 
+    /** For tests: how many pictures {@link #drawSeamless} keeps. */
+    int seamlessCount() {
+        int count = 0;
+        for (BufferedImage image : seamless) if (image != null) count++;
+        return count;
+    }
+
     /** For tests: the size of the cached picture, or {@code null} before the first frame. */
     java.awt.Dimension cachedSize() {
         return cached == null ? null : new java.awt.Dimension(cached.getWidth(), cached.getHeight());
+    }
+
+    /** For tests: the transparency of the cached picture, a {@link Transparency} constant. */
+    int cachedTransparency() {
+        return cached.getTransparency();
     }
 }

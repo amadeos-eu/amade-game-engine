@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,6 +24,31 @@ class SpriteTest {
         g.dispose();
         return image;
     }
+
+    // --8<-- [start:test-transparency]
+    @Test
+    void opaqueAndHardEdgedPicturesAreCachedWithoutBlending() {
+        BufferedImage screen = new BufferedImage(200, 100, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = screen.createGraphics();
+        g.scale(2.5, 2.5);
+        Sprite sky = Sprite.of(source(), 40, 16);                       // every pixel opaque
+        sky.draw(g, 0, 0);
+        assertEquals(Transparency.OPAQUE, sky.cachedTransparency());
+
+        BufferedImage holes = source();
+        holes.setRGB(3, 3, 0);                                          // one pixel invisible
+        Sprite hill = Sprite.of(holes, 40, 16).hardEdges();
+        hill.draw(g, 0, 0);
+        assertEquals(Transparency.BITMASK, hill.cachedTransparency());
+        // Scaled smoothly, the hole's edge is half seen: blending is needed again.
+        Sprite smooth = Sprite.of(holes, 40, 16);
+        smooth.draw(g, 0, 0);
+        assertEquals(Transparency.TRANSLUCENT, smooth.cachedTransparency());
+
+        holes.setRGB(5, 5, 0x80FF0000);                                 // and one half seen
+        assertEquals(Transparency.TRANSLUCENT, Sprite.transparencyOf(holes));
+    }
+    // --8<-- [end:test-transparency]
 
     // --8<-- [start:test-cache]
     @Test
@@ -72,4 +98,37 @@ class SpriteTest {
         assertEquals(Color.GREEN.getRGB(), screen.getRGB(29, 29));
         assertEquals(0, screen.getRGB(30, 30));
     }
+
+    // --8<-- [start:test-seamless]
+    @Test
+    void tilesDrawnSeamlesslyLeaveNoGapsAtAnyScale() {
+        Sprite tile = Sprite.drawn(16, 16, (g, w, h) -> {
+            g.setColor(Color.GREEN);
+            g.fill(new java.awt.geom.Rectangle2D.Double(0, 0, w, h));
+        });
+        BufferedImage plain = row(tile, false);
+        BufferedImage seamless = row(tile, true);
+        int gaps = 0;
+        for (int x = 0; x < 20 * 43; x++) {
+            if (plain.getRGB(x, 20) == 0) gaps++;
+            assertEquals(Color.GREEN.getRGB(), seamless.getRGB(x, 20), "pixel " + x);
+        }
+        assertEquals(4, gaps, "draw: a pixel lost at every fifth tile");
+        assertEquals(2, tile.seamlessCount(), "43 and 44 pixels wide, 43 high");
+    }
+
+    /** Twenty tiles side by side at 2.7 pixels per unit, starting at a fraction of a unit. */
+    private static BufferedImage row(Sprite tile, boolean seamless) {
+        BufferedImage screen = new BufferedImage(900, 50, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = screen.createGraphics();
+        g.scale(2.7, 2.7);
+        g.translate(-0.3, 0);
+        for (int i = 0; i < 20; i++) {
+            if (seamless) tile.drawSeamless(g, i * 16, 0);
+            else tile.draw(g, i * 16, 0);
+        }
+        g.dispose();
+        return screen;
+    }
+    // --8<-- [end:test-seamless]
 }
