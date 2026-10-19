@@ -13,6 +13,7 @@ The handbook grows with the games: a chapter is written when its game is finishe
 | [11. Solitaire](11-solitaire.md) | Solitaire (Klondike) | Undo and redo, animation (easing, tweens, an animation timer), the game clock |
 | [20. Paddle](20-paddle.md) | Paddle (Pong) | Game loop with a fixed time step, active rendering in logical coordinates, full screen, keyboard input and controls, scenes |
 | [21. Bricks](21-bricks.md) | Bricks (Breakout) | Swept box collision, sprites with a cache per screen size, particles, sound effects and a mixer, frame times, pixel mode and an overlay layer |
+| [22. Snake](22-snake.md) | Snake | A ticker for rules with a pace of their own, random numbers that repeat, replays |
 | [Java2D and X11 Pitfalls](appendix-java2d.md) | | The rules for fast and correct drawing, collected |
 
 ## Planned
@@ -21,7 +22,6 @@ The handbook grows with the games: a chapter is written when its game is finishe
 
 | Chapter | Game (in the style of) | New in the engine |
 |---|---|---|
-| 22 | **Snake** | A tick for the rules apart from the frame rate, deterministic random numbers |
 | 23 | **Rocks** (Asteroids) | Vectors, rotation, wrap-around, object pools, circle collision |
 | 24 | **Swarm** (Galaga) | Sprite sheets and animation, entities and components, flight paths, waves, spatial grid, music |
 | 25 | **Maze** (Pac-Man) | Tile maps, movement on a grid, AI as state machines, breadth-first search and A* |
