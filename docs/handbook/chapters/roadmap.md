@@ -12,6 +12,8 @@ The handbook grows with the games: a chapter is written when its game is finishe
 | [10. Mines](10-mines.md) | Mines | High scores, game menus, high-score dialogs |
 | [11. Solitaire](11-solitaire.md) | Solitaire (Klondike) | Undo and redo, animation (easing, tweens, an animation timer), the game clock |
 | [20. Paddle](20-paddle.md) | Paddle (Pong) | Game loop with a fixed time step, active rendering in logical coordinates, full screen, keyboard input and controls, scenes |
+| [21. Bricks](21-bricks.md) | Bricks (Breakout) | Swept box collision, sprites with a cache per screen size, particles, sound effects and a mixer, frame times, pixel mode and an overlay layer |
+| [Java2D and X11 Pitfalls](appendix-java2d.md) | | The rules for fast and correct drawing, collected |
 
 ## Planned
 
@@ -19,9 +21,8 @@ The handbook grows with the games: a chapter is written when its game is finishe
 
 | Chapter | Game (in the style of) | New in the engine |
 |---|---|---|
-| 21 | **Bricks** (Breakout) | Sprites, rectangle collision, levels from files, sound effects |
 | 22 | **Snake** | A tick for the rules apart from the frame rate, deterministic random numbers |
-| 23 | **Rocks** (Asteroids) | Vectors, rotation, wrap-around, object pools, circle collision, particles |
+| 23 | **Rocks** (Asteroids) | Vectors, rotation, wrap-around, object pools, circle collision |
 | 24 | **Swarm** (Galaga) | Sprite sheets and animation, entities and components, flight paths, waves, spatial grid, music |
 | 25 | **Maze** (Pac-Man) | Tile maps, movement on a grid, AI as state machines, breadth-first search and A* |
 | 26 | **Blast** (Bomberman) | Up to four players, gamepads, timers, events, chain reactions |
@@ -39,7 +40,6 @@ After Sands, an economy game in the spirit of *The Settlers* and a city builder 
 ## Appendices, also planned
 
 - **Engine reference**: every package of amade-game-engine, with the chapter that introduced it.
-- **Java2D and X11 pitfalls**: stutter without `Toolkit.sync()`, key repeat on X11, HiDPI.
 - **Glossary**.
 
 Suggestions and corrections are welcome as [issues](https://github.com/datazuul/amade-game-engine/issues) or pull requests. Each page has an edit button at the top.
