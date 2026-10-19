@@ -81,4 +81,35 @@ class MixerTest {
         assertEquals(Short.MAX_VALUE / 2, loudest, 1);
         assertEquals(8820, tone.then(tone).length());
     }
+
+    // --8<-- [start:test-music]
+    @Test
+    void musicPlaysBesideTheEffectsAndLoops() {
+        Mixer mixer = new Mixer();
+        mixer.playMusic(constant(100, 300), true);
+        for (int i = 0; i < Mixer.VOICES + 2; i++) mixer.queue(constant(1, 10_000));
+        short[] block = new short[Mixer.BLOCK];
+        mixer.mix(block);
+        assertEquals(100 + Mixer.VOICES, block[0], "the music and every effect voice");
+        assertEquals(100 + Mixer.VOICES, block[300], "the music again from its start");
+        mixer.setMuted(true);
+        mixer.mix(block);
+        assertEquals(Mixer.VOICES, block[0], "muted: the effects play to their end, the music is silent");
+        assertTrue(mixer.playingMusic(), "but goes on");
+        mixer.stopMusic();
+        mixer.mix(block);
+        assertTrue(!mixer.playingMusic());
+    }
+
+    @Test
+    void musicOnceEnds() {
+        Mixer mixer = new Mixer();
+        mixer.playMusic(constant(100, 300), false);
+        short[] block = new short[Mixer.BLOCK];
+        mixer.mix(block);
+        assertEquals(100, block[299]);
+        assertEquals(0, block[300]);
+        assertTrue(!mixer.playingMusic());
+    }
+    // --8<-- [end:test-music]
 }

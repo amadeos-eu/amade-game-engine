@@ -24,7 +24,7 @@ import java.io.UncheckedIOException;
  *
  * <p>The graphics' interpolation hint decides how the image is scaled:
  * {@link RenderingHints#VALUE_INTERPOLATION_NEAREST_NEIGHBOR} keeps hard pixels (pixel mode), anything else
- * scales smoothly. Use a sprite on one thread only, the game loop's.
+ * scales smoothly, unless the sprite has {@link #hardEdges()}. Use a sprite on one thread only, the game loop's.
  */
 public final class Sprite {
     /**
@@ -43,26 +43,29 @@ public final class Sprite {
     private final double height;
     private final BufferedImage source;
     private final Drawing drawing;
+    /** Always scaled with hard edges, whatever the render mode: pixel art. */
+    private final boolean hard;
     /** The picture at its size on the screen; made by the first frame that needs it. */
     private BufferedImage cached;
     private boolean cachedSmooth;
 
-    private Sprite(double width, double height, BufferedImage source, Drawing drawing) {
+    private Sprite(double width, double height, BufferedImage source, Drawing drawing, boolean hard) {
         if (width <= 0 || height <= 0) throw new IllegalArgumentException("empty sprite");
         this.width = width;
         this.height = height;
         this.source = source;
         this.drawing = drawing;
+        this.hard = hard;
     }
 
     /** A sprite from an image, shown at {@code width} × {@code height} logical units, whatever its pixels. */
     public static Sprite of(BufferedImage image, double width, double height) {
-        return new Sprite(width, height, image, null);
+        return new Sprite(width, height, image, null, false);
     }
 
     /** A sprite drawn in code. */
     public static Sprite drawn(double width, double height, Drawing drawing) {
-        return new Sprite(width, height, null, drawing);
+        return new Sprite(width, height, null, drawing, false);
     }
 
     /** A sprite from an image file among the classes of {@code owner}, e.g. {@code "/sprites/ball.png"}. */
@@ -79,6 +82,18 @@ public final class Sprite {
         } catch (IOException e) {
             throw new UncheckedIOException("cannot read " + resource, e);
         }
+    }
+
+    /**
+     * The same picture, always scaled with hard edges, as pixel mode scales: for pixel art, whose pixels
+     * must stay square blocks instead of blurring into each other.
+     */
+    public Sprite hardEdges() {
+        return new Sprite(width, height, source, drawing, true);
+    }
+
+    public boolean hasHardEdges() {
+        return hard;
     }
 
     public double width() {
@@ -101,7 +116,7 @@ public final class Sprite {
         }
         int w = Math.max(1, (int) Math.round(width * t.getScaleX()));
         int h = Math.max(1, (int) Math.round(height * t.getScaleY()));
-        boolean smooth = g.getRenderingHint(RenderingHints.KEY_INTERPOLATION)
+        boolean smooth = !hard && g.getRenderingHint(RenderingHints.KEY_INTERPOLATION)
                 != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         if (cached == null || cached.getWidth() != w || cached.getHeight() != h || cachedSmooth != smooth) {
             cached = render(g.getDeviceConfiguration(), w, h, smooth);
