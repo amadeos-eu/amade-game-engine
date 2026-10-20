@@ -95,8 +95,23 @@ public final class SeededRandom implements RandomGenerator {
 
     /** A generator at exactly this one's position: both draw the same numbers from here on. */
     public SeededRandom copy() {
-        SeededRandom copy = new SeededRandom(seed);
-        copy.state = state;
-        return copy;
+        return resume(seed, state);
     }
+
+    // --8<-- [start:state]
+    /**
+     * Where the generator stands: the one number that, saved with a game, lets {@link #resume} draw exactly
+     * the numbers this one would have drawn next. SplitMix64 has no other state.
+     */
+    public long state() {
+        return state;
+    }
+
+    /** A generator that started with {@code seed} and stands at {@code state}, as {@link #state()} said. */
+    public static SeededRandom resume(long seed, long state) {
+        SeededRandom random = new SeededRandom(seed);
+        random.state = state;
+        return random;
+    }
+    // --8<-- [end:state]
 }
