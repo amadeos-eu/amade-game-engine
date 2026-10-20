@@ -21,17 +21,18 @@ The handbook grows with the games: a chapter is written when its game is finishe
 | [27. Jump](27-jump.md) | Jump (platformer) | Scrolling camera, maps from the Tiled editor, gravity and jumping, parallax, saving progress |
 | [30. Towers](30-towers.md) | Towers (tower defence) | Flow fields for many units, the mouse in world coordinates, overlay menus, units and towers as data files, turned sprites |
 | [31. Sands](31-sands.md) | Sands (real-time strategy) | Selecting units, group moves and a cache of flow fields, fog of war, minimap, credits and production, an influence map for the computer opponent, saving the whole game |
+| [40. The Engine at a Glance](40-engine.md) | | Part IV, the engine manual: what each part of the engine is for, when to choose it and how it works |
+| [41. Loop, Time and Drawing](41-loop-and-drawing.md) to [48. Scenes, Menus and Sound](48-scenes-menus-sound.md) | | One chapter per subsystem, each section naming the game that introduced it |
 | [Java2D and X11 Pitfalls](appendix-java2d.md) | | The rules for fast and correct drawing, collected |
 
 ## Planned
 
 ### Part III: Strategy
 
-Sands closes Part III for now. After it, an economy game in the spirit of *The Settlers* and a city builder in the spirit of *Pharaoh* need little new engine, but a lot of simulation: production chains, transport, population, trade.
+Sands closes Part III for now. When a new game adds to the engine, its chapter tells the story and Part IV gets the new section. After it, an economy game in the spirit of *The Settlers* and a city builder in the spirit of *Pharaoh* need little new engine, but a lot of simulation: production chains, transport, population, trade.
 
-## Appendices, also planned
+## An appendix, also planned
 
-- **Engine reference**: every package of amade-game-engine, with the chapter that introduced it.
 - **Glossary**.
 
 Suggestions and corrections are welcome as [issues](https://github.com/datazuul/amade-game-engine/issues) or pull requests. Each page has an edit button at the top.

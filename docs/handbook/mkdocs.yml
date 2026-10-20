@@ -78,6 +78,16 @@ nav:
   - "Part III: Strategy":
       - 30. Towers: 30-towers.md
       - 31. Sands: 31-sands.md
+  - "Part IV: The Engine Manual":
+      - 40. The Engine at a Glance: 40-engine.md
+      - 41. Loop, Time and Drawing: 41-loop-and-drawing.md
+      - 42. Sprites and Effects: 42-sprites.md
+      - 43. Input: 43-input.md
+      - 44. Movement, Physics and Collision: 44-movement.md
+      - 45. Maps, Camera and Fog: 45-maps.md
+      - 46. Paths, Groups and Decisions: 46-paths-and-decisions.md
+      - 47. Chance, Data and Saving: 47-data-and-saving.md
+      - 48. Scenes, Menus and Sound: 48-scenes-menus-sound.md
   - Appendices:
       - Java2D and X11 Pitfalls: appendix-java2d.md
   - The Road Ahead: roadmap.md
