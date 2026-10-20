@@ -30,6 +30,14 @@ The library grows game by game: each game adds what it needs and leaves it here 
 - **Tile maps** (`eu.amadeos.gameengine.tile`): `TileMap` (a grid of tiles, read from the rows of a data file, with wrapping steps and the neighbour mask for walls that join up), `Direction` and `Cell`, and `Walker`, which walks from tile centre to tile centre and asks at each centre which way to go.
 - **State machines** (`eu.amadeos.gameengine.ai.StateMachine`): the states of a character as an enum, the allowed changes between them, the time in the current state and a listener for each change.
 - **Pathfinding** (`eu.amadeos.gameengine.path`): `DistanceMap` (breadth-first search from one or more goals: the distance of every tile and the step downhill) and `AStar` (the cheapest way between two tiles, with costs per tile and a guess that knows about wrapping).
+- **Flow fields** (`eu.amadeos.gameengine.path`): `FlowField` (one search from a goal gives every tile its way, in eight directions without cutting corners, for any number of units), `FieldCache` (a field per goal, kept until the map changes), `Formation` (a slot near the target for each unit of a group, shared out without crossing, and a test for a clear straight line).
+- **Choosing units** (`eu.amadeos.gameengine.select`): `Selection` (what is picked, Shift to add, nine groups on Ctrl and a number), `BoxSelect` (a click or a box, told apart by a few units of movement).
+- **Fog of war and minimap**: `fog.FogOfWar` (unseen, seen and visible per tile and side, saved as one bit per tile), `fog.FogPainter` (soft edges from 81 cached tiles), `minimap.Minimap` (one pixel per tile, painted where it changed, dots and the camera's box over it).
+- **Economy** (`eu.amadeos.gameengine.economy`): `Credits` (money with a store that can be full), `Production` (a queue paid while it runs, slower on low power, cancelled with a refund).
+- **Influence maps** (`eu.amadeos.gameengine.ai.InfluenceMap`): a side's strength spread over the map, for the computer's choice of where to attack.
+- **Data catalogues** (`eu.amadeos.gameengine.data.Catalog`): blocks of named properties in a data file, a block that starts like another, unknown properties named with their line.
+- **Overlay menus** (`eu.amadeos.gameengine.menu.OverlayMenu`): a menu drawn over the game, by mouse and by keys.
+- **Turned sprites** (`eu.amadeos.gameengine.sprite.Rotations`): a picture drawn once at a number of angles, the nearest one shown.
 - **Particles** (`eu.amadeos.gameengine.fx.Particles`): hundreds of splinters and sparks in arrays, without creating objects while the game runs.
 - **Sound** (`eu.amadeos.gameengine.audio`): sound effects made from tones (`Sound`), several at once through one `Mixer` thread, and music on a voice of its own, once or in a loop; tunes written in the Music Macro Language of the home computers (`Tune`), voices mixed into one sound. Silent without a sound card.
 - **Keyboard and mouse** (`eu.amadeos.gameengine.input`): `KeyState` (held keys, presses between two looks, X11 key repeat filtered), `Keyboard` (the AWT side, thread-safe), `Controls` (keys mapped to a game's actions), `Mouse` (position in logical coordinates, clicks between two looks, held buttons; `GameCanvas.toLogical` maps like the render mode draws).
@@ -40,6 +48,7 @@ The library grows game by game: each game adds what it needs and leaves it here 
 - **Platform physics** (`eu.amadeos.gameengine.physics`): `Body` (a box with a speed that falls), `TileCollider` (moves a body through a tile map one axis at a time, without tunnelling: solid tiles, and platforms that hold from above only and can be dropped through), `Jump` (variable height, coyote time and a jump buffer; the jump speed for a height).
 - **Tiled maps** (`eu.amadeos.gameengine.tiled`): `TiledMap` reads the TMX and TSX files of the [Tiled](https://www.mapeditor.org/) editor (tile layers in CSV, Base64 or zlib/gzip, tilesets in the map or in their own file, tile classes, animations, object layers with classes and properties) into records; errors name the file and the line.
 - **Save files** (`eu.amadeos.gameengine.save.SaveFile`): a game's progress as versioned key-value text with a checksum, written to a new file that then replaces the old one, with the last good save kept as a backup.
+- **Snapshots** (`eu.amadeos.gameengine.save.Snapshot`): a whole running game as keys and values for a save file, lists and nesting included, numbers exact to the bit; with `SeededRandom.state` and `resume`, a loaded game goes on exactly as the saved one would have.
 - **Scenes** (`eu.amadeos.gameengine.scene`): `Scene` and `SceneStack` (only the top scene moves, all are drawn: a pause screen over a frozen match).
 - Texts in English, Deutsch, Français, Español and Italiano.
 
@@ -51,7 +60,7 @@ The [Amade Game Developer's Handbook](https://datazuul.github.io/amade-game-engi
 
 ## Planned
 
-In the order the games need them: the mouse in world coordinates, overlay menus and flow fields for many units (Towers), then selecting units, group pathfinding, fog of war and a minimap (Sands). Game rules stay plain Java without AWT, so they can be tested headless.
+In the order the games need them: production chains, transport and population for an economy game in the spirit of *The Settlers*, then a city builder. Game rules stay plain Java without AWT, so they can be tested headless.
 
 ## Using it
 

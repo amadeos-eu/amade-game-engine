@@ -77,6 +77,7 @@ nav:
       - 27. Jump: 27-jump.md
   - "Part III: Strategy":
       - 30. Towers: 30-towers.md
+      - 31. Sands: 31-sands.md
   - Appendices:
       - Java2D and X11 Pitfalls: appendix-java2d.md
   - The Road Ahead: roadmap.md
