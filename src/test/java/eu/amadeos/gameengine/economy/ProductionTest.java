@@ -76,14 +76,14 @@ class ProductionTest {
     void aBuildingWaitsToBePlacedAndHoldsTheQueue() {
         Credits credits = new Credits(1000, 2000);
         Production<String> yard = new Production<>();
-        yard.order("windtrap", 300, 5);
+        yard.order("turbine", 300, 5);
         yard.order("silo", 100, 5);
         String done = run(yard, credits, 5, 1);
-        assertEquals("windtrap", done);
+        assertEquals("turbine", done);
         yard.keep(done);
         assertNull(run(yard, credits, 5, 1));
-        assertEquals(0, yard.progress(), "the silo waits for the windtrap to be placed");
-        assertEquals("windtrap", yard.take());
+        assertEquals(0, yard.progress(), "the silo waits for the turbine to be placed");
+        assertEquals("turbine", yard.take());
         assertEquals("silo", run(yard, credits, 5, 1));
 
         yard.order("silo", 100, 5);

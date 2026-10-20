@@ -12,7 +12,7 @@ import java.util.Arrays;
  *
  * <p>With two of them, one per side, the questions of an opponent become arithmetic: where is the enemy
  * strongest (the value at its largest)? Which of the enemy's buildings is defended worst (the building
- * with the least enemy strength around it)? Is this spice field safe for a harvester (no enemy strength
+ * with the least enemy strength around it)? Is this crystal field safe for a harvester (no enemy strength
  * there)? Game AI has used such maps since the strategy games of the nineties; they are cheap, and what
  * they answer is easy to see when they are drawn.
  *

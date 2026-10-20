@@ -1,7 +1,7 @@
 package eu.amadeos.gameengine.economy;
 
 /**
- * The money of one side, and how much of it can be kept. In Dune II spice brought in by the harvesters
+ * The money of one side, and how much of it can be kept. In Dune II what the harvesters bring in
  * fills the refineries and silos; what they cannot hold is lost. A limit to the store makes the player build
  * where the money goes, and spend it, instead of saving up for ever.
  *

@@ -15,7 +15,7 @@ import java.awt.image.BufferedImage;
  * send units there.
  *
  * <p>The picture is an image of exactly one pixel per tile. The game paints a tile when it changes, which
- * is seldom (spice gone, a building up, fog lifted), and the image is drawn scaled into the minimap's box in
+ * is seldom (crystal gone, a building up, fog lifted), and the image is drawn scaled into the minimap's box in
  * every frame. Scaling an image of 64 × 64 pixels into a box of 112 × 112 units is a small copy; drawing 4,096
  * rectangles would not be. The dots are drawn over it in every frame: they move.
  *
