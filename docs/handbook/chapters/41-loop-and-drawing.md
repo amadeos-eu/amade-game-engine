@@ -84,6 +84,29 @@ Besides `start` and `update` there are `running(key)`, `left(key)`, `cancel(key)
 
 **How it works.** The clock reads the time from a `LongSupplier` of nanoseconds: `System::nanoTime` in the game, a number the test moves forward in tests, so a test can win a game of Mines in 4.2 seconds without waiting ([chapter 10](10-mines.md#time-you-can-test)).
 
+## The seasons of a year: Seasons
+
+*Package `time` · introduced in [32. Colony](32-colony.md#seasons) · source: [`Seasons`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/time/Seasons.java)*
+
+**What it is for.** A year of seasons, each as long as the game wants: Colony's mission 3 has a long winter of 170 seconds and a short spring. It answers which season it is, which year, how far the season is, and, after each step, how many seasons began in it, so that "Winter" is said exactly once.
+
+**When to choose it.** For any game time that goes round: seasons, day and night, the shifts of a factory, the tides. It only counts; what a season means (no growing, snow, more fires) is the game's.
+
+**How it works.** The only state is the time since the start, so a save file keeps one number and `restore` sets it. Season and year are worked out from it every time they are asked: whole years first, then the seasons of the year begun. `update` compares the number of seasons begun before and after the step; a step longer than a season, as when a test runs fast, reports all of them.
+
+```java title="amade-game-engine · time/Seasons.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/time/Seasons.java:seasons"
+```
+
+| Method | What it does |
+|---|---|
+| `new Seasons(150, 150, 150, 90)` | Four seasons of these lengths, in seconds |
+| `update(seconds)` | Lets time pass; how many seasons began |
+| `season()`, `year()` | The current season from 0, the current year from 0 |
+| `progress()`, `left()` | How far the season is, 0 to 1; the seconds left in it |
+| `count()`, `length(season)` | The number of seasons, the length of one |
+| `time()`, `restore(time)` | The whole state, for a save file |
+
 ## Which clock?
 
 | The question | Use |
@@ -93,6 +116,7 @@ Besides `start` and `update` there are `running(key)`, `left(key)`, `cancel(key)
 | Which bombs explode now, and in which order? | `Timers` |
 | How long has this ghost been frightened? | `StateMachine.seconds()` ([chapter 46](46-paths-and-decisions.md#one-state-at-a-time-statemachine)) |
 | How long did the player need for this game of Mines? | `GameClock` |
+| Is it winter yet? | `Seasons` |
 | How far along is this card's flight? | `Tween` ([chapter 42](42-sprites.md#movement-in-time-easing-and-tween)) |
 
 ## The canvas: GameCanvas and RenderMode

@@ -49,6 +49,28 @@ The order of `Direction` is a rule of its own: when two ways are equally good, t
 
 `previousX()` and `previousY()` are the position before the last walk, for drawing between steps; over an edge, both move to the far side together.
 
+## The land a side owns: Territory
+
+*Package `tile` · introduced in [32. Colony](32-colony.md#the-border) · source: [`Territory`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tile/Territory.java)*
+
+**What it is for.** The land inside a border made of circles: the storehouse claims the land around it, every lookout tower more. A building may stand only inside. Claims overlap, and a tower that burns down gives back only what no other claim still holds.
+
+**When to choose it.** For any land that is owned by being near something: a settlement's border, the reach of a city's services, the area a tower guards. Who **sees** what is a different question, answered by the [fog of war](#what-a-side-sees-fogofwar-and-fogpainter).
+
+**How it works.** Every tile counts the claims that hold it; it is inside while the count is above zero. `release` counts down, so nothing has to find out which other claim also covers a tile. A circle is `dc² + dr² ≤ r² + r`: with `r²` alone, single tiles stick out at the four ends. `version` counts the changes, so a picture of the border is made again only when it moved.
+
+```java title="amade-game-engine · tile/Territory.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/tile/Territory.java:territory"
+```
+
+| Method | What it does |
+|---|---|
+| `claim(id, col, row, radius)`, `release(id)` | Claims the land in a circle under a number; gives it back |
+| `inside(col, row)` | True if any claim holds the tile |
+| `border(col, row)`, `border()` | A tile inside next to one outside; all of them, for the posts |
+| `size()`, `has(id)`, `ids()` | How much land; which claims there are, for saving |
+| `version()` | Counts every change |
+
 ## Maps from an editor: TiledMap
 
 *Package `tiled` · introduced in [27. Jump](27-jump.md#step-1-levels-from-the-tiled-editor) · source: [`TiledMap`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tiled/TiledMap.java), [`TiledObject`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tiled/TiledObject.java), [`TiledProperties`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tiled/TiledProperties.java), [`TmxReader`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tiled/TmxReader.java)*

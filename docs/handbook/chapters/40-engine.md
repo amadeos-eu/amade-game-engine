@@ -11,7 +11,7 @@ Each chapter of this part covers one area. Each section in it describes one feat
 | [43. Input](43-input.md) | `input` | Keyboard, actions instead of keys, mouse, gamepads |
 | [44. Movement, Physics and Collision](44-movement.md) | `math`, `motion`, `physics`, `collision`, `pool`, `entity` | Vectors and angles, flight paths, falling and jumping, what hits what, many things at once |
 | [45. Maps, Camera and Fog](45-maps.md) | `tile`, `tiled`, `camera`, `fog`, `minimap` | Tile maps, maps from an editor, worlds larger than the screen, what a side sees |
-| [46. Paths, Groups and Decisions](46-paths-and-decisions.md) | `path`, `select`, `ai`, `event` | Finding the way for one or for many, choosing units, states, the computer's view of the map, chain reactions |
+| [46. Paths, Groups and Decisions](46-paths-and-decisions.md) | `path`, `road`, `select`, `ai`, `event` | Finding the way for one or for many, roads between flags, choosing units, states, the computer's view of the map, chain reactions |
 | [47. Chance, Data and Saving](47-data-and-saving.md) | `random`, `replay`, `undo`, `data`, `economy`, `save`, `score` | Repeatable chance, replays, undo, data files, money and production, saving, high scores |
 | [48. Scenes, Menus and Sound](48-scenes-menus-sound.md) | `scene`, `swing`, `menu`, `audio` | Screens of a game, the standard menus and dialogs, menus over the game, sound and music |
 
@@ -50,6 +50,7 @@ A few rules hold for nearly every class. Knowing them makes the rest of the manu
 | Rules that run 120 times a second, frames as fast as the screen allows | `GameLoop` | [41](41-loop-and-drawing.md#the-game-loop-gameloop-and-fixedstep) |
 | Rules that move in ticks of their own (a snake's cell, a falling row) | `Ticker` | [41](41-loop-and-drawing.md#a-pace-of-its-own-ticker) |
 | Many countdowns: fuses, cooldowns, build times | `Timers` | [41](41-loop-and-drawing.md#many-countdowns-timers) |
+| A year of seasons, which one began | `Seasons` | [41](41-loop-and-drawing.md#the-seasons-of-a-year-seasons) |
 | The time of one game, for a high score | `GameClock` | [41](41-loop-and-drawing.md#the-time-of-a-game-gameclock) |
 | A drawing surface in fixed logical coordinates | `GameCanvas` | [41](41-loop-and-drawing.md#the-canvas-gamecanvas-and-rendermode) |
 | Animation in a Swing component of a game that waits for the player | `Animator`, `Tween` | [41](41-loop-and-drawing.md#animation-on-the-event-thread-animator), [42](42-sprites.md#movement-in-time-easing-and-tween) |
@@ -63,17 +64,20 @@ A few rules hold for nearly every class. Knowing them makes the rest of the manu
 | Things that fly at an angle | `Vector`, `Angles` | [44](44-movement.md#points-and-directions-vector-and-angles) |
 | A field without edges | `Wrap` | [44](44-movement.md#a-field-without-edges-wrap) |
 | A smooth curve to fly along at an even speed | `FlightPath` | [44](44-movement.md#curves-to-fly-along-flightpath) |
+| Animals that graze around a home, and flee | `Wander` | [44](44-movement.md#grazing-wander) |
 | Falling, standing, jumping on tiles | `Body`, `TileCollider`, `Jump` | [44](44-movement.md#falling-and-standing-body-and-tilecollider) |
 | Collision of fast boxes, of circles, of many things | `Sweep`, `Circle`, `Grid` | [44](44-movement.md#which-collision-test) |
 | Shots with a limit, without garbage | `Pool` | [44](44-movement.md#a-fixed-number-of-things-pool) |
 | Things whose behaviour changes while they live | `Entity`, `Entities` | [44](44-movement.md#entities-and-components) |
 | A level on a grid, written as text | `TileMap` | [45](45-maps.md#a-grid-of-tiles-tilemap-cell-and-direction) |
 | Walking corridors from tile centre to tile centre | `Walker` | [45](45-maps.md#walking-corridors-walker) |
+| Land owned around buildings, a border that grows | `Territory` | [45](45-maps.md#the-land-a-side-owns-territory) |
 | Levels drawn in the Tiled editor | `TiledMap` | [45](45-maps.md#maps-from-an-editor-tiledmap) |
 | A world larger than the screen | `Camera`, `Parallax` | [45](45-maps.md#a-world-larger-than-the-screen-camera) |
 | What a side has seen and sees now | `FogOfWar`, `FogPainter` | [45](45-maps.md#what-a-side-sees-fogofwar-and-fogpainter) |
 | The whole map in a corner | `Minimap` | [45](45-maps.md#the-map-in-a-corner-minimap) |
 | The way for one, or for many to one goal | `AStar`, `DistanceMap`, `FlowField` | [46](46-paths-and-decisions.md#which-search) |
+| Roads from flag to flag, the next road for a ware | `RoadNetwork` | [46](46-paths-and-decisions.md#roads-between-flags-roadnetwork) |
 | Groups that arrive side by side | `Formation`, `FieldCache` | [46](46-paths-and-decisions.md#groups-on-the-move-formation) |
 | Click and box selection, groups on number keys | `Selection`, `BoxSelect` | [46](46-paths-and-decisions.md#choosing-units-selection-and-boxselect) |
 | A character with modes | `StateMachine` | [46](46-paths-and-decisions.md#one-state-at-a-time-statemachine) |
@@ -83,6 +87,7 @@ A few rules hold for nearly every class. Knowing them makes the rest of the manu
 | Replays, undo | `Replay`, `History` | [47](47-data-and-saving.md#a-game-as-its-input-replay), [47](47-data-and-saving.md#undo-and-redo-history) |
 | Levels, waves, units as text files | `TextData`, `Catalog` | [47](47-data-and-saving.md#data-files-textdata), [47](47-data-and-saving.md#things-with-properties-catalog) |
 | Money and things that take time to make | `Credits`, `Production` | [47](47-data-and-saving.md#money-and-production-credits-and-production) |
+| Goods by kind, and what a workshop makes of them | `Stock`, `Recipe` | [47](47-data-and-saving.md#goods-and-recipes-stock-and-recipe) |
 | Progress, or a whole game, on disk | `SaveFile`, `Snapshot` | [47](47-data-and-saving.md#progress-on-disk-savefile) |
 | High scores | `HighScores` | [47](47-data-and-saving.md#high-scores-highscores) |
 | Title, match, pause and end screens | `Scene`, `SceneStack` | [48](48-scenes-menus-sound.md#screens-scene-and-scenestack) |
@@ -108,6 +113,7 @@ The order in which the engine grew, and where each part is explained step by ste
 | [27](27-jump.md#what-moved-into-the-engine) | Jump | `camera` (`Camera`, `Parallax`), `physics` (`Body`, `Solidity`, `TileCollider`, `Jump`), `tiled`, `save.SaveFile` |
 | [30](30-towers.md#what-moved-into-the-engine) | Towers | `path.FlowField`, `data.Catalog`, `menu.OverlayMenu`, `sprite.Rotations` |
 | [31](31-sands.md#what-moved-into-the-engine) | Sands | `select`, `path` (`Formation`, `FieldCache`), `fog`, `minimap`, `economy`, `ai.InfluenceMap`, `save.Snapshot` |
+| [32](32-colony.md#what-moved-into-the-engine) | Colony | `road.RoadNetwork`, `economy` (`Stock`, `Recipe`), `time.Seasons`, `tile.Territory`, `motion.Wander` |
 
 Many classes grew later, when another game needed a little more: `Camera` learned the mouse in Towers, `Sprite` its opaque caches in Jump and Towers, `SeededRandom` to be saved in Sands. The sections of this part describe each class as it is now.
 

@@ -122,6 +122,29 @@ unit orc-chief like orc
 | `progress()`, `paid()`, `current()`, `queue()`, `count(item)` | For the panel |
 | `restore(paid, done, held)` | The first order's state from a save file |
 
+## Goods and recipes: Stock and Recipe
+
+*Package `economy` · introduced in [32. Colony](32-colony.md#step-4-goods-and-recipes) · source: [`Stock`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/economy/Stock.java), [`Recipe`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/economy/Recipe.java)*
+
+**What it is for.** Goods counted by kind, and what a workshop makes of them. A `Stock` is a count for each value of an `enum` of goods, with a limit per good if wanted: a storehouse, a building site, the door of a bakery. A `Recipe` is a list of inputs, the good made and the seconds it takes; each input is a **set** of goods, any one of which will do. Colony's residence needs bread *or* fish, and cloth.
+
+**When to choose them.** For an economy of many goods, where `Credits` (above) is an economy of one. Neither knows what the goods are or who carries them.
+
+**How it works.** `Stock` keeps an `EnumMap`, so it is fast, and its order is the enum's, so a save file or a panel lists the goods always in the same order. `take` takes all of a count or nothing. `Recipe.take` chooses one good for each input, trying the goods of a set in the enum's order, and takes them only if every input is served; it never takes half of what it needs. The same good can serve two inputs only if there are two of it.
+
+```java title="amade-game-engine · economy/Recipe.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/economy/Recipe.java:recipe"
+```
+
+| Method | What it does |
+|---|---|
+| `stock.count(good)`, `add(good, n)`, `take(good, n)` | How many; adds as far as they fit and returns the rest; takes all or nothing |
+| `limit(good)`, `limit(good, n)`, `room(good)` | The most that may be kept, and how many more fit |
+| `has(price)`, `pay(price)` | Whether a price of several goods is there; takes it all or nothing |
+| `counts()`, `total()`, `set(good, n)`, `kinds()` | For the panel and a save file |
+| `new Recipe<>(List.of(Set.of(BREAD, FISH), Set.of(CLOTH)), null, 16)` | The residence: bread or fish, and cloth |
+| `recipe.ready(stock)`, `take(stock)`, `needs()` | Whether it can start; takes the inputs and returns them; every good it may use |
+
 ## Progress on disk: SaveFile
 
 *Package `save` · introduced in [27. Jump](27-jump.md#step-8-saving-progress) · source: [`SaveFile`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/save/SaveFile.java)*
