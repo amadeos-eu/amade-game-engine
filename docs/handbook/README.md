@@ -4,7 +4,7 @@ The handbook teaches game programming in Java by building the amadeOS games and 
 
 ## Writing
 
-- One Markdown file per chapter in `chapters/`, numbered: `0x` getting started, `1x` part I, `2x` part II, `3x` part III. The order of the book is the `nav` in `mkdocs.yml`.
+- One Markdown file per chapter in `chapters/`, numbered: `0x` getting started, `1x` part I, `2x` part II, `3x` part III, `4x` part IV (the engine manual, by subsystem rather than by game). The order of the book is the `nav` in `mkdocs.yml`.
 - Pictures go to `chapters/images/<game>/`.
 - **Code is never copied into a chapter.** It is included from the game's repository, from a section marked in the source:
 

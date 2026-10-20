@@ -50,6 +50,8 @@ Boxes point out things worth remembering:
 | II. Action | Paddle, Bricks, Snake, Rocks, Swarm, Maze, Blast, Jump | Game loop, keyboard, sprites, collision, sound, tile maps, AI, cameras, physics |
 | III. Strategy | Towers, Sands | Mouse in world coordinates, pathfinding for many units, selection, fog of war, saving games |
 
+Part IV, [the engine manual](40-engine.md), comes after the games. It describes the engine by subsystem rather than by game: what each part is for, when to choose it, how it works, and which chapter introduced it. Use it to look things up once you have read the games, or when you start a game of your own.
+
 What is written so far and what comes next is listed in [The Road Ahead](roadmap.md).
 
 ## Conventions
