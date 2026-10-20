@@ -22,6 +22,10 @@ Every rule below is a rule of thumb. Your computer, your graphics driver and you
 
 **Antialiasing costs.** Smooth edges for shapes and text are computed per pixel, and on most Linux setups in software. Keep it for what needs it (text, round shapes), or draw such shapes once into a cached image. Turn it off for straight-edged fills: a full-screen black rectangle cost three times as much with antialiasing on, and in Swarm that was half of each frame ([chapter 24](24-swarm.md#a-black-rectangle)).
 
+**Gradients are painted pixel by pixel.** A `GradientPaint` works out the colour of every pixel it fills, in software, in every frame. Panels and buttons that look the same from one frame to the next are drawn once into sprites and copied after that. In Sands the panel's gradients were 70 % of each frame; cached, the frame took a third less time ([chapter 31](31-sands.md#the-panel-and-a-frame-time-measured)).
+
+**Neighbours must round alike.** At a window size that is no whole multiple of the logical one, a sprite's edge and a filled rectangle's edge fall between screen pixels and are rounded, and two ways of rounding leave a line of pixels uncovered between things that should touch. Fill what lies next to sprites with the same rounding as `Sprite.drawSeamless`: the edges worked out in screen pixels, then filled without a transform ([chapter 31](31-sands.md#soft-edges)).
+
 **Don't create objects in the frame loop.** `new Color`, `new Font`, `deriveFont`, `new BasicStroke`, `String.format`: each is cheap, but hundreds per frame, sixty times a second, keep the garbage collector busy and cause the occasional long frame. Make them once (chapter 21, `Particles` and `Hud`).
 
 ## Buffers

@@ -20,17 +20,14 @@ The handbook grows with the games: a chapter is written when its game is finishe
 | [26. Blast](26-blast.md) | Blast (Bomberman) | Gamepads on Linux and Windows, timers, an event queue for chain reactions |
 | [27. Jump](27-jump.md) | Jump (platformer) | Scrolling camera, maps from the Tiled editor, gravity and jumping, parallax, saving progress |
 | [30. Towers](30-towers.md) | Towers (tower defence) | Flow fields for many units, the mouse in world coordinates, overlay menus, units and towers as data files, turned sprites |
+| [31. Sands](31-sands.md) | Sands (Dune II) | Selecting units, group moves and a cache of flow fields, fog of war, minimap, credits and production, an influence map for the computer opponent, saving the whole game |
 | [Java2D and X11 Pitfalls](appendix-java2d.md) | | The rules for fast and correct drawing, collected |
 
 ## Planned
 
 ### Part III: Strategy
 
-| Chapter | Game (in the style of) | New in the engine |
-|---|---|---|
-| 31 | **Sands** (Dune II) | Selecting units, group pathfinding, fog of war, minimap, resources and buildings, computer opponent, saving the whole game |
-
-After Sands, an economy game in the spirit of *The Settlers* and a city builder in the spirit of *Pharaoh* need little new engine, but a lot of simulation: production chains, transport, population, trade.
+Sands closes Part III for now. After it, an economy game in the spirit of *The Settlers* and a city builder in the spirit of *Pharaoh* need little new engine, but a lot of simulation: production chains, transport, population, trade.
 
 ## Appendices, also planned
 
