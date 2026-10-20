@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * What a building is making: a queue of orders, the first one in the works. As in Dune II the price is not
+ * What a building is making: a queue of orders, the first one in the works. As in the classic strategy games the price is not
  * paid at the start but <b>while it is made</b>: a tank of 300 credits that takes 20 seconds costs 15
  * credits a second. Without the money, the work stops and waits; with less power, it goes slower. The player
  * can start an order with nearly no money and watch it grow as the harvesters bring crystal, which keeps the

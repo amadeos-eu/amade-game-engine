@@ -52,7 +52,7 @@ For amadeOS this matters because the system is often tried out in QEMU. For you 
 
 ### 4. Java2D is fast enough for these games
 
-The games in this book are classic 2D games. *Dune II* ran at 320 × 200 pixels on a 1992 PC. *Pharaoh* ran at 640 × 480 on a computer with less power than a phone today. Java2D draws thousands of images per frame on current hardware if you follow a few rules: scale each picture once and then only copy it, cache tile layers as images, avoid creating objects in the loop, and measure before you change anything. The book teaches these rules when a game needs them.
+The games in this book are classic 2D games. The first real-time strategy games ran at 320 × 200 pixels on a PC of the early 1990s. *Pharaoh* ran at 640 × 480 on a computer with less power than a phone today. Java2D draws thousands of images per frame on current hardware if you follow a few rules: scale each picture once and then only copy it, cache tile layers as images, avoid creating objects in the loop, and measure before you change anything. The book teaches these rules when a game needs them.
 
 ### 5. Small and lasting
 

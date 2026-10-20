@@ -8,7 +8,7 @@ Towers (chapter 30) gave the player a mouse and a map larger than the screen, bu
 <figcaption>A base after six minutes (left): five tanks chosen by a box and sent to the sand, each to a slot of its own, the dotted lines their orders. A fight at the foot of the rock (right): red tanks attack, a launcher burns. Beyond what blue's units see, the map is dim or black.</figcaption>
 </figure>
 
-*Dune II* (Westwood, 1992) set the rules that real-time strategy has followed since: harvest, build, produce, command groups with the mouse, explore a map hidden in the dark. Each of these is a small piece of engine, and Sands is the game where they all come together. It is the largest game of this handbook, and the first in which the computer does not only move enemies but plays: it decides what to build, where, and whom to attack.
+The early 1990s set the rules that real-time strategy has followed since: harvest, build, produce, command groups with the mouse, explore a map hidden in the dark. Each of these is a small piece of engine, and Sands is the game where they all come together. It is the largest game of this handbook, and the first in which the computer does not only move enemies but plays: it decides what to build, where, and whom to attack.
 
 !!! abstract "What you will learn"
     - **Choosing units**: a click, a box, Shift to add, Ctrl and a number for a group that is kept
@@ -187,7 +187,7 @@ A click on it moves the camera there, a drag scrolls, and the right button sends
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/minimap/Minimap.java:convert"
 ```
 
-The game paints the minimap after every step in which the fog's or the crystal's version has changed, and draws the buildings, ghosts and vehicles over it. It shows nothing at all without an **outpost** with power: in Dune II the radar is a building you have to earn.
+The game paints the minimap after every step in which the fog's or the crystal's version has changed, and draws the buildings, ghosts and vehicles over it. It shows nothing at all without an **outpost** with power: in the classic strategy games the radar is a building you have to earn.
 
 ```java title="amade-sands-game · ui/game/Hud.java"
 --8<-- "amade-sands-game/src/main/java/eu/amadeos/games/sands/ui/game/Hud.java:minimap"
@@ -219,7 +219,7 @@ The money goes into `Credits`, which know how much they can hold. A limit to the
 
 ### Paying while it is made
 
-In Dune II, a tank is not paid when it is ordered but while the factory works on it: 300 credits over 14 seconds is a little more than 21 credits a second. Without money, the work stands still and waits; with half the power, it goes at half the speed. That keeps the game moving, because the player can order something with nearly no money and watch it grow as the harvesters come in. `Production` is that queue:
+In the classic strategy games, a tank is not paid when it is ordered but while the factory works on it: 300 credits over 14 seconds is a little more than 21 credits a second. Without money, the work stands still and waits; with half the power, it goes at half the speed. That keeps the game moving, because the player can order something with nearly no money and watch it grow as the harvesters come in. `Production` is that queue:
 
 ```java title="amade-game-engine · economy/Production.java"
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/economy/Production.java:production"

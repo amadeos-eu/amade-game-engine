@@ -1,7 +1,7 @@
 package eu.amadeos.gameengine.economy;
 
 /**
- * The money of one side, and how much of it can be kept. In Dune II what the harvesters bring in
+ * The money of one side, and how much of it can be kept. In a classic strategy game what the harvesters bring in
  * fills the refineries and silos; what they cannot hold is lost. A limit to the store makes the player build
  * where the money goes, and spend it, instead of saving up for ever.
  *
