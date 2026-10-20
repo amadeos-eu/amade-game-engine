@@ -146,6 +146,16 @@ A step of the game, in its order:
 --8<-- "amade-towers-game/src/main/java/eu/amadeos/games/towers/domain/Game.java:update"
 ```
 
+### Through each other
+
+Watch a wave for a while and a wolf catches up with a troll and walks right through it. Nothing in `walk` knows about other units: each one follows the field on its own, as if the others were not there. That is a choice, and tower defence games make it in three ways:
+
+- **Overlap.** Units are ghosts to each other. A fast one passes a slow one, and a crowd can stand on one spot. Most tower defence games do this, Bloons TD and Kingdom Rush among them. It costs nothing, the way of each unit is exactly the way of the field, and crowds bunch up, which rewards bursts and frost.
+- **Volume.** Each unit has a body, and bodies push each other apart. Strategy games and the tower defence maps made in them work this way, because their units collide anyway. A troll in a narrow gap now holds up the wolves behind it: traffic jams become part of the game, and the game needs rules so that a jam never freezes for good.
+- **One per cell.** On a grid, a unit may only step into a free cell. It waits or steps aside when the next one is taken: a board game more than a crowd.
+
+Towers overlaps, for four reasons. The flow field stays the whole truth about where a unit walks, so every test of walking and building stays exact. A cannon burst or a frost ring in a bunch of enemies is the reward the player builds for, and pushing would spread the bunch. The waves were balanced with units that never wait for each other, and jams behind a troll would change every level's difficulty. And the eye forgives it: each unit walks a little to one side (the offset above), so most of the time a crowd looks like a crowd and not like one sprite. Exercise 7 tries the other way.
+
 ## Step 3: Units, towers and waves as data
 
 Swarm (chapter 24) read its flight paths from text files with `TextData`: lines of words, comments after `#`, errors with the file and the line. Towers has three kinds of things with many numbers each, and those numbers are what a tower defence game is made of: an archer that costs 40 or 45 changes the whole game. They belong in files where they can be changed without compiling, and where the game designer can read them:
@@ -523,7 +533,7 @@ What stays in the game: the ground and its classes, the road and open ground, th
 4. **The longest maze.** Write a test that builds, with a fixed amount of gold, the maze that makes the way from the lair to the castle the longest. Is a greedy builder (always the tile that lengthens the way most) good enough?
 5. **Sell back the maze.** Selling a tower opens the way again, and every enemy takes the shorter way at once. Is that a trick players will use, and should the rules allow it?
 6. **A minimap.** Draw the whole battlefield small in a corner, the towers as dots, the view as a box. A click on it moves the camera there. You will need it in the next chapter.
-7. **Group flow.** Two hundred orcs on one trail walk through each other. Give each a little push away from its neighbours (the spatial grid of chapter 24 finds them) and see how a crowd forms in a gap.
+7. **Group flow.** Two hundred orcs on one trail walk through each other. Give each a little push away from its neighbours (the spatial grid of chapter 24 finds them) and see how a crowd forms in a gap, and how a troll in it now holds up the wolves behind it. Does LevelTest still win every level?
 
 ---
 
