@@ -195,7 +195,7 @@ Reading the units is a few lines. The towers need a little more: the stages are 
 --8<-- "amade-towers-game/src/main/java/eu/amadeos/games/towers/domain/Rules.java:towers"
 ```
 
-A wave is one line: groups of a unit, how many, and the seconds between two of them. Each level makes its waves a little tougher than the one before, by a factor of the health:
+A wave is one line: groups of a unit, how many, and the seconds between two of them. Each level makes its waves a little tougher than the one before, by a factor of the health, and on the road tougher still by a factor of its own, `road`: there no maze makes the enemies' way longer, so the same towers have less time to shoot:
 
 ```java title="amade-towers-game · domain/Rules.java"
 --8<-- "amade-towers-game/src/main/java/eu/amadeos/games/towers/domain/Rules.java:waves"
