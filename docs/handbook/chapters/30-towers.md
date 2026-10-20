@@ -1,6 +1,6 @@
 # 30. Towers
 
-In every game so far the player steered one thing: a paddle, a ship, a snake, a jumping figure. In **Towers** they steer nothing. Orcs, dire wolves and trolls come out of their lairs and march on the castle, and the player builds towers that shoot at them: archers, cannons and frost towers. The game has no road. The enemies walk over open ground, the shortest way to the castle, and every tower the player builds stands in that way and makes it longer. The towers are the maze. The one rule that holds it all together is that a tower may never close the last way.
+In every game so far the player steered one thing: a paddle, a ship, a snake, a jumping figure. In **Towers** they steer nothing. Orcs, dire wolves and trolls come out of their lairs and march on the castle, and the player builds towers that shoot at them: archers, cannons and frost towers. By default the enemies keep to a road and the towers stand beside it. The game has a second way to play, though, and that is the one this chapter is built around: **open ground**. There the road is grass like any other, the enemies walk the shortest way to the castle, and every tower the player builds stands in that way and makes it longer. The towers are the maze. The one rule that holds it all together is that a tower may never close the last way.
 
 <figure markdown>
 ![The meadow in the seventh wave, a maze of towers](images/towers/battle.jpg){ width="400" }
@@ -8,7 +8,7 @@ In every game so far the player steered one thing: a paddle, a ship, a snake, a 
 <figcaption>The meadow in the seventh wave (left): five walls of towers with gaps at alternate ends, and the trail the enemies walk. The same with F3 (right): every tile points the way to the castle, white near it, orange far away.</figcaption>
 </figure>
 
-Tower defence grew out of custom maps for strategy games around 2002, and its two schools have been arguing since: games with a fixed road, where towers stand beside it, and games with open ground, where the player builds the maze. The second kind is harder to make, because the computer must find the way for every enemy again whenever a tower is built, and must say *no* before a tower closes it. This chapter makes that cheap with one idea, the **flow field**, and moves the game from the keyboard to the **mouse**.
+Tower defence grew out of custom maps for strategy games around 2002, and its two schools have been arguing since: games with a fixed road, where towers stand beside it, and games with open ground, where the player builds the maze. The first is the more common; Towers has both, one switch apart. The second is the harder to make, because the computer must find the way for every enemy again whenever a tower is built, and must say *no* before a tower closes it. This chapter makes that cheap with one idea, the **flow field**, and moves the game from the keyboard to the **mouse**.
 
 !!! abstract "What you will learn"
     - **Flow fields**: one search from the goal gives every tile its way, for any number of units
@@ -24,10 +24,10 @@ The complete game is in [amade-towers-game](https://github.com/datazuul/amade-to
 
 ## The rules
 
-1. A battlefield is a grid of tiles of 20 units: grass, trees, rocks and water. It is larger than the screen of 640 × 400; the bar at the top takes 22 of those, the view shows 32 × 19 tiles.
+1. A battlefield is a grid of tiles of 20 units: grass, a road, trees, rocks and water. It is larger than the screen of 640 × 400; the bar at the top takes 22 of those, the view shows 32 × 19 tiles.
 2. Enemies come out of one or more **lairs** in **waves** and walk to the **castle**. Each one that gets there costs lives: an orc or a wolf one, a troll three. When no lives are left, the castle falls.
 3. **Towers** stand on grass, one per tile. An **archer** shoots arrows, fast and far. A **cannon** throws a ball that bursts where its target will be and hurts everything around it. A **frost** tower sends out a wave of cold that slows every enemy near it. Each tower can be upgraded twice and sold for 70 % of what it cost.
-4. Enemies walk the shortest way over grass. Trees, rocks, water and towers are in their way. A tower that would leave a lair, or an enemy already on its way, without any way to the castle is **refused**.
+4. **On the road**, the default, enemies keep to the road, and towers stand on the grass beside it. **On open ground**, enemies walk the shortest way over grass and road alike, and trees, rocks, water and towers are in their way. A tower that would leave a lair, or an enemy already on its way, without any way to the castle is **refused**. The choice of a battlefield switches between the two.
 5. Beaten enemies bring gold. Between two waves there is a pause; calling the next wave early brings a gold piece for each second of it left.
 6. When the last wave is beaten, the battle is won: three stars for keeping 90 % of the lives, two for half, one otherwise. The stars are saved, and the next battlefield opens.
 
@@ -107,6 +107,24 @@ One search of a battlefield of 40 × 24 tiles is quick, so asking on every click
 ```java title="amade-towers-game · test/domain/GameTest.java"
 --8<-- "amade-towers-game/src/test/java/eu/amadeos/games/towers/domain/GameTest.java:test-block"
 ```
+
+### On the road
+
+The road is one more class of tile in the Tiled map, and one more question to `Ground`: may a unit walk here, may a tower stand here, and the answer now depends on how the battle is fought. On the road, units walk on road tiles only and towers stand on grass only; on open ground, the road is grass:
+
+```java title="amade-towers-game · domain/Ground.java"
+--8<-- "amade-towers-game/src/main/java/eu/amadeos/games/towers/domain/Ground.java:ground"
+```
+
+Nothing else changes. The flow field is searched over the tiles a unit may enter, so on the road it simply finds the way *along* the road, round its corners, from every lair. A tower can never stand on a road tile, so it can never close the way, and the trial search of `placement` always says yes. The same rules, the same field, the same walking, two different games:
+
+```java title="amade-towers-game · test/domain/GameTest.java"
+--8<-- "amade-towers-game/src/test/java/eu/amadeos/games/towers/domain/GameTest.java:test-road"
+```
+
+A map's road must lead from every lair to the castle, with its tiles side by side: a unit does not cut corners, so two road tiles that touch only at a corner do not join. `Level.read` checks it with one more flow field and rejects the map otherwise, as it rejects a castle that covers no tile. The roads of the three battlefields are two tiles wide, so that a crowd can walk beside each other.
+
+![The meadow on the road](images/towers/road.jpg){ width="560" }
 
 ### Walking
 
@@ -389,13 +407,19 @@ The flow field is drawn with F3 as one small arrow sprite per tile, in eight dir
 
 ### A ground that changes
 
-The ground of a battlefield is the most expensive picture: noise for the grass, ponds with their banks, rocks, the shadows of trees, the lairs and the castle, and the **trail**, the trodden path the enemies walk. It is drawn as three wide strokes of the whole way, dark rim, lighter edge and bare earth:
+The ground of a battlefield is the most expensive picture: noise for the grass, ponds with their banks, rocks, the shadows of trees, the lairs and the castle, and on open ground the **trail**, the trodden path the enemies walk. It is drawn as three wide strokes of the whole way, dark rim, lighter edge and bare earth:
 
 ```java title="amade-towers-game · ui/game/Art.java"
 --8<-- "amade-towers-game/src/main/java/eu/amadeos/games/towers/ui/game/Art.java:trail"
 ```
 
-All of it together takes far too long for a frame, so it must be cached. But the trail changes with every tower. Caching the whole map as one picture would mean drawing it all again on every click, a stutter each time.
+On the road, the trail is not drawn: the road is. It is the union of its tiles' squares, which has sharp corners, rounded by a trick from image processing: grown by a few units and shrunk again, which rounds the inner corners (a **closing**), then shrunk and grown again, which rounds the outer ones (an **opening**). Growing a shape by *r* is adding the outline drawn with a pen 2*r* wide; shrinking it is taking that outline away:
+
+```java title="amade-towers-game · ui/game/Art.java"
+--8<-- "amade-towers-game/src/main/java/eu/amadeos/games/towers/ui/game/Art.java:road"
+```
+
+All of it together takes far too long for a frame, so it must be cached. The road never changes, so on the road the cache could be one picture. On open ground, though, the trail changes with every tower. Caching the whole map as one picture would mean drawing it all again on every click, a stutter each time.
 
 So `Terrain` cuts the ground into **squares of 8 × 8 tiles**. Each square is a sprite of its own. After every step, `update` compares the trail of each square, and one tile around it, with what its picture shows, and only a square whose trail changed is drawn again:
 
@@ -430,7 +454,7 @@ Every pixel of a square is covered: the grass is everywhere. Chapter 27 taught `
 <figure markdown>
 ![The ford](images/towers/ford.jpg){ width="400" }
 ![Two caves](images/towers/caves.jpg){ width="400" }
-<figcaption>The ford (left), with its river and the stones across. Two caves (right): two lairs, one on each side.</figcaption>
+<figcaption>The ford (left), where the road crosses the river. Two caves (right): two lairs, and two roads that meet before the castle.</figcaption>
 </figure>
 
 ## Step 8: Everything else
@@ -489,16 +513,17 @@ The keys are bound as in the earlier games and can be changed in the settings fi
 | 32 turned copies of a picture | `eu.amadeos.gameengine.sprite.Rotations` | Everything seen from above that turns |
 | Drawn sprites cached opaque | `eu.amadeos.gameengine.sprite.Sprite` | Every ground drawn in code |
 
-What stays in the game: the ground and its classes, the rules of building, walking, aiming and gold, the units, towers and waves, the battlefields, the art, the terrain in squares, the painter, the sounds and tunes, the progress and the scenes.
+What stays in the game: the ground and its classes, the road and open ground, the rules of building, walking, aiming and gold, the units, towers and waves, the battlefields, the art, the terrain in squares, the painter, the sounds and tunes, the progress and the scenes.
 
 ## Exercises
 
-1. **A tower of your own.** Add a fourth kind to `towers.txt`: a **poison** tower whose shot hurts a little every second for a few seconds. Which properties does it need, which lines of `Game`, and what does `finish` say before you have written them?
-2. **Flying units.** Bats fly straight to the castle over towers, trees and water. They need no flow field, or a second one: which is simpler, and which lets a frost tower still matter?
-3. **The longest maze.** Write a test that builds, with a fixed amount of gold, the maze that makes the way from the lair to the castle the longest. Is a greedy builder (always the tile that lengthens the way most) good enough?
-4. **Sell back the maze.** Selling a tower opens the way again, and every enemy takes the shorter way at once. Is that a trick players will use, and should the rules allow it?
-5. **A minimap.** Draw the whole battlefield small in a corner, the towers as dots, the view as a box. A click on it moves the camera there. You will need it in the next chapter.
-6. **Group flow.** Two hundred orcs on one trail walk through each other. Give each a little push away from its neighbours (the spatial grid of chapter 24 finds them) and see how a crowd forms in a gap.
+1. **Short cuts.** On the road, let wolves (and only wolves) leave it and cross open grass. Each kind of unit then needs a flow field of its own: how many fields does the game keep, and when is each searched again?
+2. **A tower of your own.** Add a fourth kind to `towers.txt`: a **poison** tower whose shot hurts a little every second for a few seconds. Which properties does it need, which lines of `Game`, and what does `finish` say before you have written them?
+3. **Flying units.** Bats fly straight to the castle over towers, trees and water. They need no flow field, or a second one: which is simpler, and which lets a frost tower still matter?
+4. **The longest maze.** Write a test that builds, with a fixed amount of gold, the maze that makes the way from the lair to the castle the longest. Is a greedy builder (always the tile that lengthens the way most) good enough?
+5. **Sell back the maze.** Selling a tower opens the way again, and every enemy takes the shorter way at once. Is that a trick players will use, and should the rules allow it?
+6. **A minimap.** Draw the whole battlefield small in a corner, the towers as dots, the view as a box. A click on it moves the camera there. You will need it in the next chapter.
+7. **Group flow.** Two hundred orcs on one trail walk through each other. Give each a little push away from its neighbours (the spatial grid of chapter 24 finds them) and see how a crowd forms in a gap.
 
 ---
 
