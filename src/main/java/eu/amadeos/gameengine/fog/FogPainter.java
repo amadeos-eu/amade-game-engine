@@ -57,22 +57,45 @@ public final class FogPainter {
      * world's coordinates: draw it after the world and before the marks that must stay readable.
      */
     public void render(Graphics2D g, FogOfWar fog, int fromCol, int fromRow, int toCol, int toRow) {
+        g.setColor(shroud);
         for (int row = Math.max(0, fromRow); row <= Math.min(fog.height() - 1, toRow); row++) {
-            for (int col = Math.max(0, fromCol); col <= Math.min(fog.width() - 1, toCol); col++) {
-                int kind = kind(corner(fog, col, row), corner(fog, col + 1, row),
+            int black = -1;                                   // where a run of black tiles began
+            int last = Math.min(fog.width() - 1, toCol);
+            for (int col = Math.max(0, fromCol); col <= last + 1; col++) {
+                int kind = col > last ? -1 : kind(corner(fog, col, row), corner(fog, col + 1, row),
                         corner(fog, col, row + 1), corner(fog, col + 1, row + 1));
-                double x = col * tile;
-                double y = row * tile;
-                if (kind == 0) continue;                      // all clear
                 if (kind == 80) {                             // all black: no picture needed
-                    g.setColor(shroud);
-                    rectangle.setRect(x, y, tile, tile);
-                    g.fill(rectangle);
+                    if (black < 0) black = col;
                     continue;
                 }
-                tiles[kind].drawSeamless(g, x, y);
+                if (black >= 0) {
+                    fill(g, black * tile, row * tile, (col - black) * tile, tile);
+                    black = -1;
+                }
+                if (kind > 0) tiles[kind].drawSeamless(g, col * tile, row * tile);
             }
         }
+    }
+
+    /**
+     * Black from {@code x}, {@code y}, {@code w} × {@code h}, its edges rounded to the screen's pixels just as
+     * {@link Sprite#drawSeamless} rounds them: a shape filled in the world's coordinates may round the other
+     * way, and leave a line of pixels uncovered between the black and a soft tile.
+     */
+    private void fill(Graphics2D g, double x, double y, double w, double h) {
+        AffineTransform t = g.getTransform();
+        if ((t.getType() & (AffineTransform.TYPE_MASK_ROTATION | AffineTransform.TYPE_GENERAL_TRANSFORM)) != 0) {
+            rectangle.setRect(x, y, w, h);
+            g.fill(rectangle);
+            return;
+        }
+        long left = Math.round(t.getTranslateX() + x * t.getScaleX());
+        long right = Math.round(t.getTranslateX() + (x + w) * t.getScaleX());
+        long top = Math.round(t.getTranslateY() + y * t.getScaleY());
+        long bottom = Math.round(t.getTranslateY() + (y + h) * t.getScaleY());
+        g.setTransform(new AffineTransform());
+        g.fillRect((int) left, (int) top, (int) (right - left), (int) (bottom - top));
+        g.setTransform(t);
     }
 
     /** The kind of tile with these corner states, top left, top right, bottom left, bottom right. */

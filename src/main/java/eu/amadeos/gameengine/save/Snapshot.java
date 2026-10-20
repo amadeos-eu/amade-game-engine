@@ -46,9 +46,9 @@ public final class Snapshot {
         return new Reader(values, "");
     }
 
-    /** A key that is missing or does not hold what was asked for. */
+    /** A key that is missing or does not hold what was asked for; a game throws it, too, for a value it cannot use. */
     public static final class SnapshotException extends IllegalArgumentException {
-        SnapshotException(String message) {
+        public SnapshotException(String message) {
             super(message);
         }
     }
