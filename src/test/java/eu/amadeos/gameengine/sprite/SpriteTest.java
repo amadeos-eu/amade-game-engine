@@ -50,6 +50,22 @@ class SpriteTest {
     }
     // --8<-- [end:test-transparency]
 
+    @Test
+    void aDrawingThatCoversItsWholeSizeCanBeCachedOpaque() {
+        Sprite.Drawing field = (g, w, h) -> {
+            g.setColor(Color.GREEN);
+            g.fill(new java.awt.geom.Rectangle2D.Double(0, 0, w, h));
+        };
+        BufferedImage screen = new BufferedImage(200, 100, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = screen.createGraphics();
+        Sprite plain = Sprite.drawn(40, 16, field);
+        plain.draw(g, 0, 0);
+        assertEquals(Transparency.TRANSLUCENT, plain.cachedTransparency());
+        Sprite ground = Sprite.drawn(40, 16, field).opaque();
+        ground.draw(g, 0, 0);
+        assertEquals(Transparency.OPAQUE, ground.cachedTransparency());
+    }
+
     // --8<-- [start:test-cache]
     @Test
     void theSpriteIsScaledOnceToItsSizeOnTheScreen() {
