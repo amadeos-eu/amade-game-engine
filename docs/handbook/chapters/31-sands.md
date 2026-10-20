@@ -53,7 +53,7 @@ The difference between a click and a box is a few units of mouse movement. A han
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/select/BoxSelect.java:box"
 ```
 
-`release` returns a sealed `Result`, so the game's `switch` over it must name both cases, and Java checks that it does. The game asks the world what lies under a click or inside a box, and only the player's own vehicles are picked; a click on a building shows it in the panel instead:
+`release` returns a sealed `Result`, so the game's `switch` over it must name both cases, and Java checks that it does. The game asks the world what lies under a click or inside a box, and only the player's own vehicles are picked. A click on an enemy vehicle in sight, or on a building, shows it in the panel with its health instead; an enemy is looked at, never chosen, so no order can reach it:
 
 ```java title="amade-sands-game · ui/game/SandsGame.java"
 --8<-- "amade-sands-game/src/main/java/eu/amadeos/games/sands/ui/game/SandsGame.java:release"
