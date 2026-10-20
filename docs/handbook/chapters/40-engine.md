@@ -7,10 +7,10 @@ Each chapter of this part covers one area. Each section in it describes one feat
 | Chapter | Packages | For |
 |---|---|---|
 | [41. Loop, Time and Drawing](41-loop-and-drawing.md) | `loop`, `time`, `swing` | The game loop, rules with a pace of their own, countdowns, the canvas, full screen, frame times |
-| [42. Sprites and Effects](42-sprites.md) | `sprite`, `shape`, `anim`, `fx` | Pictures that copy fast, sheets and animation, turned pictures, figures of lines, tweens, particles |
+| [42. Sprites and Effects](42-sprites.md) | `sprite`, `shape`, `anim`, `fx` | Pictures that copy fast, a ground painted only where it changed, sheets and animation, turned pictures, figures of lines, tweens, particles |
 | [43. Input](43-input.md) | `input` | Keyboard, actions instead of keys, mouse, gamepads |
 | [44. Movement, Physics and Collision](44-movement.md) | `math`, `motion`, `physics`, `collision`, `pool`, `entity` | Vectors and angles, flight paths, falling and jumping, what hits what, many things at once |
-| [45. Maps, Camera and Fog](45-maps.md) | `tile`, `tiled`, `camera`, `fog`, `minimap` | Tile maps, maps from an editor, worlds larger than the screen, what a side sees |
+| [45. Maps, Camera and Fog](45-maps.md) | `tile`, `tiled`, `iso`, `camera`, `fog`, `minimap` | Tile maps, reach and networks on them, maps from an editor, the isometric view, worlds larger than the screen, what a side sees |
 | [46. Paths, Groups and Decisions](46-paths-and-decisions.md) | `path`, `road`, `select`, `ai`, `event` | Finding the way for one or for many, roads between flags, choosing units, states, the computer's view of the map, chain reactions |
 | [47. Chance, Data and Saving](47-data-and-saving.md) | `random`, `replay`, `undo`, `data`, `economy`, `save`, `score` | Repeatable chance, replays, undo, data files, money and production, saving, high scores |
 | [48. Scenes, Menus and Sound](48-scenes-menus-sound.md) | `scene`, `swing`, `menu`, `audio` | Screens of a game, the standard menus and dialogs, menus over the game, sound and music |
@@ -55,6 +55,7 @@ A few rules hold for nearly every class. Knowing them makes the rest of the manu
 | A drawing surface in fixed logical coordinates | `GameCanvas` | [41](41-loop-and-drawing.md#the-canvas-gamecanvas-and-rendermode) |
 | Animation in a Swing component of a game that waits for the player | `Animator`, `Tween` | [41](41-loop-and-drawing.md#animation-on-the-event-thread-animator), [42](42-sprites.md#movement-in-time-easing-and-tween) |
 | A picture from a file or drawn in code, fast at any size | `Sprite` | [42](42-sprites.md#pictures-sprite) |
+| A big ground drawn once, then only where the view moved or the map changed | `ScrollingLayer` | [42](42-sprites.md#a-ground-painted-once-scrollinglayer) |
 | Many frames in one image, and which one to show | `SpriteSheet`, `Animation` | [42](42-sprites.md#many-pictures-in-one-spritesheet), [42](42-sprites.md#which-frame-when-animation) |
 | A picture that turns | `Rotations` or `Outline` | [42](42-sprites.md#turning-pictures-or-lines) |
 | Splinters, sparks, dust | `Particles` | [42](42-sprites.md#splinters-and-sparks-particles) |
@@ -72,10 +73,14 @@ A few rules hold for nearly every class. Knowing them makes the rest of the manu
 | A level on a grid, written as text | `TileMap` | [45](45-maps.md#a-grid-of-tiles-tilemap-cell-and-direction) |
 | Walking corridors from tile centre to tile centre | `Walker` | [45](45-maps.md#walking-corridors-walker) |
 | Land owned around buildings, a border that grows | `Territory` | [45](45-maps.md#the-land-a-side-owns-territory) |
+| Services that reach a circle, how strongly | `Coverage` | [45](45-maps.md#places-that-reach-a-circle-coverage) |
+| Power or water that flows from sources to loads | `SupplyGrid` | [45](45-maps.md#networks-that-carry-supplygrid) |
 | Levels drawn in the Tiled editor | `TiledMap` | [45](45-maps.md#maps-from-an-editor-tiledmap) |
+| A map seen from a corner, diamonds and walls, the mouse back to its tile | `IsoProjection` | [45](45-maps.md#the-isometric-view-isoprojection) |
+| Buildings of any size that cover each other right | `DepthSort` | [45](45-maps.md#what-covers-what-depthsort) |
 | A world larger than the screen | `Camera`, `Parallax` | [45](45-maps.md#a-world-larger-than-the-screen-camera) |
 | What a side has seen and sees now | `FogOfWar`, `FogPainter` | [45](45-maps.md#what-a-side-sees-fogofwar-and-fogpainter) |
-| The whole map in a corner | `Minimap` | [45](45-maps.md#the-map-in-a-corner-minimap) |
+| The whole map in a corner | `Minimap`, `DiamondMinimap` | [45](45-maps.md#the-map-in-a-corner-minimap), [45](45-maps.md#an-isometric-map-in-a-corner-diamondminimap) |
 | The way for one, or for many to one goal | `AStar`, `DistanceMap`, `FlowField` | [46](46-paths-and-decisions.md#which-search) |
 | Roads from flag to flag, the next road for a ware | `RoadNetwork` | [46](46-paths-and-decisions.md#roads-between-flags-roadnetwork) |
 | Groups that arrive side by side | `Formation`, `FieldCache` | [46](46-paths-and-decisions.md#groups-on-the-move-formation) |
@@ -114,8 +119,9 @@ The order in which the engine grew, and where each part is explained step by ste
 | [30](30-towers.md#what-moved-into-the-engine) | Towers | `path.FlowField`, `data.Catalog`, `menu.OverlayMenu`, `sprite.Rotations` |
 | [31](31-sands.md#what-moved-into-the-engine) | Sands | `select`, `path` (`Formation`, `FieldCache`), `fog`, `minimap`, `economy`, `ai.InfluenceMap`, `save.Snapshot` |
 | [32](32-colony.md#what-moved-into-the-engine) | Colony | `road.RoadNetwork`, `economy` (`Stock`, `Recipe`), `time.Seasons`, `tile.Territory`, `motion.Wander` |
+| [33](33-town.md#what-moved-into-the-engine) | Town | `iso` (`IsoProjection`, `DepthSort`, `DiamondMinimap`), `tile` (`Coverage`, `SupplyGrid`), `sprite.ScrollingLayer`, the wheel of `input.Mouse` |
 
-Many classes grew later, when another game needed a little more: `Camera` learned the mouse in Towers, `Sprite` its opaque caches in Jump and Towers, `SeededRandom` to be saved in Sands. The sections of this part describe each class as it is now.
+Many classes grew later, when another game needed a little more: `Camera` learned the mouse in Towers, `Mouse` the wheel in Town, `Sprite` its opaque caches in Jump and Towers, `SeededRandom` to be saved in Sands. The sections of this part describe each class as it is now.
 
 ## Using the engine in a game
 

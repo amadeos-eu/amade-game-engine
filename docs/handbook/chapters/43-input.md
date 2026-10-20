@@ -67,7 +67,7 @@ Each player gets a `Controls` of their own: two players on one keyboard in Paddl
 
 ## The mouse: Mouse
 
-*Package `input` · introduced in [21. Bricks](21-bricks.md#step-8-the-mouse); held buttons in [23. Rocks](23-rocks.md#step-7-steering-with-the-mouse), release and inside in [30. Towers](30-towers.md#step-5-the-mouse-in-the-world) · source: [`Mouse`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/Mouse.java)*
+*Package `input` · introduced in [21. Bricks](21-bricks.md#step-8-the-mouse); held buttons in [23. Rocks](23-rocks.md#step-7-steering-with-the-mouse), release and inside in [30. Towers](30-towers.md#step-5-the-mouse-in-the-world), the wheel in [33. Town](33-town.md#step-10-a-view-that-zooms) · source: [`Mouse`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/Mouse.java)*
 
 **What it is for.** The mouse of a game, like the keyboard: Swing reports, the loop polls and asks. Positions are in the game's **logical** coordinates, so a game never sees the size of the window, the black bars or the render mode.
 
@@ -80,6 +80,7 @@ Each player gets a `Controls` of their own: two players on one keyboard in Paddl
 | `wasPressed(button)`, `wasReleased(button)` | `MouseEvent.BUTTON1` and the others; a release ends a drag |
 | `isDown(button)` | Held at the last poll: thrust while the right button is held |
 | `isInside()` | Over the canvas: a game that scrolls at the edge stops when the mouse leaves |
+| `wheel()` | The notches the wheel turned between the last two polls: positive towards the player, 0 if not at all |
 
 A position outside the picture, on a black bar, lies outside 0 … logical size; check it before you use it. A map larger than the screen needs one more conversion, from the screen to the world: [`Camera.worldX`](45-maps.md#a-world-larger-than-the-screen-camera). A click or a drag on that map becomes a selection with [`BoxSelect`](46-paths-and-decisions.md#choosing-units-selection-and-boxselect).
 
