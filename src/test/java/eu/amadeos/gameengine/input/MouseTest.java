@@ -57,4 +57,15 @@ class MouseTest {
         mouse.poll();
         assertFalse(mouse.wasReleased(MouseEvent.BUTTON3), "released once");
     }
+
+    @Test
+    void wheelNotchesAddUpUntilTheNextPoll() {
+        mouse.wheeled(-1);
+        mouse.wheeled(-2);
+        assertEquals(0, mouse.wheel(), "not polled yet");
+        mouse.poll();
+        assertEquals(-3, mouse.wheel());
+        mouse.poll();
+        assertEquals(0, mouse.wheel(), "counted once");
+    }
 }
