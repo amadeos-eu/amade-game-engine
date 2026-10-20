@@ -1,6 +1,6 @@
 # 31. Sands
 
-Towers (chapter 30) gave the player a mouse and a map larger than the screen, but nothing to command: the enemies walked on their own, and the towers stood still. **Sands** hands over an army. Two houses share a desert planet, each with a construction yard on a plateau of rock. Harvesters gather the spice that lies in the sand, a refinery turns it into credits, and the credits pay for windtraps, a factory, turrets and vehicles: fast trikes, tanks with turning turrets, launchers whose rockets burst and hurt everything around them. The computer plays the other house by the same rules: it builds its base, harvests, defends and attacks in growing waves. Whoever loses the last building has lost. On the open sand of the later missions, a worm hunts whatever drives there.
+Towers (chapter 30) gave the player a mouse and a map larger than the screen, but nothing to command: the enemies walked on their own, and the towers stood still. **Sands** hands over an army. Two houses share a desert planet, each with a construction yard on a plateau of rock. Harvesters gather the crystal that lies in the sand, a refinery turns it into credits, and the credits pay for wind turbines, a factory, turrets and vehicles: fast trikes, tanks with turning turrets, launchers whose rockets burst and hurt everything around them. The computer plays the other house by the same rules: it builds its base, harvests, defends and attacks in growing waves. Whoever loses the last building has lost. On the open sand of the later missions, a burrower hunts whatever drives there.
 
 <figure markdown>
 ![A base after six minutes, five tanks sent off](images/sands/base.jpg){ width="400" }
@@ -8,7 +8,7 @@ Towers (chapter 30) gave the player a mouse and a map larger than the screen, bu
 <figcaption>A base after six minutes (left): five tanks chosen by a box and sent to the sand, each to a slot of its own, the dotted lines their orders. A fight at the foot of the rock (right): red tanks attack, a launcher burns. Beyond what blue's units see, the map is dim or black.</figcaption>
 </figure>
 
-*Dune II* (Westwood, 1992) set the rules that real-time strategy has followed since: harvest, build, produce, command groups with the mouse, explore a map hidden in the dark. Each of these is a small piece of engine, and Sands is the game where they all come together. It is the largest game of this handbook, and the first in which the computer does not only move enemies but plays: it decides what to build, where, and whom to attack.
+The early 1990s set the rules that real-time strategy has followed since: harvest, build, produce, command groups with the mouse, explore a map hidden in the dark. Each of these is a small piece of engine, and Sands is the game where they all come together. It is the largest game of this handbook, and the first in which the computer does not only move enemies but plays: it decides what to build, where, and whom to attack.
 
 !!! abstract "What you will learn"
     - **Choosing units**: a click, a box, Shift to add, Ctrl and a number for a group that is kept
@@ -18,19 +18,19 @@ Towers (chapter 30) gave the player a mouse and a map larger than the screen, bu
     - **An economy**: credits with a store, production paid while it runs, power that slows everything down
     - **A computer opponent**: a building plan, a place for each building, and an influence map that finds the weakest spot
     - **Saving a whole game**: hundreds of things in a save file, numbers exact to the bit, and a loaded battle that goes on exactly as it would have
-    - **A ground drawn on other threads**: dunes, rock and spice, worked out pixel by pixel, in squares, while the game runs
+    - **A ground drawn on other threads**: dunes, rock and crystal, worked out pixel by pixel, in squares, while the game runs
 
 The complete game is in [amade-sands-game](https://github.com/datazuul/amade-sands-game).
 
 ## The rules
 
-1. A map is 64 × 64 tiles of 16 units: sand, dunes (slower to drive on), rock, cliffs (closed to everything) and spice, a little or a lot. The view shows 32 × 25 tiles; the panel on the right takes 128 of the 640 units.
+1. A map is 64 × 64 tiles of 16 units: sand, dunes (slower to drive on), rock, cliffs (closed to everything) and crystal, a little or a lot. The view shows 32 × 25 tiles; the panel on the right takes 128 of the 640 units.
 2. Each house starts with a **construction yard**, a little money and a few vehicles. The yard builds one building at a time; when it is ready, the player puts it on rock, near a building of their own, where nothing stands. A building costs credits, and they are paid **while it is built**: without money, the work waits.
-3. **Windtraps** make power; every other building uses it. With too little power, the yard and the factory work at half speed, the turrets reload slowly, and the outpost's minimap goes dark.
-4. A **refinery** comes with a **harvester**, brought by a carryall. A harvester drives to the spice, fills its hopper, drives home and unloads; the spice becomes credits. Refineries and **silos** store credits; what they cannot hold is lost.
+3. **Wind turbines** make power; every other building uses it. With too little power, the yard and the factory work at half speed, the turrets reload slowly, and the outpost's minimap goes dark.
+4. A **refinery** comes with a **harvester**, brought by an airlifter. A harvester drives to the crystal, fills its hopper, drives home and unloads; the crystal becomes credits. Refineries and **silos** store credits; what they cannot hold is lost.
 5. The **factory** makes trikes, tanks and launchers, five in a row at most. **Turrets** guard the base. A building can be sold for half its price.
 6. A side sees what its vehicles and buildings see. What it saw once stays on the map, dimmed, with the enemy's buildings as they were when it last looked.
-7. The **worm** appears after a while on the missions that have one. It hunts vehicles on the sand, harvesters first, and swallows them whole. It cannot reach rock.
+7. The **burrower** appears after a while on the missions that have one. It hunts vehicles on the sand, harvesters first, and swallows them whole. It cannot reach rock.
 8. A side without buildings has lost. The fastest win of each mission is kept, and winning opens the next.
 
 ## Step 1: Choosing and commanding
@@ -59,7 +59,7 @@ The difference between a click and a box is a few units of mouse movement. A han
 --8<-- "amade-sands-game/src/main/java/eu/amadeos/games/sands/ui/game/SandsGame.java:release"
 ```
 
-The right button is the order. What it means depends on what is under the mouse and on who is chosen, and one button doing the right thing is much of what makes such a game pleasant: an enemy is attacked, a harvester sent to the spice harvests, a harvester sent to a refinery goes home to unload, everything else drives there. Ctrl turns a move into a hunt, in which the vehicles fight whatever they meet on the way.
+The right button is the order. What it means depends on what is under the mouse and on who is chosen, and one button doing the right thing is much of what makes such a game pleasant: an enemy is attacked, a harvester sent to the crystal harvests, a harvester sent to a refinery goes home to unload, everything else drives there. Ctrl turns a move into a hunt, in which the vehicles fight whatever they meet on the way.
 
 ```java title="amade-sands-game · ui/game/SandsGame.java"
 --8<-- "amade-sands-game/src/main/java/eu/amadeos/games/sands/ui/game/SandsGame.java:command"
@@ -117,7 +117,7 @@ A vehicle turns before it drives, as a tank does, and drives slower the further 
 --8<-- "amade-sands-game/src/main/java/eu/amadeos/games/sands/domain/Game.java:drive"
 ```
 
-The slots keep the group apart at the end. On the way, nothing does yet: five tanks following one field converge on the same tiles. So after all vehicles have moved, those that overlap push each other apart, through the spatial grid of chapter 24. Moving ones yield more than those that stand, and a harvester at work hardly at all, so a column that passes it does not shove it off its spice:
+The slots keep the group apart at the end. On the way, nothing does yet: five tanks following one field converge on the same tiles. So after all vehicles have moved, those that overlap push each other apart, through the spatial grid of chapter 24. Moving ones yield more than those that stand, and a harvester at work hardly at all, so a column that passes it does not shove it off its crystal:
 
 ```java title="amade-sands-game · domain/Game.java"
 --8<-- "amade-sands-game/src/main/java/eu/amadeos/games/sands/domain/Game.java:separate"
@@ -175,7 +175,7 @@ Two details took some looking. Taking the *darkest* tile at each corner means th
 
 ## Step 4: The minimap
 
-The panel shows the whole map, small: 64 × 64 tiles in a box of 90 × 90 units. Drawing 4,096 little rectangles in every frame would cost more than the battlefield. The `Minimap` keeps an image of exactly one pixel per tile, and the game paints a pixel only when its tile changes, which is seldom: the fog lifts, spice is harvested. In every frame the image is copied, scaled with hard edges, and the things that move are dotted over it.
+The panel shows the whole map, small: 64 × 64 tiles in a box of 90 × 90 units. Drawing 4,096 little rectangles in every frame would cost more than the battlefield. The `Minimap` keeps an image of exactly one pixel per tile, and the game paints a pixel only when its tile changes, which is seldom: the fog lifts, crystal is harvested. In every frame the image is copied, scaled with hard edges, and the things that move are dotted over it.
 
 ```java title="amade-game-engine · minimap/Minimap.java"
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/minimap/Minimap.java:minimap"
@@ -187,17 +187,17 @@ A click on it moves the camera there, a drag scrolls, and the right button sends
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/minimap/Minimap.java:convert"
 ```
 
-The game paints the minimap after every step in which the fog's or the spice's version has changed, and draws the buildings, ghosts and vehicles over it. It shows nothing at all without an **outpost** with power: in Dune II the radar is a building you have to earn.
+The game paints the minimap after every step in which the fog's or the crystal's version has changed, and draws the buildings, ghosts and vehicles over it. It shows nothing at all without an **outpost** with power: in the classic strategy games the radar is a building you have to earn.
 
 ```java title="amade-sands-game · ui/game/Hud.java"
 --8<-- "amade-sands-game/src/main/java/eu/amadeos/games/sands/ui/game/Hud.java:minimap"
 ```
 
-## Step 5: Spice, credits and power
+## Step 5: Crystals, credits and power
 
 ### Harvesting
 
-A harvester is a vehicle with a task of its own. On spice it takes in a little in every step, and the tile loses what it takes; full, it drives home; on the pad of the refinery it unloads. Without spice under it, it looks for the nearest field from where it last harvested, so it goes back to the same field until it is empty:
+A harvester is a vehicle with a task of its own. On crystal it takes in a little in every step, and the tile loses what it takes; full, it drives home; on the pad of the refinery it unloads. Without crystal under it, it looks for the nearest field from where it last harvested, so it goes back to the same field until it is empty:
 
 ```java title="amade-sands-game · domain/Game.java"
 --8<-- "amade-sands-game/src/main/java/eu/amadeos/games/sands/domain/Game.java:harvest"
@@ -219,7 +219,7 @@ The money goes into `Credits`, which know how much they can hold. A limit to the
 
 ### Paying while it is made
 
-In Dune II, a tank is not paid when it is ordered but while the factory works on it: 300 credits over 14 seconds is a little more than 21 credits a second. Without money, the work stands still and waits; with half the power, it goes at half the speed. That keeps the game moving, because the player can order something with nearly no money and watch it grow as the harvesters come in. `Production` is that queue:
+In the classic strategy games, a tank is not paid when it is ordered but while the factory works on it: 300 credits over 14 seconds is a little more than 21 credits a second. Without money, the work stands still and waits; with half the power, it goes at half the speed. That keeps the game moving, because the player can order something with nearly no money and watch it grow as the harvesters come in. `Production` is that queue:
 
 ```java title="amade-game-engine · economy/Production.java"
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/economy/Production.java:production"
@@ -255,7 +255,7 @@ On rock, on no other building, under no vehicle, and near a building of the same
 
 While the player looks for the place, the building's footprint follows the mouse, green or red, tile by tile:
 
-![A windtrap looking for its place next to the yard](images/sands/placing.jpg){ width="560" }
+![A wind turbine looking for its place next to the yard](images/sands/placing.jpg){ width="560" }
 
 ```java title="amade-sands-game · ui/game/SandsPainter.java"
 --8<-- "amade-sands-game/src/main/java/eu/amadeos/games/sands/ui/game/SandsPainter.java:placing"
@@ -327,21 +327,21 @@ Being hit tells the side, now and then, where it is attacked, which the panel sa
 --8<-- "amade-sands-game/src/test/java/eu/amadeos/games/sands/domain/GameTest.java:test-fight"
 ```
 
-### The worm
+### The burrower
 
-The worm is the one thing on the map that belongs to nobody. It smells vehicles on the sand, harvesters at twice the distance, for they shake the ground; it turns towards its prey at a limited rate, so a fast trike can outrun it on a curve; it turns away from rock. A vehicle in its mouth is gone. Then it dives, and comes up again far from everyone after a while.
+The burrower is the one thing on the map that belongs to nobody. It smells vehicles on the sand, harvesters at twice the distance, for they shake the ground; it turns towards its prey at a limited rate, so a fast trike can outrun it on a curve; it turns away from rock. A vehicle in its mouth is gone. Then it dives, and comes up again far from everyone after a while.
 
 ```java title="amade-sands-game · domain/Game.java"
---8<-- "amade-sands-game/src/main/java/eu/amadeos/games/sands/domain/Game.java:worm"
+--8<-- "amade-sands-game/src/main/java/eu/amadeos/games/sands/domain/Game.java:burrower"
 ```
 
 ```java title="amade-sands-game · test/domain/GameTest.java"
---8<-- "amade-sands-game/src/test/java/eu/amadeos/games/sands/domain/GameTest.java:test-worm"
+--8<-- "amade-sands-game/src/test/java/eu/amadeos/games/sands/domain/GameTest.java:test-burrower"
 ```
 
 ### One step
 
-All of it in order: production, the computer's thoughts once a second, the vehicles, pushing apart, the turrets, the shots, the carryalls, the worm, the dead, the fog, and whether someone has won:
+All of it in order: production, the computer's thoughts once a second, the vehicles, pushing apart, the turrets, the shots, the airlifters, the burrower, the dead, the fog, and whether someone has won:
 
 ```java title="amade-sands-game · domain/Game.java"
 --8<-- "amade-sands-game/src/main/java/eu/amadeos/games/sands/domain/Game.java:update"
@@ -357,7 +357,7 @@ The computer plays by exactly the rules the player plays by. It has no money the
 
 ### What to build
 
-The order of its buildings is a list in `commander.txt`: windtrap, refinery, outpost, factory, windtrap, refinery, silo, windtrap, factory. It builds the first one of which it has fewer than the list names up to there. So a building it loses is simply the first missing one again, and the plan heals itself; and before a building that would use more power than it has, it builds a windtrap.
+The order of its buildings is a list in `commander.txt`: turbine, refinery, outpost, factory, turbine, refinery, silo, turbine, factory. It builds the first one of which it has fewer than the list names up to there. So a building it loses is simply the first missing one again, and the plan heals itself; and before a building that would use more power than it has, it builds a turbine.
 
 ```java title="amade-sands-game · domain/Commander.java"
 --8<-- "amade-sands-game/src/main/java/eu/amadeos/games/sands/domain/Commander.java:next"
@@ -399,7 +399,7 @@ On the title screen it plays against itself, on both sides, at double speed.
 
 ## Step 9: Saving the whole game
 
-Jump (chapter 27) saved progress: a handful of numbers. A running battle is a few hundred things, each with a dozen values, many of them in lists: vehicles, buildings, shots in the air, carryalls, both production queues of both sides, the fog, the ghosts, the spice on every tile, the computer's plans, and the random numbers. The engine's `SaveFile` holds keys and values; a `Snapshot` gives the lists names it can hold and a person can read:
+Jump (chapter 27) saved progress: a handful of numbers. A running battle is a few hundred things, each with a dozen values, many of them in lists: vehicles, buildings, shots in the air, airlifters, both production queues of both sides, the fog, the ghosts, the crystal on every tile, the computer's plans, and the random numbers. The engine's `SaveFile` holds keys and values; a `Snapshot` gives the lists names it can hold and a person can read:
 
 ```text
 unit.count=41
@@ -445,9 +445,9 @@ When this test fails, it names the first key that differs, and that is nearly al
 
 ### The ground
 
-The ground of Bricks or Towers was tiles with a little noise. A desert needs more: dunes with ripples that catch the light, rock with cracks and the shadows of cliffs, scree at the foot of the rock, and spice that lies orange in the hollows. `Terrain` works out every pixel on its own, from noise and the tiles of the map, with light from the top left. That takes a second or two for a whole map, too long for the start of a mission and much too long for a frame.
+The ground of Bricks or Towers was tiles with a little noise. A desert needs more: dunes with ripples that catch the light, rock with cracks and the shadows of cliffs, scree at the foot of the rock, and crystals that glint teal in the hollows. `Terrain` works out every pixel on its own, from noise and the tiles of the map, with light from the top left. That takes a second or two for a whole map, too long for the start of a mission and much too long for a frame.
 
-So it is done on other threads, in squares of 8 × 8 tiles. A square shows the plain colours of its tiles until its picture is ready, and the player, who looks at the base first, never sees that. Each square keeps two pictures: its ground without spice, and the colour the spice would have on each pixel, both lit already. When harvesting changes the spice under a square by a step, the two are mixed again, which is quick, and also done on another thread.
+So it is done on other threads, in squares of 8 × 8 tiles. A square shows the plain colours of its tiles until its picture is ready, and the player, who looks at the base first, never sees that. Each square keeps two pictures: its ground without crystal, and the colour the crystal would have on each pixel, both lit already. When harvesting changes the crystal under a square by a step, the two are mixed again, which is quick, and also done on another thread.
 
 ```java title="amade-sands-game · ui/game/Terrain.java"
 --8<-- "amade-sands-game/src/main/java/eu/amadeos/games/sands/ui/game/Terrain.java:update"
@@ -461,7 +461,7 @@ A picture made on another thread is handed over through an `AtomicReference`, an
 
 ### The things
 
-The buildings, vehicles in 32 directions, the harvester with five fillings of its hopper, the worm, explosions in eight pictures at three sizes: all are drawn once from vector shapes when the window opens, at the size of the screen, and copied after that. `Pictures` holds them:
+The buildings, vehicles in 32 directions, the harvester with five fillings of its hopper, the burrower, explosions in eight pictures at three sizes: all are drawn once from vector shapes when the window opens, at the size of the screen, and copied after that. `Pictures` holds them:
 
 ```java title="amade-sands-game · ui/game/Pictures.java"
 --8<-- "amade-sands-game/src/main/java/eu/amadeos/games/sands/ui/game/Pictures.java:pictures"
@@ -485,8 +485,8 @@ The first benchmark of the finished game said 17 to 22 milliseconds a frame at 1
 
 ## Step 11: Everything else
 
-- **Events.** The rules say what happened in a step as a list of records, as since chapter 26: fired, hit, burst, destroyed, collapsed, ready, placed, deployed, under attack, the worm rose, the worm ate. `Effects` turns them into explosions, smoke, wrecks and sounds, but only where the player sees them, or for the player's own side: the player must not hear a battle in the fog.
-- **Messages.** The same events become the line at the bottom of the map: *Construction complete*, *Our base is under attack*, *Harvester swallowed by the worm*.
+- **Events.** The rules say what happened in a step as a list of records, as since chapter 26: fired, hit, burst, destroyed, collapsed, ready, placed, deployed, under attack, the burrower rose, the burrower ate. `Effects` turns them into explosions, smoke, wrecks and sounds, but only where the player sees them, or for the player's own side: the player must not hear a battle in the fog.
+- **Messages.** The same events become the line at the bottom of the map: *Construction complete*, *Our base is under attack*, *Harvester swallowed by the burrower*.
 - **Music.** A slow desert tune in MML (chapter 24), and short ones for winning and losing.
 - **Scenes.** Title (the computer against itself), the choice of a mission, the battle, the pause (continue, save, load, leave), the result with the numbers of both sides.
 
@@ -513,13 +513,13 @@ The first benchmark of the finished game said 17 to 22 milliseconds a frame at 1
 | `save` | `Snapshot` | a whole game as keys and values, exact |
 | `random` | `SeededRandom.state` and `resume` | random numbers that go on after loading |
 
-Each of them is a page or two, each has its tests, and none of them knows of spice or tanks: an economy game in the spirit of *The Settlers* can use `Production`, `Credits`, the fog and the minimap as they are.
+Each of them is a page or two, each has its tests, and none of them knows of crystal or tanks: an economy game in the spirit of *The Settlers* can use `Production`, `Credits`, the fog and the minimap as they are.
 
 ## Exercises
 
 1. **Repair.** Damaged buildings are repaired for credits while the player holds a button. What does that mean for `Production`, which knows only orders with a fixed price? Is repair an order?
 2. **Formation shapes.** The slots are a blob around the target. Give the group a line facing the way it drives, the launchers behind the tanks. Where in `Formation` does that go, and what does `assign` need to know?
-3. **A smarter harvest.** The computer's harvesters drive to the nearest spice even where the player's tanks wait. Use the influence map to send them to the safest field instead.
+3. **A smarter harvest.** The computer's harvesters drive to the nearest crystal even where the player's tanks wait. Use the influence map to send them to the safest field instead.
 4. **Fog for the computer.** The computer's attack sees the player's buildings through the fog (`weakest` looks at all of them). Give it only what its own fog has seen, its ghosts, and watch it scout.
 5. **Replays.** The battle is exact from a save; the inputs are few (orders, builds). Record the orders with their step numbers, as Snake recorded keys (chapter 22), and play a whole battle back from the start.
 6. **A third house.** `Side` has two values. What would three houses need: in the fog, in the influence map, in `judge`?

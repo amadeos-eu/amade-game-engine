@@ -537,4 +537,4 @@ What stays in the game: the ground and its classes, the road and open ground, th
 
 ---
 
-Towers is the first chapter of Part III. Its enemies all want the same thing, and the player commands no one. In **Sands**, in the spirit of Dune II, the player selects their own units with the mouse and sends each group somewhere else, the map is dark where nobody has looked, and a computer opponent builds its own base.
+Towers is the first chapter of Part III. Its enemies all want the same thing, and the player commands no one. In **Sands**, a real-time strategy game, the player selects their own units with the mouse and sends each group somewhere else, the map is dark where nobody has looked, and a computer opponent builds its own base.

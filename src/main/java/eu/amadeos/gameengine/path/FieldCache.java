@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Flow fields towards many goals, each searched once and kept while the map stays as it is. In Towers all
  * enemies had one goal and one field. In a strategy game every order has a goal of its own: this group to
- * the ridge, that one to the spice, the harvesters home. A group shares one field, and two groups sent to
+ * the ridge, that one to the crystal, the harvesters home. A group shares one field, and two groups sent to
  * the same place share it too. When the map changes, because a building went up or came down, every field
  * may be wrong: {@link #invalidate} forgets them all, and each is searched again when it is next asked for.
  *

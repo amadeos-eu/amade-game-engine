@@ -508,4 +508,4 @@ What stays in the game: the tiles and their classes, the levels, the player, bee
 
 ---
 
-Jump ends Part II. In **Part III**, the camera looks down on a map instead of from the side, and the player commands many units with the mouse instead of steering one: first **Towers**, a tower defence, then **Sands**, in the spirit of Dune II.
+Jump ends Part II. In **Part III**, the camera looks down on a map instead of from the side, and the player commands many units with the mouse instead of steering one: first **Towers**, a tower defence, then **Sands**, a real-time strategy game.
