@@ -69,4 +69,31 @@ class CameraTest {
         assertTrue(camera.sees(670, 10, 16, 16, 1));
         assertFalse(camera.sees(1400, 10, 16, 16, 1));
     }
+
+    // --8<-- [start:test-world]
+    @Test
+    void theMousePointsIntoTheWorldThroughTheCamera() {
+        // A map of 800 × 480 below a bar of 22: the view is 640 × 378, from y = 22 on the screen.
+        Camera camera = new Camera(640, 378, 800, 480).placedAt(0, 22);
+        camera.moveBy(100, 50);
+        assertEquals(100, camera.x(), 1e-9);
+        assertEquals(415, camera.worldX(315), 1e-9, "the mouse at 315 on the screen, 100 into the world");
+        assertEquals(50 + 200 - 22, camera.worldY(200), 1e-9, "the bar is not part of the view");
+        assertEquals(315, camera.screenX(415, 1), 1e-9, "and back");
+        assertTrue(camera.shows(315, 200));
+        assertFalse(camera.shows(315, 10), "on the bar");
+    }
+
+    @Test
+    void theViewIsMovedByThePlayerAsFarAsTheEdges() {
+        Camera camera = new Camera(640, 378, 800, 480);
+        camera.moveBy(-30, 0);
+        assertEquals(0, camera.x(), 1e-9, "not left of the world");
+        camera.moveBy(500, 500);
+        assertEquals(160, camera.x(), 1e-9, "800 - 640");
+        assertEquals(102, camera.y(), 1e-9, "480 - 378");
+        camera.moveBy(0, 0);
+        assertEquals(160, camera.x(0), 1e-9, "a step without moving: no drift between the steps");
+    }
+    // --8<-- [end:test-world]
 }

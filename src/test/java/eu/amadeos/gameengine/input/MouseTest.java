@@ -41,4 +41,20 @@ class MouseTest {
         mouse.poll();
         assertFalse(mouse.isDown(MouseEvent.BUTTON3));
     }
+
+    @Test
+    void aReleaseEndsADragAndLeavingTheCanvasIsNoticed() {
+        mouse.moved(10, 10);
+        mouse.pressed(MouseEvent.BUTTON3);
+        mouse.poll();
+        assertTrue(mouse.isInside());
+        assertFalse(mouse.wasReleased(MouseEvent.BUTTON3));
+        mouse.released(MouseEvent.BUTTON3);
+        mouse.exited();
+        mouse.poll();
+        assertTrue(mouse.wasReleased(MouseEvent.BUTTON3));
+        assertFalse(mouse.isInside(), "left the canvas");
+        mouse.poll();
+        assertFalse(mouse.wasReleased(MouseEvent.BUTTON3), "released once");
+    }
 }

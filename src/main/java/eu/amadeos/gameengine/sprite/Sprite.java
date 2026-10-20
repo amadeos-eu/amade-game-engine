@@ -45,6 +45,8 @@ public final class Sprite {
     private final Drawing drawing;
     /** Always scaled with hard edges, whatever the render mode: pixel art. */
     private final boolean hard;
+    /** A drawing that covers every pixel of its box, so its cache needs no transparency. */
+    private final boolean opaque;
     /** The picture at its size on the screen; made by the first frame that needs it. */
     private BufferedImage cached;
     private boolean cachedSmooth;
@@ -55,23 +57,24 @@ public final class Sprite {
     /** What the source's pixels need of transparency; 0 until the first picture is cached. */
     private int sourceTransparency;
 
-    private Sprite(double width, double height, BufferedImage source, Drawing drawing, boolean hard) {
+    private Sprite(double width, double height, BufferedImage source, Drawing drawing, boolean hard, boolean opaque) {
         if (width <= 0 || height <= 0) throw new IllegalArgumentException("empty sprite");
         this.width = width;
         this.height = height;
         this.source = source;
         this.drawing = drawing;
         this.hard = hard;
+        this.opaque = opaque;
     }
 
     /** A sprite from an image, shown at {@code width} × {@code height} logical units, whatever its pixels. */
     public static Sprite of(BufferedImage image, double width, double height) {
-        return new Sprite(width, height, image, null, false);
+        return new Sprite(width, height, image, null, false, false);
     }
 
     /** A sprite drawn in code. */
     public static Sprite drawn(double width, double height, Drawing drawing) {
-        return new Sprite(width, height, null, drawing, false);
+        return new Sprite(width, height, null, drawing, false, false);
     }
 
     /** A sprite from an image file among the classes of {@code owner}, e.g. {@code "/sprites/ball.png"}. */
@@ -95,8 +98,20 @@ public final class Sprite {
      * must stay square blocks instead of blurring into each other.
      */
     public Sprite hardEdges() {
-        return new Sprite(width, height, source, drawing, true);
+        return new Sprite(width, height, source, drawing, true, opaque);
     }
+
+    // --8<-- [start:opaque]
+    /**
+     * The same drawing, promised to cover every pixel of its box, such as a whole map's ground: its cache
+     * is then opaque and copied without blending, which a picture drawn in code otherwise never is. What
+     * the drawing leaves out shows black.
+     */
+    public Sprite opaque() {
+        if (drawing == null) throw new IllegalStateException("an image knows its own transparency");
+        return new Sprite(width, height, null, drawing, hard, true);
+    }
+    // --8<-- [end:opaque]
 
     public boolean hasHardEdges() {
         return hard;
@@ -239,12 +254,13 @@ public final class Sprite {
      * the unseen ones, and only a translucent one is blended with what lies below, pixel by pixel. A sky
      * the size of the screen costs a quarter as much when it is known to be opaque.
      *
-     * <p>Pictures drawn in code have soft edges and stay translucent. An image is looked at once: opaque if
+     * <p>Pictures drawn in code have soft edges and stay translucent, unless they are {@link #opaque()}. An
+     * image is looked at once: opaque if
      * every pixel is, a bitmask if every pixel is either opaque or invisible. Smooth scaling mixes the
      * edges of a bitmask with the invisible pixels around them, so then it is translucent too.
      */
     private int transparency(boolean smooth) {
-        if (source == null) return Transparency.TRANSLUCENT;
+        if (source == null) return opaque ? Transparency.OPAQUE : Transparency.TRANSLUCENT;
         if (sourceTransparency == 0) sourceTransparency = transparencyOf(source);
         if (sourceTransparency == Transparency.BITMASK && smooth) return Transparency.TRANSLUCENT;
         return sourceTransparency;

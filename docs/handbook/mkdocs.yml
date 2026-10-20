@@ -75,6 +75,8 @@ nav:
       - 25. Maze: 25-maze.md
       - 26. Blast: 26-blast.md
       - 27. Jump: 27-jump.md
+  - "Part III: Strategy":
+      - 30. Towers: 30-towers.md
   - Appendices:
       - Java2D and X11 Pitfalls: appendix-java2d.md
   - The Road Ahead: roadmap.md

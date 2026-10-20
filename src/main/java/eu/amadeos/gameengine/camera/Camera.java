@@ -43,6 +43,9 @@ public final class Camera {
     private double y;
     private double previousX;
     private double previousY;
+    /** Where the view's top left corner lies on the screen: (0, 0) unless a status bar takes the top. */
+    private double screenLeft;
+    private double screenTop;
 
     public Camera(double viewWidth, double viewHeight, double worldWidth, double worldHeight) {
         if (viewWidth <= 0 || viewHeight <= 0 || worldWidth <= 0 || worldHeight <= 0) {
@@ -108,6 +111,69 @@ public final class Camera {
         return Math.clamp(top, 0, worldHeight - viewHeight);
     }
     // --8<-- [end:camera]
+
+    // --8<-- [start:move]
+    /**
+     * One update step of a camera that the player moves, by keys, the mouse at the edge of the screen or
+     * dragging the map: by {@code dx}, {@code dy} in the world, as far as the edges allow. Call it in every
+     * step, with 0, 0 when nothing moves, so that drawing between two steps does not drift.
+     */
+    public void moveBy(double dx, double dy) {
+        previousX = x;
+        previousY = y;
+        x = clampX(x + dx);
+        y = clampY(y + dy);
+    }
+    // --8<-- [end:move]
+
+    /**
+     * Places the view on the screen with its top left corner at {@code left}, {@code top} in logical
+     * coordinates, e.g. below a bar of 22 units: a view of 640 × 378 at (0, 22).
+     */
+    public Camera placedAt(double left, double top) {
+        screenLeft = left;
+        screenTop = top;
+        return this;
+    }
+
+    public double screenLeft() {
+        return screenLeft;
+    }
+
+    public double screenTop() {
+        return screenTop;
+    }
+
+    // --8<-- [start:to-world]
+    /**
+     * Where a point of the screen, such as the mouse, lies in the world: the camera's position plus the
+     * point's place in the view. Screen coordinates are those of the canvas, logical, so the window's size,
+     * the black bars and the render mode are already taken care of ({@code Mouse}). The answer is for the
+     * camera after the last step, where the rules live; the picture may lag a fraction of a step behind.
+     */
+    public double worldX(double screenX) {
+        return x + screenX - screenLeft;
+    }
+
+    public double worldY(double screenY) {
+        return y + screenY - screenTop;
+    }
+
+    /** Where a point of the world is drawn on the screen, between the last two steps. */
+    public double screenX(double worldX, double alpha) {
+        return worldX - x(alpha) + screenLeft;
+    }
+
+    public double screenY(double worldY, double alpha) {
+        return worldY - y(alpha) + screenTop;
+    }
+
+    /** True if a point of the screen lies in the view, not on a bar beside it. */
+    public boolean shows(double screenX, double screenY) {
+        return screenX >= screenLeft && screenX < screenLeft + viewWidth
+                && screenY >= screenTop && screenY < screenTop + viewHeight;
+    }
+    // --8<-- [end:to-world]
 
     /** The left edge of the view in the world, after the last step. */
     public double x() {

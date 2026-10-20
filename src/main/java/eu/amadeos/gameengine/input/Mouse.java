@@ -28,6 +28,10 @@ public final class Mouse {
     private int pressed;
     private int downNow;     // one bit per button, as the Swing thread last saw it
     private int down;
+    private int releasedSincePoll;
+    private int released;
+    private boolean insideNow;
+    private boolean inside;
 
     /** Listens to the canvas; positions are converted the way the canvas currently draws. */
     public void attach(GameCanvas canvas) {
@@ -53,6 +57,16 @@ public final class Mouse {
             public void mouseReleased(MouseEvent e) {
                 released(e.getButton());
             }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                mouseMoved(e);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                exited();
+            }
         };
         canvas.addMouseListener(listener);
         canvas.addMouseMotionListener(listener);
@@ -62,6 +76,12 @@ public final class Mouse {
         this.x = x;
         this.y = y;
         movedSincePoll = true;
+        insideNow = true;
+    }
+
+    /** The mouse left the canvas: for a game that scrolls while the mouse is at the edge, a reason to stop. */
+    public synchronized void exited() {
+        insideNow = false;
     }
 
     public synchronized void pressed(int button) {
@@ -72,7 +92,10 @@ public final class Mouse {
     }
 
     public synchronized void released(int button) {
-        if (button > 0 && button < 32) downNow &= ~(1 << button);
+        if (button > 0 && button < 32) {
+            downNow &= ~(1 << button);
+            releasedSincePoll |= 1 << button;
+        }
     }
 
     /** Call once per update step on the game loop thread, before asking. */
@@ -80,8 +103,11 @@ public final class Mouse {
         moved = movedSincePoll;
         pressed = pressedSincePoll;
         down = downNow;
+        released = releasedSincePoll;
+        inside = insideNow;
         movedSincePoll = false;
         pressedSincePoll = 0;
+        releasedSincePoll = 0;
     }
 
     /** The last position in logical coordinates; {@code NaN} until the mouse has moved over the canvas. */
@@ -101,6 +127,16 @@ public final class Mouse {
     /** True if the button ({@link MouseEvent#BUTTON1} …) went down between the last two polls. */
     public synchronized boolean wasPressed(int button) {
         return button > 0 && button < 32 && (pressed & 1 << button) != 0;
+    }
+
+    /** True if the button came up between the last two polls: the end of a drag. */
+    public synchronized boolean wasReleased(int button) {
+        return button > 0 && button < 32 && (released & 1 << button) != 0;
+    }
+
+    /** True if the mouse was over the canvas at the last poll. */
+    public synchronized boolean isInside() {
+        return inside;
     }
 
     /** True if the button was held down at the last poll: for actions that last as long as it is held. */
