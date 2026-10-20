@@ -68,6 +68,29 @@ None of the classes here touches AWT. They are the rules' tools, and they are te
 
 Paths are data: Swarm writes them in its stage file, `path swoop-left from 300 -20 curve ...`, and reads them with [`TextData`](47-data-and-saving.md#data-files-textdata).
 
+## Grazing: Wander
+
+*Package `motion` · introduced in [32. Colony](32-colony.md#grazing) · source: [`Wander`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/motion/Wander.java)*
+
+**What it is for.** Something that idles around a home: sheep in a pasture, hens in a yard, people on a square. It walks to a spot, stands there for one to four seconds, and walks to the next; frightened, it runs to the far side of its circle at twice the speed.
+
+**When to choose it.** For life in the picture that the rules do not need to steer. Something that must reach a place follows a path ([46](46-paths-and-decisions.md#which-search)); something that flies a set course follows a `FlightPath`.
+
+**How it works.** A spot is drawn evenly from the circle: an angle, and a radius times the **square root** of a random number. Without the root, half of the spots fall in the inner quarter of the circle, and the herd crowds in the middle. The random numbers come from the game's `SeededRandom`, so grazing repeats in a replay and goes on exactly after loading: `state()` is six numbers, and `restore` sets them.
+
+```java title="amade-game-engine · motion/Wander.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/motion/Wander.java:wander"
+```
+
+| Method | What it does |
+|---|---|
+| `new Wander(homeX, homeY, radius, speed)` | Starts at its home |
+| `update(seconds, random)` | One step; true while it walks |
+| `flee(x, y)` | Runs away from a point, to the far side of the circle, twice as fast |
+| `home(x, y)` | Moves the circle; the next spot is in the new one |
+| `x()`, `y()`, `walking()`, `facingLeft()` | For drawing |
+| `state()`, `restore(state)` | For a save file |
+
 ## Falling and standing: Body and TileCollider
 
 *Package `physics` · introduced in [27. Jump](27-jump.md#step-2-falling-and-standing) · source: [`Body`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Body.java), [`Solidity`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Solidity.java), [`TileCollider`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/TileCollider.java)*

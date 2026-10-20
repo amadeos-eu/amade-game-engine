@@ -513,7 +513,7 @@ The first benchmark of the finished game said 17 to 22 milliseconds a frame at 1
 | `save` | `Snapshot` | a whole game as keys and values, exact |
 | `random` | `SeededRandom.state` and `resume` | random numbers that go on after loading |
 
-Each of them is a page or two, each has its tests, and none of them knows of crystal or tanks: an economy game in the spirit of *The Settlers* can use `Production`, `Credits`, the fog and the minimap as they are.
+Each of them is a page or two, each has its tests, and none of them knows of crystal or tanks: the economy game of [chapter 32](32-colony.md) uses the minimap as it is, next to goods of its own.
 
 ## Exercises
 

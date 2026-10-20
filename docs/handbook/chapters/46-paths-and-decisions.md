@@ -16,6 +16,7 @@ Every search asks the game, not the map, whether a tile can be entered: `(col, r
 | The cheapest way from here to there, with costs per tile: a computer player that avoids danger | `AStar` | One search per question, looking first towards the goal |
 | The way from everywhere to one place, in eight directions, for many units walking freely | `FlowField` | One search for every tile; each unit only looks up an arrow |
 | Many such goals, one per order | `FieldCache` | A flow field per goal, kept until the map changes |
+| The next road for a ware on a network of roads and flags | `RoadNetwork.next` | One search from the goal over the flags, kept until the network changes |
 | Where each unit of a group stops | `Formation.slots` and `assign` | A small search around the target |
 | May a unit drive straight from here to there? | `Formation.clearLine` | One walk along the line |
 
@@ -79,6 +80,31 @@ The two searches work well together. The pilot of Maze, the computer player, pla
 *Package `path` · introduced in [31. Sands](31-sands.md#one-field-for-the-group) · source: [`FieldCache`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/path/FieldCache.java)*
 
 In a strategy game every order has a goal of its own. `toward(goal)` gives the field towards a tile, from the cache or searched now: a group shares one field, two groups sent to the same place share it too, and the harvesters, all driving home to the same refinery, share theirs for the whole game. When a building goes up or comes down, `invalidate()` forgets every field, and each is searched again when it is next asked for. Only the 32 fields used last are kept, an access-ordered `LinkedHashMap` that drops its eldest entry, because a field of a map of 64 × 64 is 20 KB. `searches()` counts what the cache did not save: a test proves that six tanks with one order cost one search.
+
+## Roads between flags: RoadNetwork
+
+*Package `road` · introduced in [32. Colony](32-colony.md#step-1-roads-from-flag-to-flag) · source: [`RoadNetwork`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/road/RoadNetwork.java)*
+
+**What it is for.** Roads that the player lays from flag to flag, and the way of a ware over them. A road joins two flags and runs over the cells between; a new flag on a road makes two roads of it. A ware at a flag asks which road it takes next to reach the flag of the house it is meant for.
+
+**When to choose it.** When things travel on a network the player builds, in hops between fixed points: the roads of a settlement, rails between stations, pipes between pumps. Things that walk freely over the map use the searches above.
+
+**How it works.** The flags are the nodes of a graph and the roads its edges, each as long as its steps. The way to a goal is found by Dijkstra's search **from the goal outwards**, once, which gives every flag at once its distance and the road it takes: `next` is then a lookup. The searches are kept for the 64 goals used most recently and forgotten when a flag or road is added or removed. Ties go to the lower number, so the answer never depends on the order of a hash map, and a loaded game goes on exactly. Flags and roads may be added with a given number, and `restore` sets the counters, for loading.
+
+```java title="amade-game-engine · road/RoadNetwork.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/road/RoadNetwork.java:next"
+```
+
+| Method | What it does |
+|---|---|
+| `addFlag(cell)`, `removeFlag(flag)` | A new flag and its number; removes one with its roads |
+| `connect(from, to, cells)`, `remove(road)` | A road over the cells from one flag to another, checked; removes one |
+| `split(cell)` | A flag in the middle of a road, two roads of one; the new flag |
+| `next(from, to)`, `distance(from, to)`, `connected(from, to)`, `way(from, to)` | The next road on the shortest way, its length, whether there is one, all of its roads |
+| `flagAt(cell)`, `roadAt(cell)`, `cell(flag)`, `road(id)` | What is where, for the mouse and the drawing |
+| `flags()`, `roads()`, `roads(flag)` | Everything, and the roads at one flag |
+| `version()`, `searches()` | Counts changes for the drawing; counts searches for tests |
+| `nextFlag()`, `nextRoad()`, `restore(nextFlag, nextRoad)` | The counters, for a save file |
 
 ## Groups on the move: Formation
 
