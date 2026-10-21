@@ -92,4 +92,5 @@ nav:
       - 48. Scenes, Menus and Sound: 48-scenes-menus-sound.md
   - Appendices:
       - Java2D and X11 Pitfalls: appendix-java2d.md
+      - Glossary: appendix-glossary.md
   - The Road Ahead: roadmap.md
