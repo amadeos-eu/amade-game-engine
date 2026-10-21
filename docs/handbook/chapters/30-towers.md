@@ -5,7 +5,7 @@ In every game so far the player steered one thing: a paddle, a ship, a snake, a 
 <figure markdown>
 ![The meadow in the seventh wave, a maze of towers](images/towers/battle.jpg){ width="400" }
 ![The same with the flow field shown](images/towers/flowfield.jpg){ width="400" }
-<figcaption>The meadow in the seventh wave (left): five walls of towers with gaps at alternate ends, and the trail the enemies walk. The same with F3 (right): every tile points the way to the castle, white near it, orange far away.</figcaption>
+<figcaption>The meadow in the seventh wave (left): five walls of towers with gaps at alternate ends, and nothing on the grass to show the way: only the enemies walking it. The same with F3 (right): every tile points the way to the castle, white near it, orange far away.</figcaption>
 </figure>
 
 Tower defence grew out of custom maps for strategy games around 2002, and its two schools have been arguing since: games with a fixed road, where towers stand beside it, and games with open ground, where the player builds the maze. The first is the more common; Towers has both, one switch apart. The second is the harder to make, because the computer must find the way for every enemy again whenever a tower is built, and must say *no* before a tower closes it. This chapter makes that cheap with one idea, the **flow field**, and moves the game from the keyboard to the **mouse**.
@@ -17,7 +17,7 @@ Tower defence grew out of custom maps for strategy games around 2002, and its tw
     - **Menus over the game**: a build menu beside the tile, by mouse and by keys
     - **Units and towers as data files**: blocks of properties, stages that inherit from each other, typos found
     - **Aiming**: turning turrets, leading the target, a burst that hits everything near it
-    - **A ground that changes**: drawn in squares, only where it changed, a few in each frame
+    - **The ground**: drawn once, in squares, each when the camera first sees it
     - **Turned sprites**: 32 directions cached once
 
 The complete game is in [amade-towers-game](https://github.com/datazuul/amade-towers-game).
@@ -92,7 +92,7 @@ The game keeps one flow field, from all the castle's tiles at once, and searches
 --8<-- "amade-towers-game/src/main/java/eu/amadeos/games/towers/domain/Game.java:way"
 ```
 
-The `trail` is the way from each lair to the castle, following the arrows. It is not needed by the rules; it is what the ground shows as a trodden path (Step 7).
+The `trail` is the way from each lair to the castle, following the arrows. The rules do not need it, and nothing draws it (Step 7 says why): the simple builder of the tests and of the title screen puts its towers beside it.
 
 ### May a tower stand here?
 
@@ -415,42 +415,32 @@ The flow field is drawn with F3 as one small arrow sprite per tile, in eight dir
 --8<-- "amade-towers-game/src/main/java/eu/amadeos/games/towers/ui/game/TowersPainter.java:flow"
 ```
 
-### A ground that changes
+### The ground
 
-The ground of a battlefield is the most expensive picture: noise for the grass, ponds with their banks, rocks, the shadows of trees, the lairs and the castle, and on open ground the **trail**, the trodden path the enemies walk. It is drawn as three wide strokes of the whole way, dark rim, lighter edge and bare earth:
-
-```java title="amade-towers-game · ui/game/Art.java"
---8<-- "amade-towers-game/src/main/java/eu/amadeos/games/towers/ui/game/Art.java:trail"
-```
-
-On the road, the trail is not drawn: the road is. It is the union of its tiles' squares, which has sharp corners, rounded by a trick from image processing: grown by a few units and shrunk again, which rounds the inner corners (a **closing**), then shrunk and grown again, which rounds the outer ones (an **opening**). Growing a shape by *r* is adding the outline drawn with a pen 2*r* wide; shrinking it is taking that outline away:
+The ground of a battlefield is the most expensive picture: noise for the grass, ponds with their banks, rocks, the shadows of trees, the lairs and the castle, and the road. The road is the union of its tiles' squares, which has sharp corners, rounded by a trick from image processing: grown by a few units and shrunk again, which rounds the inner corners (a **closing**), then shrunk and grown again, which rounds the outer ones (an **opening**). Growing a shape by *r* is adding the outline drawn with a pen 2*r* wide; shrinking it is taking that outline away:
 
 ```java title="amade-towers-game · ui/game/Art.java"
 --8<-- "amade-towers-game/src/main/java/eu/amadeos/games/towers/ui/game/Art.java:road"
 ```
 
-All of it together takes far too long for a frame, so it must be cached. The road never changes, so on the road the cache could be one picture. On open ground, though, the trail changes with every tower. Caching the whole map as one picture would mean drawing it all again on every click, a stutter each time.
+On open ground there is no road, and no path either: the grass is plain, and the way shows only in where the enemies walk, and in the arrows of F3. An earlier version of this game drew a trodden trail along the current way, which moved with every tower. It looked like a road, though, and a road says "the enemies keep to me", which on open ground is not true. Maze games mostly leave the ground plain, as Desktop Tower Defense and Fieldrunners do, and let the player read the way from the crowd; others draw the way as a line or arrows. Towers keeps the arrows for F3.
 
-So `Terrain` cuts the ground into **squares of 8 × 8 tiles**. Each square is a sprite of its own. After every step, `update` compares the trail of each square, and one tile around it, with what its picture shows, and only a square whose trail changed is drawn again:
+So the ground never changes, and it is drawn once and then only copied. For the meadow, 36 × 22 tiles, one picture of the whole map would do. `Terrain` cuts the ground into **squares of 8 × 8 tiles** anyway, each a sprite of its own, because a map may be much larger than the screen: a sprite drawn in code is drawn when it is first shown, so a square the camera does not see is neither drawn nor copied:
 
 ```java title="amade-towers-game · ui/game/Terrain.java"
 --8<-- "amade-towers-game/src/main/java/eu/amadeos/games/towers/ui/game/Terrain.java:terrain"
 ```
 
-Drawing a square is the same for any square: the part of the grass, the ponds, the trail, the rocks and shadows, all of them clipped to the square by the sprite. The tiles one beyond its edge are drawn as well, so that a pond or a trail that crosses the edge continues into the next square without a seam:
+Drawing a square is the same for any square: the part of the grass, the ponds, the road, the rocks and shadows, all of them clipped to the square by the sprite. The tiles one beyond its edge are drawn as well, so that a pond or a road that crosses the edge continues into the next square without a seam:
 
 ```java title="amade-towers-game · ui/game/Terrain.java"
 --8<-- "amade-towers-game/src/main/java/eu/amadeos/games/towers/ui/game/Terrain.java:draw"
 ```
 
-A tower in the middle of the map can change the trail everywhere: all of it walks round the new tower. Twenty squares to draw in one frame would be the stutter again. So `render` takes over **at most two** new pictures per frame. The others keep showing the old trail for a few frames more, which nobody notices, because the enemies take a second to walk from one tile to the next:
+In each frame, `render` copies the squares the camera sees:
 
 ```java title="amade-towers-game · ui/game/Terrain.java"
 --8<-- "amade-towers-game/src/main/java/eu/amadeos/games/towers/ui/game/Terrain.java:render"
-```
-
-```java title="amade-towers-game · test/ui/game/TowersGameTest.java"
---8<-- "amade-towers-game/src/test/java/eu/amadeos/games/towers/ui/game/TowersGameTest.java:test-terrain"
 ```
 
 Every pixel of a square is covered: the grass is everywhere. Chapter 27 taught `Sprite` to look at a picture's pixels and cache it opaque if none is transparent. A picture *drawn* in code is drawn into a transparent cache, though, and the sprite cannot know in advance that nothing will stay transparent. `opaque()` is the promise, and with it a square is copied as a plain copy, without blending:
@@ -533,7 +523,7 @@ What stays in the game: the ground and its classes, the road and open ground, th
 4. **The longest maze.** Write a test that builds, with a fixed amount of gold, the maze that makes the way from the lair to the castle the longest. Is a greedy builder (always the tile that lengthens the way most) good enough?
 5. **Sell back the maze.** Selling a tower opens the way again, and every enemy takes the shorter way at once. Is that a trick players will use, and should the rules allow it?
 6. **A minimap.** Draw the whole battlefield small in a corner, the towers as dots, the view as a box. A click on it moves the camera there. You will need it in the next chapter.
-7. **Group flow.** Two hundred orcs on one trail walk through each other. Give each a little push away from its neighbours (the spatial grid of chapter 24 finds them) and see how a crowd forms in a gap, and how a troll in it now holds up the wolves behind it. Does LevelTest still win every level?
+7. **Group flow.** Two hundred orcs on one way walk through each other. Give each a little push away from its neighbours (the spatial grid of chapter 24 finds them) and see how a crowd forms in a gap, and how a troll in it now holds up the wolves behind it. Does LevelTest still win every level?
 
 ---
 
