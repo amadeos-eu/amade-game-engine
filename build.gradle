@@ -74,3 +74,28 @@ publishing {
         }
     }
 }
+
+// The handbook as the Debian package amade-game-handbook (docs/handbook/package-deb.sh), which the
+// amadeOS image installs; the Help drawer of the Front Panel lists it.
+tasks.register('handbookDeb', Exec) {
+    description = 'Builds the Debian package amade-game-handbook (the handbook for reading offline)'
+    group = 'distribution'
+    commandLine 'docs/handbook/package-deb.sh', project.version, layout.buildDirectory.dir('distributions').get().asFile.absolutePath
+}
+
+tasks.register('installToAmadeOs') {
+    dependsOn 'handbookDeb'
+    description = 'Builds and drops the handbook package into ../amadeos/config/packages.chroot/'
+    group = 'distribution'
+
+    doLast {
+        def targetDir = file('../amadeos/config/packages.chroot')
+        targetDir.mkdirs()
+        def debFile = new File(layout.buildDirectory.get().asFile, "distributions/amade-game-handbook_${project.version}_all.deb")
+        copy {
+            from debFile
+            into targetDir
+        }
+        println "[installToAmadeOs] Copied ${debFile.name} to ${targetDir.absolutePath}"
+    }
+}

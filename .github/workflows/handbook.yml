@@ -118,6 +118,10 @@ jobs:
       - name: Build
         working-directory: amade-game-engine/docs/handbook
         run: mkdocs build --strict --site-dir "$GITHUB_WORKSPACE/site"
+      # The offline variant of the Debian package amade-game-handbook (package-deb.sh) must build too.
+      - name: Build offline variant
+        working-directory: amade-game-engine/docs/handbook
+        run: mkdocs build --strict -f mkdocs-offline.yml --site-dir "$RUNNER_TEMP/site-offline"
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site
