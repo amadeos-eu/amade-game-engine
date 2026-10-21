@@ -48,9 +48,11 @@ Boxes point out things worth remembering:
 |---|---|---|
 | I. Games that wait for you | Mines, Solitaire | Model and rules, drawing with Java2D, mouse input, Model-View-Presenter, high scores, drag and drop, animation, undo |
 | II. Action | Paddle, Bricks, Snake, Rocks, Swarm, Maze, Blast, Jump | Game loop, keyboard, sprites, collision, sound, tile maps, AI, cameras, physics |
-| III. Strategy | Towers, Sands | Mouse in world coordinates, pathfinding for many units, selection, fog of war, saving games |
+| III. Strategy | Towers, Sands, Colony, Town | Mouse in world coordinates, pathfinding for many units, selection, fog of war, saving games, roads and goods, seasons, the isometric view, networks and services |
 
 Part IV, [the engine manual](40-engine.md), comes after the games. It describes the engine by subsystem rather than by game: what each part is for, when to choose it, how it works, and which chapter introduced it. Use it to look things up once you have read the games, or when you start a game of your own.
+
+Two appendices close the book: [Java2D and X11 pitfalls](appendix-java2d.md), the rules for fast and correct drawing, and a [glossary](appendix-glossary.md) of the words of game programming, each with the chapter that explains it.
 
 What is written so far and what comes next is listed in [The Road Ahead](roadmap.md).
 

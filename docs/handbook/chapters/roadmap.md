@@ -26,15 +26,10 @@ The handbook grows with the games: a chapter is written when its game is finishe
 | [40. The Engine at a Glance](40-engine.md) | | Part IV, the engine manual: what each part of the engine is for, when to choose it and how it works |
 | [41. Loop, Time and Drawing](41-loop-and-drawing.md) to [48. Scenes, Menus and Sound](48-scenes-menus-sound.md) | | One chapter per subsystem, each section naming the game that introduced it |
 | [Java2D and X11 Pitfalls](appendix-java2d.md) | | The rules for fast and correct drawing, collected |
+| [Glossary](appendix-glossary.md) | | The words of game programming used in this book, each with the chapter that explains it |
 
-## Planned
+## What comes next
 
-### Part III: Strategy
-
-When a new game adds to the engine, its chapter tells the story and Part IV gets the new section. With Town, Part III has a game of every kind it set out to cover: towers, real-time strategy, an economy and a city. What comes next will be chosen by what the engine has not yet needed.
-
-## An appendix, also planned
-
-- **Glossary**.
+With Town, Part III has a game of every kind it set out to cover: towers, real-time strategy, an economy and a city. Nothing more is planned for now. A new game will be chosen by what the engine has not yet needed; its chapter will tell the story, and Part IV, the tables of [chapter 40](40-engine.md) and the [glossary](appendix-glossary.md) will get what it adds.
 
 Suggestions and corrections are welcome as [issues](https://github.com/datazuul/amade-game-engine/issues) or pull requests. Each page has an edit button at the top.
