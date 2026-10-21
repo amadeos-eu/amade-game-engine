@@ -1,6 +1,6 @@
 # 45. Maps, Camera and Fog
 
-From Maze on, the games of this book live on maps: a grid of tiles that the rules think in, and a picture of it that the drawing scales. This chapter covers the maps themselves, written as text or drawn in an editor, the camera that shows a part of a world larger than the screen, and what one side of a strategy game knows of the map: the fog of war and the minimap.
+From Maze on, the games of this book live on maps: a grid of tiles that the rules think in, and a picture of it that the drawing scales. This chapter covers the maps themselves, written as text or drawn in an editor, what spreads over them (land owned, services that reach, power that flows), the isometric view of a map, the camera that shows a part of a world larger than the screen, and what one side of a strategy game knows of the map: the fog of war and the minimap.
 
 ## A grid of tiles: TileMap, Cell and Direction
 
@@ -71,6 +71,55 @@ The order of `Direction` is a rule of its own: when two ways are equally good, t
 | `size()`, `has(id)`, `ids()` | How much land; which claims there are, for saving |
 | `version()` | Counts every change |
 
+## Places that reach a circle: Coverage
+
+*Package `tile` · introduced in [33. Town](33-town.md#step-5-reach-water-and-land-value) · source: [`Coverage`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tile/Coverage.java)*
+
+**What it is for.** How well the tiles of a map are served by places that reach a circle around them: schools, fire stations, water towers, parks. A tile knows how many places reach it, and how close the nearest one is, as a **strength** from 1 on the place itself to almost 0 at the edge of its reach.
+
+**When to choose it.** When reach adds up or fades with distance: land value that rises near a park, happiness that counts how many homes a school reaches. When it only matters whether a tile is inside, and claims must be given back one by one, [`Territory`](#the-land-a-side-owns-territory) fits better.
+
+**How it works.** `add` walks the square around the circle and counts every tile whose middle lies within the radius, keeping the strongest strength. A strength cannot be taken back out of a maximum, so there is no `remove`: the game clears the coverage and adds every place again when something changed, or once a month. For a map of 64 × 64 tiles and a few dozen places that costs nothing.
+
+```java title="amade-game-engine · tile/Coverage.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/tile/Coverage.java:coverage"
+```
+
+| Method | What it does |
+|---|---|
+| `clear()` | Forgets all places |
+| `add(col, row, radius)` | A place on a tile; `add(double col, double row, radius)` for the middle of a building of several tiles |
+| `count(col, row)`, `covered(col, row)` | How many places reach a tile; whether any does |
+| `strength(col, row)` | 1 on the place, falling towards 0 at the edge of its reach, 0 outside |
+
+## Networks that carry: SupplyGrid
+
+*Package `tile` · introduced in [33. Town](33-town.md#step-4-power-through-the-town) · source: [`SupplyGrid`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tile/SupplyGrid.java)*
+
+**What it is for.** A network of tiles that carries something from where it is made to where it is used: power from plants through lines and buildings to homes, water through pipes. Tiles that carry are **conductors**; some are **sources** that put an amount in, others **loads** that take an amount out.
+
+**When to choose it.** Whenever something flows through what the player builds and runs short when there is too little: power, water, gas, data. Something carried by people or vehicles, one piece at a time, is a road network instead ([`RoadNetwork`](46-paths-and-decisions.md#roads-between-flags-roadnetwork)).
+
+**How it works.** `solve` finds the networks, groups of conductors that touch along an edge (not across a corner), with a flood fill. In each network it serves the loads in the order a breadth-first flood from all its sources reaches them, until the network's sources run dry. So a town that builds more than its plant can feed loses power **at the far end**, where the player is looking, and not here and there at random. A load is served wholly or not at all; a load or source on a tile that does not conduct is made a conductor.
+
+```java title="amade-game-engine · tile/SupplyGrid.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/tile/SupplyGrid.java:grid"
+```
+
+| Method | What it does |
+|---|---|
+| `clear()`, then `conductor`, `source`, `load` | Describes the network anew, once per survey |
+| `solve()` | Finds the networks and serves the loads |
+| `supplied(col, row)` | A load that got what it asked for |
+| `connected(col, row)` | A tile in a network with a source, served or not: "no power" or "not enough power"? |
+| `network(col, row)`, `networks()` | Which network a tile belongs to, how many there are |
+| `supply()`, `demand()`, `served()` | All sources, all loads, what was served: the numbers for the bar at the top |
+
+??? example "Test: the far end goes dark first"
+    ```java title="amade-game-engine · test/tile/SupplyGridTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/tile/SupplyGridTest.java:test-grid"
+    ```
+
 ## Maps from an editor: TiledMap
 
 *Package `tiled` · introduced in [27. Jump](27-jump.md#step-1-levels-from-the-tiled-editor) · source: [`TiledMap`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tiled/TiledMap.java), [`TiledObject`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tiled/TiledObject.java), [`TiledProperties`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tiled/TiledProperties.java), [`TmxReader`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tiled/TmxReader.java)*
@@ -98,6 +147,60 @@ Errors name the file and the line, as in `level1.tmx:12: ...`, because the reade
     ```java title="amade-game-engine · test/tiled/TiledMapTest.java"
     --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/tiled/TiledMapTest.java:test-objects"
     ```
+
+## The isometric view: IsoProjection
+
+*Package `iso` · introduced in [33. Town](33-town.md#step-1-the-isometric-view) · source: [`IsoProjection`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/iso/IsoProjection.java)*
+
+**What it is for.** A tile map seen from a corner and from above: every square tile becomes a diamond twice as wide as high, and things on it show two walls and a roof. The rules stay flat and square, in the same tile units as every other map of the engine; only the drawing turns.
+
+**When to choose it.** For city builders, strategy games and role-playing games where buildings should look like buildings. It costs more than a flat map in the drawing: things must be sorted ([`DepthSort`](#what-covers-what-depthsort)), and the visible part of the map is no longer a rectangle of tiles.
+
+**How it works.** A point of the world, `height` above the ground, lies at `originX + (x − y) · halfWidth / tile`, `originY + (x + y) · halfHeight / tile − height` of the **picture**, the plane in which the whole map is drawn. The camera moves over that picture as over any big world. The way back works for points on the ground, which is all a mouse click needs: `col` and `row` find the tile under a point of the picture.
+
+```java title="amade-game-engine · iso/IsoProjection.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/iso/IsoProjection.java:projection"
+```
+
+The projection is affine, so it is also a transform for the graphics. Under `ground(h)` a rectangle of the world is drawn as the diamond it covers, at height `h`: lawns, roofs, shadows. Under `frontWall(x, y)` and `sideWall(x, y)` a wall is drawn as if it faced the viewer, with its windows and door, and Java2D shears it into place ([chapter 33](33-town.md#walls-and-roofs-through-transforms)).
+
+| Method | What it does |
+|---|---|
+| `IsoProjection.forMap(cols, rows, tile, tileWidth, tileHeight, above)` | The projection of a whole map, with room `above` it for the tallest building |
+| `IsoProjection.at(tile, tileWidth, tileHeight, originX, originY)` | A projection without a map, for drawing one building into a picture of its own |
+| `pictureX(x, y)`, `pictureY(x, y, height)` | Where a point of the world lies in the picture |
+| `worldX(px, py)`, `worldY(px, py)`, `col(px, py)`, `row(px, py)` | The point of the ground, and the tile, under a point of the picture |
+| `ground(height)`, `frontWall(x, y)`, `sideWall(x, y)` | Transforms for drawing flat things, front walls and side walls |
+| `visible(left, top, width, height, margin)` | The columns and rows to look at for a view, with `margin` rows below it for tall things |
+| `width()`, `height()` | The size of the picture of the whole map: the camera's world |
+
+!!! tip "Tip: zoom with the camera's view"
+    The camera works in the picture's units. A view drawn twice as large is a camera with half the view, drawn under `g.scale(2, 2)`, with the mouse divided by 2 before the camera converts it. Sprites then cache themselves at the larger size, so the close view stays sharp ([chapter 33](33-town.md#step-10-a-view-that-zooms)).
+
+??? example "Test: the way there and back"
+    ```java title="amade-game-engine · test/iso/IsoProjectionTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/iso/IsoProjectionTest.java:test-projection"
+    ```
+
+### What covers what: DepthSort
+
+*Package `iso` · introduced in [33. Town](33-town.md#step-2-what-covers-what) · source: [`DepthSort`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/iso/DepthSort.java)*
+
+**What it is for.** The order in which the things of an isometric view are drawn, so what stands in front covers what stands behind: the painter's algorithm for things of any size. For things of one tile, sorting by `x + y` would do; a building of three tiles by two breaks that rule, and a tree behind its end would be drawn over its wall.
+
+**How it works.** Each thing is a **footprint**, a rectangle of the ground, and a box in the picture. A lies behind B if A ends before B begins along `x`, or along `y`. That rule only orders things that touch in the picture, so the sort compares only things whose boxes overlap, found by a sweep along the picture's `x`, and draws them in topological order, the smallest `x + y` first among those that are free. Things behind each other both ways, a cycle no order can draw right, fall back to `x + y`. `sorted()` empties the sort for the next frame and reuses its objects.
+
+```java title="amade-game-engine · iso/DepthSort.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/iso/DepthSort.java:sort"
+```
+
+| Method | What it does |
+|---|---|
+| `add(x0, y0, x1, y1, left, top, right, bottom, thing)` | A thing with its footprint in world units and its box in the picture |
+| `sorted()` | All things, back to front; empties the sort |
+| `DepthSort.behind(...)` | The rule for two footprints, for a test of your own |
+
+Put only what stands into the sort. Flat things (lawns, car parks, roads) are drawn before it, with the ground; a building of several parts is one item, its parts ordered inside its own picture.
 
 ## A world larger than the screen: Camera
 
@@ -165,3 +268,13 @@ What the player saw of the enemy, a building as it was when someone last looked,
 ```
 
 `contains(x, y)` tells whether a point of the screen lies on the minimap, and `worldX`, `worldY` where in the world it points: the camera moves there with a left click, a right click can send the chosen units. A map that is not square keeps its proportions and is centred in the box. Draw the minimap in the overlay, so it stays sharp in pixel mode.
+
+### An isometric map in a corner: DiamondMinimap
+
+*Package `iso` · introduced in [33. Town](33-town.md#step-12-everything-else) · source: [`DiamondMinimap`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/iso/DiamondMinimap.java)*
+
+The minimap of an isometric map: the whole map as a small diamond, turned like the view. It is the picture of the `IsoProjection`, scaled down, so the camera's view is a plain box on it and a click on it is a point of the picture to move the camera to: `camera.jumpTo(minimap.pictureX(x), minimap.pictureY(y))`. The tiles are an image of one pixel per tile, as in `Minimap`, drawn through a transform that turns each pixel into a little diamond; `paint(col, row, rgb)` when a tile changes, `render(g)` and `view(g, camera, alpha, colour)` in the overlay, `dot` for things that move. Town also uses it, without a camera, for the previews on the choice of a mission.
+
+```java title="amade-game-engine · iso/DiamondMinimap.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/iso/DiamondMinimap.java:minimap"
+```

@@ -22,6 +22,7 @@ The handbook grows with the games: a chapter is written when its game is finishe
 | [30. Towers](30-towers.md) | Towers (tower defence) | Flow fields for many units, the mouse in world coordinates, overlay menus, units and towers as data files, turned sprites |
 | [31. Sands](31-sands.md) | Sands (real-time strategy) | Selecting units, group moves and a cache of flow fields, fog of war, minimap, credits and production, an influence map for the computer opponent, saving the whole game |
 | [32. Colony](32-colony.md) | Colony (economy and settlement) | Roads from flag to flag and the shortest way over them, carriers, goods and recipes, demand answered by the storehouses, a border that grows, seasons, grazing |
+| [33. Town](33-town.md) | Town (city builder) | The isometric view and its drawing order, a minimap turned like the view, networks that carry power from plants to loads, services that reach in circles, the mouse wheel, a ground layer painted only where it changed |
 | [40. The Engine at a Glance](40-engine.md) | | Part IV, the engine manual: what each part of the engine is for, when to choose it and how it works |
 | [41. Loop, Time and Drawing](41-loop-and-drawing.md) to [48. Scenes, Menus and Sound](48-scenes-menus-sound.md) | | One chapter per subsystem, each section naming the game that introduced it |
 | [Java2D and X11 Pitfalls](appendix-java2d.md) | | The rules for fast and correct drawing, collected |
@@ -30,7 +31,7 @@ The handbook grows with the games: a chapter is written when its game is finishe
 
 ### Part III: Strategy
 
-When a new game adds to the engine, its chapter tells the story and Part IV gets the new section. After Colony comes a city builder: zones the player marks out for houses, workshops and markets, and a demand that decides what grows there, instead of goods carried by hand. It needs little new engine, but a lot of simulation: population, services that reach so far, trade.
+When a new game adds to the engine, its chapter tells the story and Part IV gets the new section. With Town, Part III has a game of every kind it set out to cover: towers, real-time strategy, an economy and a city. What comes next will be chosen by what the engine has not yet needed.
 
 ## An appendix, also planned
 

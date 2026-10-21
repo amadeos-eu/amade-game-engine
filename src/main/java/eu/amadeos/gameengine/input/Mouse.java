@@ -4,6 +4,7 @@ import eu.amadeos.gameengine.swing.GameCanvas;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 
 /**
@@ -16,6 +17,7 @@ import java.awt.geom.Point2D;
  * if (mouse.wasMoved()) paddle.aim(mouse.x());
  * if (mouse.wasPressed(MouseEvent.BUTTON1)) launch();
  * if (mouse.isDown(MouseEvent.BUTTON3)) thrust();
+ * if (mouse.wheel() != 0) zoom(-mouse.wheel());
  * </pre>
  */
 // --8<-- [start:mouse]
@@ -32,6 +34,8 @@ public final class Mouse {
     private int released;
     private boolean insideNow;
     private boolean inside;
+    private int wheelSincePoll;
+    private int wheel;
 
     /** Listens to the canvas; positions are converted the way the canvas currently draws. */
     public void attach(GameCanvas canvas) {
@@ -67,9 +71,15 @@ public final class Mouse {
             public void mouseExited(MouseEvent e) {
                 exited();
             }
+
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                wheeled(e.getWheelRotation());
+            }
         };
         canvas.addMouseListener(listener);
         canvas.addMouseMotionListener(listener);
+        canvas.addMouseWheelListener(listener);
     }
 
     public synchronized void moved(double x, double y) {
@@ -98,6 +108,11 @@ public final class Mouse {
         }
     }
 
+    /** The wheel turned by {@code notches}: positive towards the player, negative away. */
+    public synchronized void wheeled(int notches) {
+        wheelSincePoll += notches;
+    }
+
     /** Call once per update step on the game loop thread, before asking. */
     public synchronized void poll() {
         moved = movedSincePoll;
@@ -105,6 +120,8 @@ public final class Mouse {
         down = downNow;
         released = releasedSincePoll;
         inside = insideNow;
+        wheel = wheelSincePoll;
+        wheelSincePoll = 0;
         movedSincePoll = false;
         pressedSincePoll = 0;
         releasedSincePoll = 0;
@@ -132,6 +149,11 @@ public final class Mouse {
     /** True if the button came up between the last two polls: the end of a drag. */
     public synchronized boolean wasReleased(int button) {
         return button > 0 && button < 32 && (released & 1 << button) != 0;
+    }
+
+    /** How many notches the wheel turned between the last two polls: positive towards the player, negative away, 0 if not at all. */
+    public synchronized int wheel() {
+        return wheel;
     }
 
     /** True if the mouse was over the canvas at the last poll. */

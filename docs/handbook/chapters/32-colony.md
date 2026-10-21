@@ -403,7 +403,7 @@ The settlement is drawn in layers: the ground; then everything that stands, sort
 | `tile` | `Territory` | land claimed in circles, overlapping, given back |
 | `motion` | `Wander` | something that grazes around a home and flees |
 
-None of them knows of sheep or planks. The city builder that comes next can use `Stock` for its markets, `Territory` for the reach of its services, and `Seasons` for its floods.
+None of them knows of sheep or planks. The city builder that came next, Town (chapter 33), needed other parts after all: its services reach in circles that overlap and add up, which `Territory` does not count, so it got a `Coverage` of its own.
 
 ## Exercises
 

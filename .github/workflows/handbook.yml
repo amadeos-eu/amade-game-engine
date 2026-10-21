@@ -30,6 +30,7 @@ env:
   TOWERS_COMMIT: bca228c1d9383c413ab91344f0ee19370968cb28
   SANDS_COMMIT: 78b12ae6e2a1ceb8efa0caa5290c51195cf039d0
   COLONY_COMMIT: e5d981c8e12afc20838e231b7382c8942b5312b1
+  TOWN_COMMIT: ec87350faa44f4c867495556ac57c9636726b79d
 
 jobs:
   build:
@@ -103,6 +104,11 @@ jobs:
           repository: datazuul/amade-colony-game
           ref: ${{ env.COLONY_COMMIT }}
           path: amade-colony-game
+      - uses: actions/checkout@v7
+        with:
+          repository: datazuul/amade-town-game
+          ref: ${{ env.TOWN_COMMIT }}
+          path: amade-town-game
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'

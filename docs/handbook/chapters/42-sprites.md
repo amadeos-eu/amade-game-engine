@@ -45,6 +45,35 @@ The cache also gets the least transparency the picture needs, because copying co
     --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/sprite/SpriteTest.java:test-cache"
     ```
 
+## A ground painted once: ScrollingLayer
+
+*Package `sprite` · introduced in [33. Town](33-town.md#a-ground-that-is-painted-only-where-it-changed) · source: [`ScrollingLayer`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/sprite/ScrollingLayer.java)*
+
+**What it is for.** A layer of the world that rarely changes and costs much to draw: the ground of a big map with a thousand tiles in view, and the shadows on it. The layer keeps the view as one opaque picture in screen pixels and copies it, instead of drawing the tiles again in every frame.
+
+**When to choose it.** When a frame measures slow and most of the time goes into something that looks the same from one frame to the next. Sprites already make each tile cheap; the layer makes the thousand copies one. A ground that changes in most frames (snow falling, water that ripples everywhere) gains nothing; neither does a small map that fits the screen. Things that move are never part of it: they are drawn over it.
+
+**How it works.** The layer remembers where its picture lies in the world, in whole screen pixels. When the view stands still and the game passes the same **key**, `draw` copies the picture. When the view has moved, the picture is shifted by `copyArea` and only the strips that came into view are painted, by a painter the game hands in, clipped to each strip. When the key changes (the game folds into it whatever the layer shows), or the view jumped further than the picture is wide, or the window or zoom changed the scale, the whole view is painted again.
+
+```java title="amade-game-engine · sprite/ScrollingLayer.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/sprite/ScrollingLayer.java:layer"
+```
+
+| Method | What it does |
+|---|---|
+| `new ScrollingLayer(viewWidth, viewHeight)` | A layer for a view of that many world units |
+| `draw(g, screenLeft, screenTop, left, top, key, painter)` | Draws the view whose top left world point is `left`, `top`, painting first what is missing |
+| `invalidate()` | The next frame paints the whole view |
+| `ScrollingLayer.snap(world, scale)` | A position rounded to the screen pixel the layer puts it on |
+| `painted()` | How many regions were painted so far: what the layer saved |
+
+The painter must cover every pixel of the region it gets, so fill a background first: the picture is opaque and is copied without blending. Because the layer puts the view at whole screen pixels, draw the rest of the world at `snap`ped camera positions too, or things that stand on the ground slide half a pixel against it while the view scrolls ([chapter 33](33-town.md#a-ground-that-is-painted-only-where-it-changed)).
+
+??? example "Test: a moved view paints only its new strips, and looks as if painted whole"
+    ```java title="amade-game-engine · test/sprite/ScrollingLayerTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/sprite/ScrollingLayerTest.java:test-scroll"
+    ```
+
 ## Many pictures in one: SpriteSheet
 
 *Package `sprite` · introduced in [24. Swarm](24-swarm.md#step-1-a-sprite-sheet) · source: [`SpriteSheet`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/sprite/SpriteSheet.java)*
