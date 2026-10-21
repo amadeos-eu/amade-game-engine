@@ -5,7 +5,7 @@ Colony (chapter 32) was a game about goods: every plank was carried, every loaf 
 <figure markdown>
 ![The town close up](images/town/town.jpg){ width="400" }
 ![The same town from further away](images/town/overview.jpg){ width="400" }
-<figcaption>Mission 1 after a year and a half (left): row houses on lawns, the water tower, the school with its sports field, cars on both lanes. The wheel shows the same district from further away (right): the town hall on its plaza, the clinic, shops on blue lots.</figcaption>
+<figcaption>Mission 1 after a year and a half (left): row houses on lawns, the water tower, the school with its sports field, cars on both lanes and people on the pavements. The wheel shows the same district from further away (right): the town hall on its plaza, the clinic, shops on blue lots.</figcaption>
 </figure>
 
 It is also the first game in this handbook that is drawn **isometric**: the map is still a grid of square tiles, but the player looks at it from a corner and from above, so every tile becomes a diamond and every house shows two walls and its roof. That is a step for the engine more than for the game. A flat map is drawn tile after tile, row after row; an isometric one needs a projection that turns the world into a picture and the mouse back into the world, an order in which buildings of different sizes cover each other correctly, a minimap turned like the view, and a way to draw a big map that is quick enough for a large window.
@@ -85,7 +85,7 @@ The engine's `DepthSort` sorts on **footprints**, rectangles of the ground: A li
 --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/iso/DepthSortTest.java:test-sort"
 ```
 
-Town puts everything that stands into one sort each frame: the lots with their buildings, the plants and services, trees, pylons, cars, rubble and the zone signs. A building with several parts, a factory with its chimney, is one item, its parts ordered inside its own picture. Flat things, lawns, car parks, the yard of the coal plant, are not sorted at all: they are drawn with the ground, before everything that stands.
+Town puts everything that stands into one sort each frame: the lots with their buildings, the plants and services, trees, pylons, cars, people, rubble and the zone signs. A building with several parts, a factory with its chimney, is one item, its parts ordered inside its own picture. Flat things, lawns, car parks, the yard of the coal plant, are not sorted at all: they are drawn with the ground, before everything that stands.
 
 ```java title="amade-town-game · ui/game/TownPainter.java"
 --8<-- "amade-town-game/src/main/java/eu/amadeos/games/town/ui/game/TownPainter.java:things"
@@ -200,6 +200,20 @@ The rules only say that a truck was sent. The drawing sends a real one: a red tr
 --8<-- "amade-town-game/src/main/java/eu/amadeos/games/town/ui/game/Traffic.java:drive"
 ```
 
+People walk on the pavements, one for every 12 people, up to 120. A walker goes from corner to corner of the road tiles, a metre in from the edge: on along the pavement, round the corner of a block, to the touching corner of the next road tile, and now and then across the street. A corner is pavement unless the roads on both its sides and the road between them meet there; the highway has none.
+
+```java title="amade-town-game · ui/game/Walkers.java"
+--8<-- "amade-town-game/src/main/java/eu/amadeos/games/town/ui/game/Walkers.java:pavement"
+
+--8<-- "amade-town-game/src/main/java/eu/amadeos/games/town/ui/game/Walkers.java:next"
+```
+
+The test lets the computer build a town and then follows the walkers for twenty seconds: none of them may leave the street or step into the middle of the road.
+
+```java title="amade-town-game · WalkersTest.java"
+--8<-- "amade-town-game/src/test/java/eu/amadeos/games/town/ui/game/WalkersTest.java:test-walkers"
+```
+
 <figure markdown>
 ![A fire in the shops](images/town/fire.jpg){ width="400" }
 ![Zoning homes](images/town/zoning.jpg){ width="400" }
@@ -268,7 +282,7 @@ The ground is computed pixel by pixel, as in Sands and Colony, but here every ti
 --8<-- "amade-town-game/src/main/java/eu/amadeos/games/town/ui/game/Pictures.java:floor"
 ```
 
-On top come the roads, one picture for each combination of neighbours (16 for streets, 16 for the highway), river banks and corners of pavement. All shadows are one path, filled once under the ground transform, so where two shadows overlap the ground is not darker.
+On top come the roads, one picture for each combination of neighbours (16 for streets, 16 for the highway), river banks and corners of pavement. All shadows are one path, filled once under the ground transform, so where two shadows overlap the ground is not darker. A tree's shadow has its shape: the trunk's from the foot along +x, then a round crown's, or for a conifer a shadow that narrows to the point of its tip.
 
 ```java title="amade-town-game · ui/game/TownPainter.java"
 --8<-- "amade-town-game/src/main/java/eu/amadeos/games/town/ui/game/TownPainter.java:shadows"
@@ -292,7 +306,9 @@ The layer puts the view at whole screen pixels, so the rest of the town is drawn
 
 ### Lots and buildings
 
-Every lot has four looks for each level of each zone, chosen by its tile so a street is not a row of copies: cottages and row houses with hedges, apartment blocks; a corner shop, shops with flats above them, offices and a glass tower; workshops with tanks, a brick factory with its chimney, a works with a banded stack. All of them are drawn from boxes, gabled roofs, windows and awnings through the projection's transforms.
+Every lot has four looks for each level of each zone, chosen by its tile so a street is not a row of copies: cottages and row houses with hedges, apartment blocks; a corner shop, shops with flats above them, offices and a glass tower; workshops with tanks, a brick factory with its chimney, a works with a banded stack. All of them are drawn from boxes, gabled roofs, windows and awnings through the projection's transforms. The order inside a picture matters as much as between pictures: a chimney stands on the far slope of its roof, so it is drawn before the near slope, which hides its foot, and its top again after the ridge's line.
+
+A lot's front faces +y, but its street may run along any side. A car parked in the garden, or a lorry in the yard, would then stand behind a fence or between two houses with no way out. So the lots that park one are drawn twice, with the car and a drive through a gap in the fence, and without, and the painter takes the first only where a road runs along the front.
 
 ```java title="amade-town-game · ui/game/Lots.java"
 --8<-- "amade-town-game/src/main/java/eu/amadeos/games/town/ui/game/Lots.java:home"
