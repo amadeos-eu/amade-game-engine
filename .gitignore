@@ -25,3 +25,4 @@ bin/
 # Built handbook
 docs/handbook/site/
 docs/handbook/.venv/
+docs/handbook/.cache/

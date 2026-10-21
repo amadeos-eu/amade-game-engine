@@ -31,3 +31,20 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/mkdocs serve          # http://127.0.0.1:8000, reloads on every save
 .venv/bin/mkdocs build --strict # what CI runs: fails on broken links and missing excerpts
 ```
+
+## The offline package
+
+amadeOS installs the handbook as the Debian package `amade-game-handbook`: the pages in
+`/usr/share/doc/amade-game-handbook/html` and a desktop entry of category `Documentation`, so the
+Help drawer of the Front Panel lists *Game Developer's Handbook* and opens it in the web browser.
+
+```bash
+./gradlew installToAmadeOs        # builds the package and copies it to ../amadeos/config/packages.chroot
+docs/handbook/package-deb.sh 0.1.0 /tmp   # the package alone
+```
+
+It is built from `mkdocs-offline.yml`, which takes everything from `mkdocs.yml` and adds what reading
+from disk needs: links to `.html` files (`use_directory_urls: false`), the `offline` plugin for search
+without a server, and the `privacy` plugin, which stores the fonts and scripts (Mermaid) that the
+pages would load from the web. The games must be checked out next to `amade-game-engine` as for the
+published book; MkDocs is installed into `.venv` if none is on the PATH. CI builds this variant too.
