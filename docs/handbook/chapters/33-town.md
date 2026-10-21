@@ -167,6 +167,13 @@ Three numbers, one per zone, from -1 to 1, decide what the town wants. They pull
 --8<-- "amade-town-game/src/main/java/eu/amadeos/games/town/domain/Game.java:demand"
 ```
 
+A grown town wants something more: offices. Above 300 people, every further person asks for a quarter of an office job, counted with the shops, because offices grow in the shop zone as its third level, the office block and the glass tower. They are clean jobs, so the town wants a little less industry for them. Shops alone would never get there: at 1,000 people the town has all the shops it buys from, and shop demand turns negative. Offices also ask for less land value than tall homes, 40 instead of 55, so they rise by the parks, the clinic and the town hall.
+
+<figure markdown>
+![Offices downtown](images/town/downtown.jpg){ width="600" }
+<figcaption>Mission 1 played on to its fifth year: two glass towers and office blocks between the shops, by the clinic and its park. The computer's plan built more wind turbines, a second coal plant and a third pump after the win, since power, not demand, is what holds a grown town back.</figcaption>
+</figure>
+
 Each number moves halfway to its new value every month, so demand does not jump when a block grows at once. Taxes above the usual 9 % push every zone down, and a happy town pulls people in. How happy the people are is worked out from what reaches their homes: services, parks, clean air, power, water, enough jobs and fair taxes, each weighed by how many people live on the lot.
 
 ```java title="amade-town-game · domain/Game.java"
@@ -222,7 +229,7 @@ The test lets the computer build a town and then follows the walkers for twenty 
 
 ## Step 8: The computer builds
 
-The title screen shows a town the computer builds, and `GameTest` lets it build mission 1 until it is won. As in Colony the plan is a text file, one step every few seconds, as a player would make them with the mouse: lay a road, zone a block, build a plant, run a line, build a pump. A step the town cannot pay for waits until the money is there.
+The title screen shows a town the computer builds, and `GameTest` lets it build mission 1 until it is won. As in Colony the plan is a text file, one step every few seconds, as a player would make them with the mouse: lay a road, zone a block, build a plant, run a line, build a pump. A step the town cannot pay for waits until the money is there. After the win, when the player could keep building, the plan adds power and water, so the title screen's town keeps growing into offices.
 
 ```java title="amade-town-game · domain/Planner.java"
 --8<-- "amade-town-game/src/main/java/eu/amadeos/games/town/domain/Planner.java:update"
@@ -306,7 +313,7 @@ The layer puts the view at whole screen pixels, so the rest of the town is drawn
 
 ### Lots and buildings
 
-Every lot has four looks for each level of each zone, chosen by its tile so a street is not a row of copies: cottages and row houses with hedges, apartment blocks; a corner shop, shops with flats above them, offices and a glass tower; workshops with tanks, a brick factory with its chimney, a works with a banded stack. All of them are drawn from boxes, gabled roofs, windows and awnings through the projection's transforms. The order inside a picture matters as much as between pictures: a chimney stands on the far slope of its roof, so it is drawn before the near slope, which hides its foot, and its top again after the ridge's line.
+Every lot has four looks for each level of each zone, chosen by its tile so a street is not a row of copies: cottages and row houses with hedges, apartment blocks; a corner shop, shops with flats above them, an office block and a glass tower; workshops with tanks, a brick factory with its chimney, a works with a banded stack. All of them are drawn from boxes, gabled roofs, windows and awnings through the projection's transforms. The order inside a picture matters as much as between pictures: a chimney stands on the far slope of its roof, so it is drawn before the near slope, which hides its foot, and its top again after the ridge's line.
 
 A lot's front faces +y, but its street may run along any side. A car parked in the garden, or a lorry in the yard, would then stand behind a fence or between two houses with no way out. So the lots that park one are drawn twice, with the car and a drive through a gap in the fence, and without, and the painter takes the first only where a road runs along the front.
 
