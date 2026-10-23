@@ -4,7 +4,7 @@ What a game shows, apart from plain shapes: pictures from files and pictures dra
 
 ## Pictures: Sprite
 
-*Package `sprite` · introduced in [21. Bricks](21-bricks.md#step-4-sprites); hard edges in [24. Swarm](24-swarm.md#pixel-art-needs-hard-edges), seamless tiles and transparency in [27. Jump](27-jump.md#tiles-without-gaps), opaque drawings in [30. Towers](30-towers.md#a-ground-that-changes) · source: [`Sprite`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/sprite/Sprite.java)*
+*Package `sprite` · introduced in [21. Bricks](21-bricks.md#step-4-sprites); hard edges in [24. Swarm](24-swarm.md#pixel-art-needs-hard-edges), seamless tiles and transparency in [27. Jump](27-jump.md#tiles-without-gaps), opaque drawings in [30. Towers](30-towers.md#the-ground) · source: [`Sprite`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/sprite/Sprite.java)*
 
 **What it is for.** A picture with a size in logical coordinates, say a brick of 40 × 16 units, whatever the size of the window. Its source is an image file, usually drawn larger than the logical size so it stays sharp on large screens, or a **drawing in code**, a function that paints into a box of the sprite's size.
 

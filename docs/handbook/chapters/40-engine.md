@@ -9,11 +9,11 @@ Each chapter of this part covers one area. Each section in it describes one feat
 | [41. Loop, Time and Drawing](41-loop-and-drawing.md) | `loop`, `time`, `swing` | The game loop, rules with a pace of their own, countdowns, the canvas, full screen, frame times |
 | [42. Sprites and Effects](42-sprites.md) | `sprite`, `shape`, `anim`, `fx` | Pictures that copy fast, a ground painted only where it changed, sheets and animation, turned pictures, figures of lines, tweens, particles |
 | [43. Input](43-input.md) | `input` | Keyboard, actions instead of keys, mouse, gamepads |
-| [44. Movement, Physics and Collision](44-movement.md) | `math`, `motion`, `physics`, `collision`, `pool`, `entity` | Vectors and angles, flight paths, falling and jumping, what hits what, many things at once |
+| [44. Movement, Physics and Collision](44-movement.md) | `math`, `motion`, `physics`, `collision`, `pool`, `entity` | Vectors and angles, flight paths, falling and jumping, flying on jets and landing, what hits what (down to the pixel), many things at once |
 | [45. Maps, Camera and Fog](45-maps.md) | `tile`, `tiled`, `iso`, `camera`, `fog`, `minimap` | Tile maps, reach and networks on them, maps from an editor, the isometric view, worlds larger than the screen, what a side sees |
 | [46. Paths, Groups and Decisions](46-paths-and-decisions.md) | `path`, `road`, `select`, `ai`, `event` | Finding the way for one or for many, roads between flags, choosing units, states, the computer's view of the map, chain reactions |
 | [47. Chance, Data and Saving](47-data-and-saving.md) | `random`, `replay`, `undo`, `data`, `economy`, `save`, `score` | Repeatable chance, replays, undo, data files, money and production, saving, high scores |
-| [48. Scenes, Menus and Sound](48-scenes-menus-sound.md) | `scene`, `swing`, `menu`, `audio` | Screens of a game, the standard menus and dialogs, menus over the game, sound and music |
+| [48. Scenes, Menus and Sound](48-scenes-menus-sound.md) | `scene`, `swing`, `menu`, `audio` | Screens of a game, the standard menus and dialogs, menus over the game, sound and music, speech |
 
 ## What the engine is, and is not
 
@@ -25,7 +25,7 @@ It also has no editor, no scene graph and no physics engine in the usual sense. 
 
 A few rules hold for nearly every class. Knowing them makes the rest of the manual shorter.
 
-**The rules never see Swing.** Everything the domain of a game uses (vectors, tile maps, paths, timers, the economy) is plain Java without `java.awt`, so the rules can be tested in milliseconds without a screen ([chapter 2](02-structure.md#domain-the-rules)). Only `swing`, `sprite`, `fx`, `shape`, `fog.FogPainter`, `minimap`, `menu` drawing and `audio` touch the screen or the sound card.
+**The rules never see Swing.** Everything the domain of a game uses (vectors, tile maps, paths, timers, the economy) is plain Java without `java.awt`, so the rules can be tested in milliseconds without a screen ([chapter 2](02-structure.md#domain-the-rules)). Only `swing`, `sprite`, `fx`, `shape`, `fog.FogPainter`, `minimap`, `menu` drawing and `audio` touch the screen or the sound card. `collision.PixelMask` uses Java2D, but only to draw shapes into an image in memory, which works headless; the rules may use it.
 
 **No class reads the clock by itself.** `FixedStep`, `Ticker`, `Timers`, `Jump`, `Camera.follow`, `Production` and the others are told how many seconds passed. `GameClock`, `Keyboard` and `Tween` take their time from a function you pass, `System::nanoTime` in the game and a number the test moves in tests. So a test can play a minute of a game in a millisecond, and every second of it is the same each time.
 
@@ -69,7 +69,9 @@ A few rules hold for nearly every class. Knowing them makes the rest of the manu
 | A smooth curve to fly along at an even speed | `FlightPath` | [44](44-movement.md#curves-to-fly-along-flightpath) |
 | Animals that graze around a home, and flee | `Wander` | [44](44-movement.md#grazing-wander) |
 | Falling, standing, jumping on tiles | `Body`, `TileCollider`, `Jump` | [44](44-movement.md#falling-and-standing-body-and-tilecollider) |
+| A craft on jets against gravity, fuel, air, a soft or hard landing | `Thrusters`, `Body.drag`, `Touchdown` | [44](44-movement.md#flying-on-jets-thrusters-drag-and-touchdown) |
 | Collision of fast boxes, of circles, of many things | `Sweep`, `Circle`, `Grid` | [44](44-movement.md#which-collision-test) |
+| Collision exact to the pixel, for shapes that are neither boxes nor circles | `PixelMask` | [44](44-movement.md#exact-to-the-pixel-pixelmask) |
 | Shots with a limit, without garbage | `Pool` | [44](44-movement.md#a-fixed-number-of-things-pool) |
 | Things whose behaviour changes while they live | `Entity`, `Entities` | [44](44-movement.md#entities-and-components) |
 | A level on a grid, written as text | `TileMap` | [45](45-maps.md#a-grid-of-tiles-tilemap-cell-and-direction) |
@@ -101,6 +103,7 @@ A few rules hold for nearly every class. Knowing them makes the rest of the manu
 | New Game, Full Screen, Exit with the usual keys | `GameMenus` | [48](48-scenes-menus-sound.md#the-standard-menus-gamemenus-and-gametexts) |
 | A menu on the map, beside what it is about | `OverlayMenu` | [48](48-scenes-menus-sound.md#menus-over-the-game-overlaymenu) |
 | Sound effects and music | `Sound`, `Tune`, `Mixer` | [48](48-scenes-menus-sound.md#sound-effects-sound) |
+| Characters who talk, without recordings | `Speech`, `Phoneme` | [48](48-scenes-menus-sound.md#speech-speech-and-phoneme) |
 
 ## The packages by chapter
 
@@ -118,6 +121,7 @@ The order in which the engine grew, and where each part is explained step by ste
 | [25](25-maze.md#what-moved-into-the-engine) | Maze | `tile` (`TileMap`, `Cell`, `Direction`, `Walker`), `ai.StateMachine`, `path` (`DistanceMap`, `AStar`, `Passable`) |
 | [26](26-blast.md#what-moved-into-the-engine) | Blast | `input` (`Gamepad`, `Gamepads`, `LinuxJoysticks`, `XInput`), `time.Timers`, `event.EventQueue` |
 | [27](27-jump.md#what-moved-into-the-engine) | Jump | `camera` (`Camera`, `Parallax`), `physics` (`Body`, `Solidity`, `TileCollider`, `Jump`), `tiled`, `save.SaveFile` |
+| [28](28-hover-cab.md#what-moved-into-the-engine) | Hover Cab | `audio` (`Speech`, `Phoneme`), `collision.PixelMask`, `physics` (`Thrusters`, `Touchdown`, `Body.drag`) |
 | [30](30-towers.md#what-moved-into-the-engine) | Towers | `path.FlowField`, `data.Catalog`, `menu.OverlayMenu`, `sprite.Rotations` |
 | [31](31-sands.md#what-moved-into-the-engine) | Sands | `select`, `path` (`Formation`, `FieldCache`), `fog`, `minimap`, `economy`, `ai.InfluenceMap`, `save.Snapshot` |
 | [32](32-colony.md#what-moved-into-the-engine) | Colony | `road.RoadNetwork`, `economy` (`Stock`, `Recipe`), `time.Seasons`, `tile.Territory`, `motion.Wander` |

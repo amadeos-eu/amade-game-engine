@@ -1,8 +1,8 @@
 # 44. Movement, Physics and Collision
 
-Things move in a game in a few typical ways: in a straight line at an angle, along a curve someone designed, falling and jumping on tiles, from tile centre to tile centre. Then the game must find out what hit what, often for hundreds of things in every step, and keep track of many things whose behaviour changes while they live. This chapter covers the arithmetic for all of it. Walking on a grid is in [chapter 45](45-maps.md#walking-corridors-walker), finding a way in [chapter 46](46-paths-and-decisions.md).
+Things move in a game in a few typical ways: in a straight line at an angle, along a curve someone designed, falling and jumping on tiles, flying on jets, from tile centre to tile centre. Then the game must find out what hit what, often for hundreds of things in every step, and keep track of many things whose behaviour changes while they live. This chapter covers the arithmetic for all of it. Walking on a grid is in [chapter 45](45-maps.md#walking-corridors-walker), finding a way in [chapter 46](46-paths-and-decisions.md).
 
-None of the classes here touches AWT. They are the rules' tools, and they are tested without a screen.
+None of the classes here needs a screen. They are the rules' tools, and they are tested without one. Only `PixelMask` uses AWT, to draw its shapes into an image in memory, which works headless on a build server too.
 
 ## Points and directions: Vector and Angles
 
@@ -129,6 +129,41 @@ The jump of a platformer, with the three small kindnesses that make it feel righ
 
 The speed of a jump follows from the height it should reach: rising at *v* against gravity *g*, a body stops at the height *v*² / 2*g*. `Jump.speedFor(height, gravity)` turns "four tiles high" into a speed, and `heightOf` goes the other way, so the level designer can rely on it and a test can prove every level can be finished ([chapter 27](27-jump.md#step-5-can-the-level-be-finished)). `launch(body, speed, cuttable)` throws a body up without the button: the bounce off a stomped enemy, a spring.
 
+## Flying on jets: Thrusters, drag and Touchdown
+
+*Package `physics` · introduced in [28. Hover Cab](28-hover-cab.md#step-1-jets-against-gravity) · source: [`Thrusters`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Thrusters.java), [`Touchdown`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Touchdown.java), [`Body`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Body.java)*
+
+**What it is for.** A craft that flies against gravity on jets and has to land: a lunar lander, a flying cab, a jetpack, a helicopter. `Thrusters` know how hard the jets push, up (the main jet), to the sides and down, and how much fuel they burn; `Body.drag` is the air that slows the craft; `Touchdown` decides whether a landing was soft, hard or a crash.
+
+**When to choose it.** When the player steers by **pushing**, not by setting a speed: a jet changes the speed a little in every step for as long as it burns. A character that runs and jumps sets its speed at once, with a [`Jump`](#jumping-jump); a ship in a field without edges turns and pushes with a [`Vector`](#points-and-directions-vector-and-angles) and needs no gravity.
+
+**How it works.** `fire(body, x, y, fuel, seconds)` adds the pushes of the jets that fire to the body's velocity, as accelerations like gravity, and returns the fuel burned, never more than is left: with too little for the whole step, the jets push for the part of the step the fuel lasts. The side and down jets burn in proportion to their push.
+
+```java title="amade-game-engine · physics/Thrusters.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/physics/Thrusters.java:thrusters"
+```
+
+A main jet of about twice gravity feels right: the craft rises about as fast as it falls. Without **drag**, a push sets the craft drifting until an equal push the other way stops it, which feels like steering soap. `drag(perSecond, seconds)` takes away that part of the speed each second, smoothly and whatever the step ([chapter 28](28-hover-cab.md#why-a-cab-needs-air)):
+
+```java title="amade-game-engine · physics/Body.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/physics/Body.java:drag"
+```
+
+`Touchdown.of(vx, vy, soft, hard)` grades a landing by the larger of the downward speed and twice the sideways one: sliding onto a deck tips a craft over sooner than sitting down hard. On a moving deck, pass the speed against the deck.
+
+| Method | What it does |
+|---|---|
+| `new Thrusters(up, side, down, burn)` | The pushes in units per second per second, and the fuel the main jet burns in a second |
+| `fire(body, x, y, fuel, seconds)` | Fires for a step: `x` -1 left, 1 right; `y` -1 up, 1 down; returns the fuel burned |
+| `rate(x, y)` | The fuel a second the jets burn, fired so: for a gauge or a planner |
+| `body.drag(perSecond, seconds)` | Air: the velocity loses that part of itself each second |
+| `Touchdown.of(vx, vy, soft, hard)` | `SOFT`, `HARD` or `CRASH` |
+
+??? example "Test: jets that burn what is left"
+    ```java title="amade-game-engine · test/physics/ThrustersTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/physics/ThrustersTest.java:test-thrusters"
+    ```
+
 ## Which collision test?
 
 | The things | Use | Because |
@@ -137,6 +172,7 @@ The speed of a jump follows from the height it should reach: rising at *v* again
 | Boxes at rest, or slow: a player and a coin | `Box.overlaps` | One comparison per axis |
 | Round things, things that turn | `Circle` | A circle looks the same at every angle; works across the edge of a `Wrap` |
 | A body against tiles | `TileCollider` | Above |
+| Shapes that are neither boxes nor circles: a cab and a neon sign, a rock face | `PixelMask` | Exact to the pixel, 64 pixels per comparison |
 | Many things against many | `Grid`, then one of the above | Each thing meets only its neighbours |
 
 ### Boxes: Box and Sweep
@@ -158,6 +194,34 @@ A ball that hits a brick early in a step moves on, bounced, for the rest of it, 
 *Package `collision` · introduced in [23. Rocks](23-rocks.md#step-4-circles) · source: [`Circle`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/collision/Circle.java)*
 
 Two circles overlap when their centres are closer than both radii together, compared squared, without a root. `overlaps(other, wrap)` measures across the edges of a field without edges; `contains(x, y)` is for a click on a round thing. A turning figure's hit circle is its `Outline.radius()`, or a little less, so that only a real touch counts.
+
+### Exact to the pixel: PixelMask
+
+*Package `collision` · introduced in [28. Hover Cab](28-hover-cab.md#step-3-collisions-as-exact-as-the-pictures) · source: [`PixelMask`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/collision/PixelMask.java)*
+
+**What it is for.** Collisions as exact as the pictures, for shapes a box or a circle fits badly: a cab with thin legs, a slanted strut, a round sign, the jagged wall of a cave. A `PixelMask` says which pixels of a thing are solid, one bit each; two masks collide when they have a solid pixel in the same place.
+
+**When to choose it.** When players would see the difference: a near miss that a box would count as a hit. For many small things, or things that turn every step, circles are cheaper; a mask is made once and does not turn (keep one per direction or per few degrees, made in advance).
+
+**How it works.** A row is kept as `long`s of 64 pixels, the leftmost in the lowest bit. To compare a row of one mask with a row of another, each of its longs is shifted to where it lies in the other row, where it falls into one long or across two, and ANDed: 64 pixels in one instruction. A cab of 32 × 16 pixels against a whole scene costs a few dozen ANDs. `firstOverlap` also returns the first pixel where both are solid, top row first, to tell what was hit.
+
+```java title="amade-game-engine · collision/PixelMask.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/collision/PixelMask.java:overlaps"
+```
+
+The easiest masks to get right are drawn: `PixelMask.painted(width, height, g -> ...)` fills the same shapes the painter draws into an image without antialiasing, so what is seen is what collides. `PixelMask.of(image)` takes the opaque pixels of a picture.
+
+| Method | What it does |
+|---|---|
+| `PixelMask.painted(w, h, painter)`, `PixelMask.of(image)` | A mask of shapes, or of a picture's pixels with alpha 128 or more |
+| `overlaps(other, dx, dy)`, `firstOverlap(other, dx, dy)` | Whether, and where first, `other` at `dx`, `dy` touches this mask |
+| `anyIn(x, y, w, h)` | Whether a box has a solid pixel: a mask against something that is a box |
+| `solid`, `set`, `clear`, `add(other, dx, dy)`, `count()` | Single pixels; another mask added in |
+
+??? example "Test: a round sign is hit only where it is round"
+    ```java title="amade-game-engine · test/collision/PixelMaskTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/collision/PixelMaskTest.java:test-mask"
+    ```
 
 ### Many things: Grid
 

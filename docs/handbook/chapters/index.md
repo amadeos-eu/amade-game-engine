@@ -47,7 +47,7 @@ Boxes point out things worth remembering:
 | Part | Games | You learn |
 |---|---|---|
 | I. Games that wait for you | Mines, Solitaire | Model and rules, drawing with Java2D, mouse input, Model-View-Presenter, high scores, drag and drop, animation, undo |
-| II. Action | Paddle, Bricks, Snake, Rocks, Swarm, Maze, Blast, Jump | Game loop, keyboard, sprites, collision, sound, tile maps, AI, cameras, physics |
+| II. Action | Paddle, Bricks, Snake, Rocks, Swarm, Maze, Blast, Jump, Hover Cab | Game loop, keyboard, sprites, collision, sound, tile maps, AI, cameras, physics, speech synthesis |
 | III. Strategy | Towers, Sands, Colony, Town | Mouse in world coordinates, pathfinding for many units, selection, fog of war, saving games, roads and goods, seasons, the isometric view, networks and services |
 
 Part IV, [the engine manual](40-engine.md), comes after the games. It describes the engine by subsystem rather than by game: what each part is for, when to choose it, how it works, and which chapter introduced it. Use it to look things up once you have read the games, or when you start a game of your own.

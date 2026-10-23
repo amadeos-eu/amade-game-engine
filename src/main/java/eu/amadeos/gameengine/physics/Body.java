@@ -50,6 +50,19 @@ public final class Body {
     }
     // --8<-- [end:body]
 
+    // --8<-- [start:drag]
+    /**
+     * Air: the velocity loses the part {@code perSecond} of itself each second, smoothly, whatever the
+     * length of the step. Without it a craft that has been pushed drifts on for ever, as in space; with
+     * {@code 0.5} it has lost about forty percent after a second and is slow after a few.
+     */
+    public void drag(double perSecond, double seconds) {
+        double keep = Math.pow(1 - perSecond, seconds);
+        vx *= keep;
+        vy *= keep;
+    }
+    // --8<-- [end:drag]
+
     /** Puts the body somewhere at once, at rest, also for drawing: a new start, no gliding there. */
     public void place(double x, double y) {
         this.x = x;

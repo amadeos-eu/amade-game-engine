@@ -16,9 +16,13 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 **Antialiasing.** Smooth edges for shapes and text, computed pixel by pixel. It looks better and costs time; turn it off for straight-edged fills. [Swarm](24-swarm.md#a-black-rectangle), [appendix](appendix-java2d.md#drawing).
 
+**ARPAbet.** A way of writing the sounds of speech in plain letters, one name per phoneme: `k ae1 b` is "cab". American speech research has used it since the 1970s; the engine's speech is written in it. [Hover Cab](28-hover-cab.md#how-a-voice-is-made), [manual](48-scenes-menus-sound.md#speech-speech-and-phoneme).
+
 ## B
 
 **Back buffer.** The hidden picture a frame is drawn into before it is shown on the screen, so the player never sees a half-drawn frame. [Paddle](20-paddle.md#step-2-drawing-actively), [appendix](appendix-java2d.md#buffers).
+
+**Bang-bang control.** Steering with switches that are only on or off: in each step a jet fires if that brings the speed nearer the wanted one. Switched often enough, the pushes average out to just what is needed. [Hover Cab](28-hover-cab.md#which-jets).
 
 **Bézier curve.** A smooth curve defined by four points: it starts at the first, ends at the last, and the two in between pull it into shape. Flight paths are built from them. [Swarm](24-swarm.md#step-3-flight-paths), [manual](44-movement.md#curves-to-fly-along-flightpath).
 
@@ -58,6 +62,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 **Domain.** The rules of a game as plain Java, without Swing, so they can be tested without a screen. [Structure](02-structure.md#domain-the-rules).
 
+**Drag.** The slowing of a thing by the air it moves through: each second it loses a part of its speed. It makes a craft on jets steerable. [Hover Cab](28-hover-cab.md#why-a-cab-needs-air), [manual](44-movement.md#flying-on-jets-thrusters-drag-and-touchdown).
+
 ## E
 
 **Easing.** How a movement feels over its time: starting fast and landing gently, or slow at both ends. An easing maps the share of the time to the share of the way. [Solitaire](11-solitaire.md#easing-how-a-movement-feels), [manual](42-sprites.md#movement-in-time-easing-and-tween).
@@ -77,6 +83,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 **Flow field.** For every tile of a map, the direction that leads to a goal. Any number of units follow the arrows, and the whole field costs one search. [Towers](30-towers.md#step-1-the-flow-field), [manual](46-paths-and-decisions.md#many-units-one-goal-flowfield).
 
 **Fog of war.** What one side knows of the map: tiles never seen are black, tiles seen once are dimmed, and only what the side's units see now shows enemies. [Sands](31-sands.md#step-3-fog-of-war), [manual](45-maps.md#what-a-side-sees-fogofwar-and-fogpainter).
+
+**Formant.** A frequency at which the mouth and throat ring while speaking. Where the first two formants are decides which vowel is heard. [Hover Cab](28-hover-cab.md#how-a-voice-is-made), [manual](48-scenes-menus-sound.md#speech-speech-and-phoneme).
 
 **Formation.** Where each unit of a group stands when it arrives: a slot of its own near the target, chosen so that the units do not cross each other's way. [Sands](31-sands.md#a-slot-for-each), [manual](46-paths-and-decisions.md#groups-on-the-move-formation).
 
@@ -101,6 +109,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 ## I
 
 **Influence map.** A map of where a side is strong: each unit and building spreads its strength around it, and the sums show strong and weak places at a glance. [Sands](31-sands.md#whom-to-attack-the-influence-map), [manual](46-paths-and-decisions.md#strength-on-the-map-influencemap).
+
+**Intonation.** The tune of a spoken phrase: the pitch sinks as the breath runs out, rises on stressed syllables, and rises at the end of a question. [Hover Cab](28-hover-cab.md#a-phrase).
 
 **Isometric view.** A tile map seen from a corner and from above: each square tile becomes a diamond twice as wide as high, and buildings show two walls and a roof. The rules stay square. [Town](33-town.md#step-1-the-isometric-view), [manual](45-maps.md#the-isometric-view-isoprojection).
 
@@ -138,6 +148,10 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 **Passable.** Whether a tile may be entered, asked by every search for a way. [Maze](25-maze.md#step-5-breadth-first-search-the-way-home), [manual](46-paths-and-decisions.md#what-may-be-entered-passable).
 
+**Phoneme.** One sound of speech, such as the *k*, *ae* and *b* of "cab". A speech synthesizer makes words from phonemes. [Hover Cab](28-hover-cab.md#how-a-voice-is-made), [manual](48-scenes-menus-sound.md#speech-speech-and-phoneme).
+
+**Pixel mask.** Which pixels of a thing are solid, one bit each. Two masks collide where both have a solid pixel, which is as exact as the pictures. [Hover Cab](28-hover-cab.md#step-3-collisions-as-exact-as-the-pictures), [manual](44-movement.md#exact-to-the-pixel-pixelmask).
+
 **Pixel mode.** A render mode that draws the world at its logical size and enlarges it by a whole factor, so each logical pixel becomes a square block. Fast on large screens, and the look of old games. [Bricks](21-bricks.md#pixel-mode), [manual](41-loop-and-drawing.md#the-canvas-gamecanvas-and-rendermode).
 
 **Polling.** Asking an input device for its state at a fixed moment, once per step, instead of acting on each event when it arrives. All questions of one step get the same answers. [Paddle](20-paddle.md#step-7-two-threads-one-game), [manual](43-input.md#one-pattern-for-every-device).
@@ -152,6 +166,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 **Replay.** A whole game kept as a seed and the player's actions with the tick of each. Fed to the rules again, they play the same game. [Snake](22-snake.md#step-5-replays), [manual](47-data-and-saving.md#a-game-as-its-input-replay).
 
+**Resonator.** A filter that rings at one frequency: a tone at that frequency builds up in it, others die away. Five of them in a row are the mouth of the speech synthesizer. [Hover Cab](28-hover-cab.md#the-resonator).
+
 ## S
 
 **Save file.** A player's progress, or a whole running game, on disk, written so that a crash while writing never loses the old file. [Jump](27-jump.md#step-8-saving-progress), [Sands](31-sands.md#step-9-saving-the-whole-game), [manual](47-data-and-saving.md#progress-on-disk-savefile).
@@ -164,7 +180,11 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 **Snapshot.** A whole game written down as keys and values, exact enough that a loaded game goes on as the saved one would have. [Sands](31-sands.md#step-9-saving-the-whole-game), [manual](47-data-and-saving.md#a-whole-game-snapshot).
 
+**Source-filter model.** Speech as a sound source, the vocal folds' puffs and the hiss of narrow places, shaped by a filter, the mouth and throat. The source sets the pitch, the filter the vowel. [Hover Cab](28-hover-cab.md#how-a-voice-is-made).
+
 **Spatial grid.** Things sorted into the squares of a coarse grid, so each one is tested only against its neighbours instead of against everything. [Swarm](24-swarm.md#step-5-collisions-on-a-grid), [manual](44-movement.md#many-things-grid).
+
+**Speech synthesis.** Making speech by computation instead of playing recordings. The engine's synthesizer models the voice with formants, as the talking machines of the early 1980s did. [Hover Cab](28-hover-cab.md#step-6-passengers-who-talk), [manual](48-scenes-menus-sound.md#speech-speech-and-phoneme).
 
 **Sprite.** A picture with a size in logical coordinates, scaled once to the screen and then copied in every frame. [Bricks](21-bricks.md#step-4-sprites), [manual](42-sprites.md#pictures-sprite).
 
@@ -180,11 +200,15 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 **Territory.** The land inside a border of circles that a side's buildings claim. Buildings may stand only inside. [Colony](32-colony.md#the-border), [manual](45-maps.md#the-land-a-side-owns-territory).
 
+**Thrust.** The push of a jet: an acceleration, like gravity, for as long as the jet burns. [Hover Cab](28-hover-cab.md#step-1-jets-against-gravity), [manual](44-movement.md#flying-on-jets-thrusters-drag-and-touchdown).
+
 **Tick.** One step of rules that move at a pace of their own, slower than the game loop, such as the snake moving one cell. [Snake](22-snake.md#step-2-a-pace-of-its-own), [manual](41-loop-and-drawing.md#a-pace-of-its-own-ticker).
 
 **Tile map.** Columns and rows of squares, each holding one value such as `WALL` or `ROAD`. The rules of maze, puzzle and strategy games live on it in whole cells. [Maze](25-maze.md#step-1-a-map-of-tiles), [manual](45-maps.md#a-grid-of-tiles-tilemap-cell-and-direction).
 
 **Tiled.** A free map editor whose TMX files the engine reads. [Jump](27-jump.md#step-1-levels-from-the-tiled-editor), [manual](45-maps.md#maps-from-an-editor-tiledmap).
+
+**Touchdown.** The moment a craft comes down on a landing place, graded by its speed as soft, hard or a crash. [Hover Cab](28-hover-cab.md#step-2-touching-down), [manual](44-movement.md#flying-on-jets-thrusters-drag-and-touchdown).
 
 **Tween.** One movement from one value to another in a given time, with an easing. [Solitaire](11-solitaire.md#tween-one-animation-in-time), [manual](42-sprites.md#movement-in-time-easing-and-tween).
 
