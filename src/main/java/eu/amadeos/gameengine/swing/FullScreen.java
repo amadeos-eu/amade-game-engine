@@ -8,6 +8,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+import javax.swing.Timer;
 import java.awt.Component;
 import java.awt.GraphicsDevice;
 import java.awt.Rectangle;
@@ -28,14 +29,21 @@ import java.util.List;
  *
  * <p>A frame can only lose its frame while it is not displayable, so the switch disposes the window and
  * shows it again. That gives the canvas a new native window and sends {@code windowClosed}: end the game
- * with {@link #whenClosed(Runnable)} instead of a window listener of your own.
+ * with {@link #whenClosed(Runnable)} instead of a window listener of your own. The window also loses the
+ * focus for a moment and gets it back; a game that pauses when the player switches to another program
+ * pauses with {@link #whenDeactivated(Runnable)}, which leaves the switch out.
  */
 public final class FullScreen {
     private static final String MIRROR = "amade-fullscreen-shortcut-";
+    /** How long after a switch the window may be without the focus before it counts as left. */
+    static final int SETTLE_MILLIS = 1000;
 
     private final JFrame frame;
     private final GameCanvas canvas;
     private final List<Runnable> closeActions = new ArrayList<>();
+    private final List<Runnable> deactivateActions = new ArrayList<>();
+    /** When the last switch began, in {@link System#nanoTime()}; at the start, as if long ago. */
+    private long switched = System.nanoTime() - 2_000_000L * SETTLE_MILLIS;
     private final List<KeyStroke> mirrored = new ArrayList<>();
     /** The windowClosed events of our own dispose() calls still to come. */
     private int ownCloses;
@@ -55,6 +63,11 @@ public final class FullScreen {
                 }
                 closeActions.forEach(Runnable::run);
             }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+                deactivated();
+            }
         });
     }
 
@@ -67,6 +80,30 @@ public final class FullScreen {
         closeActions.add(action);
     }
 
+    // --8<-- [start:deactivated]
+    /**
+     * Runs the action when the window loses the focus to another window or program, e.g. to pause the
+     * game, but not when it only loses it for a moment while switching to or from full screen. A window
+     * that is still without the focus a second after a switch counts as left then.
+     */
+    public void whenDeactivated(Runnable action) {
+        deactivateActions.add(action);
+    }
+
+    private void deactivated() {
+        long since = (System.nanoTime() - switched) / 1_000_000;
+        if (since >= SETTLE_MILLIS) {
+            deactivateActions.forEach(Runnable::run);
+            return;
+        }
+        Timer later = new Timer((int) (SETTLE_MILLIS - since), e -> {
+            if (!frame.isActive() && frame.isDisplayable()) deactivateActions.forEach(Runnable::run);
+        });
+        later.setRepeats(false);
+        later.start();
+    }
+    // --8<-- [end:deactivated]
+
     public void toggle() {
         if (active) leave();
         else enter();
@@ -78,6 +115,7 @@ public final class FullScreen {
         GraphicsDevice device = frame.getGraphicsConfiguration().getDevice();
         windowBounds = frame.getBounds();
         windowState = frame.getExtendedState();
+        switched = System.nanoTime();
         canvas.withoutFrames(() -> {
             reopen(true);
             if (device.isFullScreenSupported()) {
@@ -96,6 +134,7 @@ public final class FullScreen {
     public void leave() {
         if (!active) return;
         GraphicsDevice device = frame.getGraphicsConfiguration().getDevice();
+        switched = System.nanoTime();
         canvas.withoutFrames(() -> {
             if (device.getFullScreenWindow() == frame) device.setFullScreenWindow(null);
             reopen(false);

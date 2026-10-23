@@ -23,6 +23,12 @@ import java.util.Locale;
  * 640 × 400, as if the screen always had that size; the canvas scales the picture to its real size, keeps
  * the proportions and fills the rest with black bars.
  *
+ * <p>A game whose world is larger than the screen, such as a map that scrolls, can let the canvas
+ * {@linkplain #setMaxLogicalWidth widen} the logical picture instead: on a screen wider than the logical
+ * proportions, the height stays and the width grows until the picture fills the screen, so a 16:9 monitor
+ * shows more map rather than black bars. The game then asks {@link #logicalWidth()} for the width of each
+ * frame and lays out its view and panels from it.
+ *
  * <p>Drawing is <i>active</i>: the game loop calls {@link #render(double)} whenever it wants a frame, and
  * the canvas draws into a hidden buffer and shows it at once ({@link BufferStrategy}). Swing's repaint
  * mechanism is not involved, so nothing waits for the event thread.
@@ -49,8 +55,12 @@ public final class GameCanvas extends Canvas {
     private static final Color IN_TIME = new Color(0x7CFC00);
     private static final Color LATE = new Color(0xFF5050);
 
-    private final int logicalWidth;
+    /** The narrowest logical width: the one the canvas was made with. */
+    private final int minLogicalWidth;
     private final int logicalHeight;
+    private volatile int maxLogicalWidth;
+    /** The logical width of the current frame; set by the loop thread at the start of each frame. */
+    private volatile int logicalWidth;
     private final Painter painter;
     private final Painter overlay;
     /** Held while a frame is drawn, so the native window cannot vanish in the middle of one. */
@@ -73,6 +83,8 @@ public final class GameCanvas extends Canvas {
      *                coordinates, but always straight onto the screen
      */
     public GameCanvas(int logicalWidth, int logicalHeight, Painter painter, Painter overlay) {
+        this.minLogicalWidth = logicalWidth;
+        this.maxLogicalWidth = logicalWidth;
         this.logicalWidth = logicalWidth;
         this.logicalHeight = logicalHeight;
         this.painter = painter;
@@ -82,9 +94,35 @@ public final class GameCanvas extends Canvas {
         setPreferredSize(new Dimension(logicalWidth, logicalHeight));
     }
 
+    // --8<-- [start:logical-width]
+    /**
+     * The logical width of the current frame: the width the canvas was made with, or more on a wide screen
+     * if the canvas may {@linkplain #setMaxLogicalWidth widen}. The game loop thread sees the same width in
+     * the update steps as in the frame drawn after them.
+     */
     public int logicalWidth() {
         return logicalWidth;
     }
+
+    /** The width the canvas was made with: the narrowest the picture gets. */
+    public int minLogicalWidth() {
+        return minLogicalWidth;
+    }
+
+    public int maxLogicalWidth() {
+        return maxLogicalWidth;
+    }
+
+    /**
+     * Lets the logical picture grow wider than the width the canvas was made with, up to {@code maxWidth},
+     * to fill a wide screen instead of leaving black bars beside it. Only for a game that can show more
+     * of its world, such as a scrolling map; a fixed playing field keeps its bars. Takes effect with the
+     * next frame.
+     */
+    public void setMaxLogicalWidth(int maxWidth) {
+        maxLogicalWidth = Math.max(minLogicalWidth, maxWidth);
+    }
+    // --8<-- [end:logical-width]
 
     public int logicalHeight() {
         return logicalHeight;
@@ -134,6 +172,23 @@ public final class GameCanvas extends Canvas {
     }
     // --8<-- [end:whole-scale]
 
+    // --8<-- [start:width-for]
+    /**
+     * The logical width for a screen of {@code width} × {@code height} pixels: the height decides the scale
+     * ({@link #wholeScale whole} in pixel mode), and the width is as much as that scale fits on the screen,
+     * between {@code minWidth} and {@code maxWidth}.
+     */
+    public static int widthFor(int width, int height, int minWidth, int maxWidth, int logicalHeight,
+                               RenderMode mode) {
+        if (maxWidth <= minWidth || width <= 0 || height <= 0) return minWidth;
+        double scale = mode == RenderMode.PIXEL
+                ? wholeScale(width, height, minWidth, logicalHeight)
+                : scale(width, height, minWidth, logicalHeight);
+        // Whole logical units, rounded down: the picture is at most a scale's width narrower than the screen.
+        return Math.clamp((int) Math.floor(width / scale + 1e-9), minWidth, maxWidth);
+    }
+    // --8<-- [end:width-for]
+
     // --8<-- [start:to-logical]
     /**
      * Where a point of the component (a mouse event's {@code x} and {@code y}) lies in logical coordinates,
@@ -143,8 +198,11 @@ public final class GameCanvas extends Canvas {
     public Point2D.Double toLogical(double x, double y) {
         GraphicsConfiguration gc = getGraphicsConfiguration();
         double ui = gc == null ? 1 : gc.getDefaultTransform().getScaleX();
-        return toLogical(x * ui, y * ui, (int) Math.round(getWidth() * ui), (int) Math.round(getHeight() * ui),
-                logicalWidth, logicalHeight, mode);
+        int width = (int) Math.round(getWidth() * ui);
+        int height = (int) Math.round(getHeight() * ui);
+        RenderMode m = mode;
+        return toLogical(x * ui, y * ui, width, height,
+                widthFor(width, height, minLogicalWidth, maxLogicalWidth, logicalHeight, m), logicalHeight, m);
     }
 
     /** {@link #toLogical(double, double)} for a screen of {@code width} × {@code height} pixels. */
@@ -175,6 +233,7 @@ public final class GameCanvas extends Canvas {
                 return;
             }
             long start = System.nanoTime();
+            logicalWidth = currentWidth();
             // The buffers live in video memory and can be lost (another program, a mode switch): draw again.
             do {
                 do {
@@ -193,6 +252,14 @@ public final class GameCanvas extends Canvas {
         }
     }
     // --8<-- [end:render]
+
+    /** The logical width for the canvas's present size, in the screen's own pixels. */
+    private int currentWidth() {
+        GraphicsConfiguration gc = getGraphicsConfiguration();
+        double ui = gc == null ? 1 : gc.getDefaultTransform().getScaleX();
+        return widthFor((int) Math.round(getWidth() * ui), (int) Math.round(getHeight() * ui),
+                minLogicalWidth, maxLogicalWidth, logicalHeight, mode);
+    }
 
     /**
      * Runs a change on the Swing thread that takes the canvas off the screen for a moment, such as
@@ -262,8 +329,9 @@ public final class GameCanvas extends Canvas {
     private VolatileImage drawWorld(double alpha) {
         GraphicsConfiguration gc = getGraphicsConfiguration();
         do {
-            // A new monitor or a lost graphics card: make the buffer anew.
-            if (backBuffer == null || backBuffer.validate(gc) == VolatileImage.IMAGE_INCOMPATIBLE) {
+            // A new monitor, a lost graphics card or a new width: make the buffer anew.
+            if (backBuffer == null || backBuffer.getWidth() != logicalWidth
+                    || backBuffer.validate(gc) == VolatileImage.IMAGE_INCOMPATIBLE) {
                 if (backBuffer != null) backBuffer.flush();
                 backBuffer = gc.createCompatibleVolatileImage(logicalWidth, logicalHeight);
             }

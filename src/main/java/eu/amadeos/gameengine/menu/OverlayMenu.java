@@ -55,10 +55,10 @@ public final class OverlayMenu<T> {
     private final double width;
     private final double rowHeight;
     private final double titleHeight;
-    private final double boundsLeft;
-    private final double boundsTop;
-    private final double boundsRight;
-    private final double boundsBottom;
+    private double boundsLeft;
+    private double boundsTop;
+    private double boundsRight;
+    private double boundsBottom;
     private String title = "";
     private List<Item<T>> items = List.of();
     private boolean open;
@@ -83,6 +83,17 @@ public final class OverlayMenu<T> {
         this.boundsBottom = bottom;
     }
     // --8<-- [end:menu]
+
+    /**
+     * The part of the screen the menu may cover from now on, e.g. wider when the canvas widens on a wide
+     * screen; a menu that is open stays where it is until it opens again.
+     */
+    public void setBounds(double left, double top, double right, double bottom) {
+        boundsLeft = left;
+        boundsTop = top;
+        boundsRight = right;
+        boundsBottom = bottom;
+    }
 
     // --8<-- [start:open]
     /**
