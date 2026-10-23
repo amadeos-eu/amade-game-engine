@@ -53,6 +53,8 @@ A few rules hold for nearly every class. Knowing them makes the rest of the manu
 | A year of seasons, which one began | `Seasons` | [41](41-loop-and-drawing.md#the-seasons-of-a-year-seasons) |
 | The time of one game, for a high score | `GameClock` | [41](41-loop-and-drawing.md#the-time-of-a-game-gameclock) |
 | A drawing surface in fixed logical coordinates | `GameCanvas` | [41](41-loop-and-drawing.md#the-canvas-gamecanvas-and-rendermode) |
+| A map that fills a wide screen instead of black bars | `GameCanvas.setMaxLogicalWidth`, `Camera.resize` | [41](41-loop-and-drawing.md#the-canvas-gamecanvas-and-rendermode), [45](45-maps.md#a-world-larger-than-the-screen-camera) |
+| Full screen with F11, without ending or pausing the game | `FullScreen` | [41](41-loop-and-drawing.md#full-screen-fullscreen) |
 | Animation in a Swing component of a game that waits for the player | `Animator`, `Tween` | [41](41-loop-and-drawing.md#animation-on-the-event-thread-animator), [42](42-sprites.md#movement-in-time-easing-and-tween) |
 | A picture from a file or drawn in code, fast at any size | `Sprite` | [42](42-sprites.md#pictures-sprite) |
 | A big ground drawn once, then only where the view moved or the map changed | `ScrollingLayer` | [42](42-sprites.md#a-ground-painted-once-scrollinglayer) |

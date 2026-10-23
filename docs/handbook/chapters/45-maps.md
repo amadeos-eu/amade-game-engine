@@ -223,6 +223,12 @@ Put only what stands into the sort. Flat things (lawns, car parks, roads) are dr
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/camera/Camera.java:to-world"
 ```
 
+**A view that changes its size.** When the canvas widens on a wide screen, the view grows with it: `resize(width, height)` gives the camera a new view size and keeps the middle of the view where it was, as far as the edges allow. A game calls it in every update step with the size the screen has now; a size that has not changed changes nothing ([chapter 30](30-towers.md#a-wider-screen-a-wider-view)).
+
+```java title="amade-game-engine · camera/Camera.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/camera/Camera.java:resize"
+```
+
 **Drawing.** `x(alpha)` and `y(alpha)` give the camera between its last two positions, for the frame. `sees(left, top, width, height, alpha)` is true when a box of the world is at least partly in view: a map of 64 × 64 tiles draws only the 33 × 26 or so the camera sees ([chapter 27](27-jump.md#only-what-the-camera-sees)).
 
 ### Depth: Parallax

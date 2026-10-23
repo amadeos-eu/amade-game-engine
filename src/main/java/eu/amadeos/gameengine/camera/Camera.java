@@ -31,8 +31,8 @@ package eu.amadeos.gameengine.camera;
  */
 // --8<-- [start:camera]
 public final class Camera {
-    private final double viewWidth;
-    private final double viewHeight;
+    private double viewWidth;
+    private double viewHeight;
     private final double worldWidth;
     private final double worldHeight;
     private double deadWidth;
@@ -111,6 +111,31 @@ public final class Camera {
         return Math.clamp(top, 0, worldHeight - viewHeight);
     }
     // --8<-- [end:camera]
+
+    // --8<-- [start:resize]
+    /**
+     * Gives the view a new size, e.g. when the canvas {@linkplain eu.amadeos.gameengine.swing.GameCanvas#logicalWidth()
+     * widens} on a wide screen. The middle of the view stays where it was, as far as the edges of the world
+     * allow; a size that has not changed changes nothing. Call it before {@link #moveBy} or {@link #follow}
+     * in an update step.
+     */
+    public void resize(double width, double height) {
+        if (width <= 0 || height <= 0) throw new IllegalArgumentException("empty view");
+        if (width == viewWidth && height == viewHeight) return;
+        double middleX = x + viewWidth / 2;
+        double middleY = y + viewHeight / 2;
+        double previousMiddleX = previousX + viewWidth / 2;
+        double previousMiddleY = previousY + viewHeight / 2;
+        viewWidth = width;
+        viewHeight = height;
+        deadWidth = Math.min(deadWidth, width);
+        deadHeight = Math.min(deadHeight, height);
+        x = clampX(middleX - width / 2);
+        y = clampY(middleY - height / 2);
+        previousX = clampX(previousMiddleX - width / 2);
+        previousY = clampY(previousMiddleY - height / 2);
+    }
+    // --8<-- [end:resize]
 
     // --8<-- [start:move]
     /**

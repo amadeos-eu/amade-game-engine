@@ -32,6 +32,23 @@ class CameraTest {
     }
     // --8<-- [end:test-dead-zone]
 
+    // --8<-- [start:test-resize]
+    @Test
+    void aWiderViewKeepsItsMiddleAndStopsAtTheEdges() {
+        Camera camera = new Camera(512, 380, 2048, 1024).catchUp(1);
+        camera.jumpTo(1000, 500);
+        assertEquals(744, camera.x(), 1e-9);
+        camera.resize(720, 380);                // a 16:9 screen: 208 units more map
+        assertEquals(640, camera.x(), 1e-9, "the middle stays at 1000");
+        assertEquals(720, camera.viewWidth(), 1e-9);
+        assertTrue(camera.shows(700, 100), "the new part of the view is on the screen");
+        camera.jumpTo(2000, 500);
+        assertEquals(1328, camera.x(), 1e-9, "the right edge of the view at the right edge of the world");
+        camera.resize(512, 380);
+        assertEquals(1328 + 104, camera.x(), 1e-9, "narrower again, at the same middle");
+    }
+    // --8<-- [end:test-resize]
+
     // --8<-- [start:test-smoothing]
     @Test
     void smoothingClosesTheSamePartPerSecondAtAnyStepLength() {

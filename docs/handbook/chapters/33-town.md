@@ -277,6 +277,8 @@ The camera did not have to learn anything. It works in the picture's units, so a
 --8<-- "amade-town-game/src/test/java/eu/amadeos/games/town/ui/game/TownGameTest.java:test-zoom"
 ```
 
+On a wide screen the view is wider, as in Sands and Colony: `viewWidth()` is 512 units plus whatever the canvas widened by, the camera is resized to it divided by the zoom in every step, and the zoom keeps the point under the mouse with the middle of the wider view. The cards of the mission choice, each with its map, are drawn for 640 and moved to the middle of the screen.
+
 Because every sprite scales itself once to its size on the screen ([chapter 42](42-sprites.md#pictures-sprite)), the close view is not a blown-up picture: the houses are drawn again, at twice the resolution, the first time they are shown that large.
 
 ## Step 11: Drawing the town

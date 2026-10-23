@@ -380,6 +380,7 @@ The settlement is drawn in layers: the ground; then everything that stands, sort
 
 - **Events.** The rules say what happened as records, as since chapter 26: built, made, settled, a season began, a house burning, doused, burned, wolves, barked, a sheep taken, a lamb born, a road paved. `Effects` turns them into smoke, sparks, snowflakes and sounds; the message line at the bottom of the map shows the ones the player must know about.
 - **The minimap.** The engine's `Minimap` (chapter 31): one pixel per tile, the roads, the houses and the border on it, white in winter. It is painted again every half second, and only when something changed.
+- **Wide screens.** As in Sands, the canvas widens up to 1024 units, the valley gets the extra width, and the panel is drawn moved to the right edge, with the mouse moved back for its clicks ([chapter 31](31-sands.md#the-panel-and-a-frame-time-measured)). The goods bar along the top grows with the screen; its background is a cached face, kept once per width.
 - **Music.** An easy tune in MML in three-four time over a walking bass, and short ones for winning and losing.
 - **Scenes.** Title (over a settlement the computer builds), the choice of a mission (each card with a preview of its map), the mission, the pause (continue, save, load, leave), the result with the settlers, the houses built, the goods made, the road laid, and what fire and wolves took.
 

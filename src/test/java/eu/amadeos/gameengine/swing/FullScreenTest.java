@@ -16,6 +16,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -33,6 +34,7 @@ class FullScreenTest {
     private FullScreen fullScreen;
     private int newGames;
     private int closes;
+    private int deactivations;
 
     @BeforeEach
     void open() throws Exception {
@@ -52,6 +54,7 @@ class FullScreenTest {
             frame.setJMenuBar(bar);
             fullScreen = new FullScreen(frame, canvas);
             fullScreen.whenClosed(() -> closes++);
+            fullScreen.whenDeactivated(() -> deactivations++);
             frame.setBounds(40, 30, 320, 200);
             frame.setVisible(true);
         });
@@ -61,6 +64,19 @@ class FullScreenTest {
     void close() throws Exception {
         if (frame != null) onEdt(() -> frame.dispose());
     }
+
+    // --8<-- [start:test-deactivated]
+    @Test
+    void losingTheFocusWhileSwitchingDoesNotCount() throws Exception {
+        onEdt(() -> {
+            frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_DEACTIVATED));
+            assertEquals(1, deactivations, "another program took the focus: the game pauses");
+            fullScreen.enter();
+            frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_DEACTIVATED));
+            assertEquals(1, deactivations, "the switch itself took it for a moment: nothing yet");
+        });
+    }
+    // --8<-- [end:test-deactivated]
 
     @Test
     void entersAndLeavesWithoutClosingTheGame() throws Exception {

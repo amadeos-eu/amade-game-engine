@@ -62,6 +62,8 @@ With a real graphics card and a good OpenGL driver, the OpenGL pipeline can win,
 
 **Full screen without a mode switch.** `setDisplayMode` can lower the screen's resolution, the old trick for speed. On Linux it is often unsupported, flickers, and can leave the desktop's windows rearranged. `GraphicsDevice.setFullScreenWindow` without a mode change marks the window as full screen, which lets the compositor get out of the way ([chapter 20](20-paddle.md#full-screen)).
 
+**Black bars or a wider picture.** Most monitors today are 16:9, the games' logical size is 16:10. Scaled to keep its proportions, the picture leaves bars on the left and right (96 pixels each at 1920 × 1080). A fixed field keeps them. A world larger than the screen should fill it: let the canvas widen (`setMaxLogicalWidth`), give the camera the extra width, and anchor panels and buttons at the right edge rather than at 640. Otherwise the edge of the screen, where the player pushes the mouse to scroll, is not the edge of the map ([chapter 30](30-towers.md#a-wider-screen-a-wider-view)).
+
 **Several monitors.** Each monitor has its own `GraphicsConfiguration`. A compatible image made for one may be slower on the other. When a window moves to another monitor, `VolatileImage.validate` reports `IMAGE_INCOMPATIBLE`, and the canvas makes a new buffer.
 
 ## Input and windows
@@ -71,6 +73,8 @@ With a real graphics card and a good OpenGL driver, the OpenGL pipeline can win,
 **Heavyweight and lightweight.** A `Canvas` is a native (heavyweight) window inside the Swing window. Lightweight popup menus open *behind* it unless `JPopupMenu.setDefaultLightWeightPopupEnabled(false)`, and Swing's menu shortcuts never see the keys the canvas receives unless it passes them on ([chapter 20](20-paddle.md#a-heavyweight-in-a-swing-window)).
 
 **A disposed window sends `windowClosed`.** Switching to full screen disposes the window to remove its frame. End the program on `FullScreen.whenClosed`, not on `windowClosed` ([chapter 20](20-paddle.md#full-screen)).
+
+**A disposed window loses the focus.** The same switch sends `windowDeactivated`, and a game that pauses on it pauses on every F11. Pause on `FullScreen.whenDeactivated`, which leaves out the moment of the switch ([chapter 20](20-paddle.md#full-screen)).
 
 ## Sound
 

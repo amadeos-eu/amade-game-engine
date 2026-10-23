@@ -148,17 +148,31 @@ Both the screen's buffers and the pixel-mode buffer live in video memory where t
 | `render(alpha)` | Draws one frame; the loop's render function |
 | `setRenderMode(mode)`, `renderMode()` | `DIRECT` or `PIXEL`, from the next frame on; from any thread |
 | `toLogical(x, y)` | A point of the component, such as a mouse event's, in logical coordinates, placed as the current mode places the picture |
+| `setMaxLogicalWidth(max)` | Lets the picture widen up to `max` units to fill a wide screen; from the next frame on |
+| `logicalWidth()`, `minLogicalWidth()` | The width of the current frame, and the width the canvas was made with |
+| `widthFor(width, height, min, max, logicalHeight, mode)` | The logical width for a screen of that many pixels |
 | `setShowFrameTimes(show)`, `frameTimes()` | The frame-time display, and its numbers |
 | `withoutFrames(change)` | Runs a change that takes the canvas off the screen for a moment, with no frame drawn meanwhile |
 
 !!! warning "Pitfall: a heavyweight in a Swing window"
     The canvas is an AWT `Canvas`, a native window inside the Swing window. Lightweight popup menus open behind it unless `JPopupMenu.setDefaultLightWeightPopupEnabled(false)`, and Swing's menu shortcuts never see keys the canvas receives. The canvas therefore hands every key the game does not consume on to Swing's key bindings ([chapter 20](20-paddle.md#a-heavyweight-in-a-swing-window)).
 
+**Wide screens.** The canvas keeps the proportions of its logical size, so a 640 × 400 picture has black bars on a 16:9 screen. A game whose world is larger than the screen calls `setMaxLogicalWidth(max)`: the height stays, and the logical width grows with the screen, up to `max`, until the picture fills it. The game asks `logicalWidth()` in each update step and lays out its view and panels from it; the width is set at the start of each frame on the loop thread, so the step and the frame after it agree, and `toLogical` uses the same width for the mouse ([chapter 30](30-towers.md#a-wider-screen-a-wider-view)). Games on a fixed field (Paddle to Jump) keep their bars.
+
+```java title="amade-game-engine · swing/GameCanvas.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/swing/GameCanvas.java:width-for"
+```
+
 **Which mode?** `DIRECT` is the default and sharp at every size. `PIXEL` costs 640 × 400 pixels on any screen, which makes it the fast choice for very large screens and slow drivers, and gives the look of old games. Every game offers both in its *Graphics* menu ([chapter 48](48-scenes-menus-sound.md#the-standard-menus-gamemenus-and-gametexts)) and keeps the choice in its settings.
 
 ??? example "Test: the mouse where pixel mode puts the picture"
     ```java title="amade-game-engine · test/swing/GameCanvasTest.java"
     --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/swing/GameCanvasTest.java:test-to-logical"
+    ```
+
+??? example "Test: the width on wide screens"
+    ```java title="amade-game-engine · test/swing/GameCanvasTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/swing/GameCanvasTest.java:test-width-for"
     ```
 
 ## Full screen: FullScreen
@@ -175,6 +189,13 @@ Both the screen's buffers and the pixel-mode buffer live in video memory where t
 
 !!! warning "Pitfall: the game ends on F11"
     Disposing the window sends `windowClosed`. A game that stops its loop in a window listener of its own ends when the player presses F11. End the game with `fullScreen.whenClosed(action)`, which runs only when the window is really closed ([chapter 20](20-paddle.md#full-screen)).
+
+!!! warning "Pitfall: the game pauses on F11"
+    Disposing the window also takes the focus away for a moment. A game that pauses in a `windowDeactivated` listener of its own pauses whenever the player switches. Pause with `fullScreen.whenDeactivated(action)`: it runs at once when the focus goes to another program, and after a switch only if the window has not got the focus back within a second ([chapter 20](20-paddle.md#full-screen)).
+
+    ```java title="amade-game-engine · swing/FullScreen.java"
+    --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/swing/FullScreen.java:deactivated"
+    ```
 
 ## Frame times: FrameTimes
 

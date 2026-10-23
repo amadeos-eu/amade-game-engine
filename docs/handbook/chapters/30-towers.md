@@ -325,6 +325,39 @@ The play scene moves it three ways: by the arrow keys, by the mouse at the edge 
 
 The top edge does not scroll: the bar is there, and a mouse on its buttons should not move the map. A camera that moves closes an open menu, which would otherwise point at a tile that has moved away.
 
+### A wider screen, a wider view
+
+The canvas of chapter 20 keeps the logical 640 × 400 and fills the rest of the screen with black bars. On a 16:9 monitor in full screen that leaves 96 pixels black on each side, and the mouse that should scroll the map at the edge of the screen finds the edge of the picture somewhere in between. Paddle must keep its court; a battlefield need not: it is larger than the screen anyway, and a wider screen can simply show more of it.
+
+So the canvas may **widen**. The game tells it how far, and from then on the height stays at 400 while the width grows until the picture fills the screen:
+
+```java title="amade-game-engine · swing/GameCanvas.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/swing/GameCanvas.java:logical-width"
+```
+
+```java title="amade-game-engine · swing/GameCanvas.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/swing/GameCanvas.java:width-for"
+```
+
+At 1920 × 1080 the scale is 1080 / 400 = 2.7 and the width 1920 / 2.7 = 711 units; in pixel mode the scale is a whole 2 and the width 960. The width is set once per frame, on the loop thread, so the update step and the frame after it see the same one. The mouse is converted with the same width, so its x runs from 0 at the left edge of the screen to 711 at the right.
+
+The game reads the width in every update step and hands it on. Towers caps it at 720, the width of its smallest battlefield, so that no screen shows more than a whole battlefield and black beside it:
+
+```java title="amade-towers-game · domain/Field.java"
+--8<-- "amade-towers-game/src/main/java/eu/amadeos/games/towers/domain/Field.java:max-width"
+```
+
+Three things follow the width. The **camera** gets a wider view, with its middle where it was (`resize`); the **bar** puts its buttons at the right edge instead of at 640; and the build menu may open as far right as the screen goes (`OverlayMenu.setBounds`). Everything else, the tiles, the towers, the mouse on the map, already works in world coordinates through the camera.
+
+```java title="amade-game-engine · camera/Camera.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/camera/Camera.java:resize"
+```
+
+??? example "Test: a 16:9 screen"
+    ```java title="amade-towers-game · test/ui/game/TowersGameTest.java"
+    --8<-- "amade-towers-game/src/test/java/eu/amadeos/games/towers/ui/game/TowersGameTest.java:test-wide"
+    ```
+
 ## Step 6: Menus over the game
 
 A click on grass opens the **build menu** beside the tile: a row per tower, with its picture, name and price. A click on a tower opens its menu: upgrade, with the price of the next stage, or sell. These menus are not Swing menus. They are drawn by the game, over the game, in the game's style, and they work in full screen.
@@ -509,7 +542,8 @@ The keys are bound as in the earlier games and can be changed in the settings fi
 | Blocks of properties in text files, `like`, typos found | `eu.amadeos.gameengine.data.Catalog` | Every game with units, buildings or items |
 | A menu drawn over the game, beside the thing it is about, by mouse and keys | `eu.amadeos.gameengine.menu.OverlayMenu` | Every command given on the map |
 | Mouse released, mouse inside the canvas | `eu.amadeos.gameengine.input.Mouse` | Dragging, scrolling at the edge |
-| Screen to world and back, a view below a bar, a camera the player moves | `eu.amadeos.gameengine.camera.Camera` | Every map the mouse points into |
+| Screen to world and back, a view below a bar, a camera the player moves, a view that grows with the screen | `eu.amadeos.gameengine.camera.Camera` | Every map the mouse points into |
+| A picture that widens to fill a wide screen instead of black bars | `eu.amadeos.gameengine.swing.GameCanvas` | Every game with a world larger than the screen |
 | 32 turned copies of a picture | `eu.amadeos.gameengine.sprite.Rotations` | Everything seen from above that turns |
 | Drawn sprites cached opaque | `eu.amadeos.gameengine.sprite.Sprite` | Every ground drawn in code |
 

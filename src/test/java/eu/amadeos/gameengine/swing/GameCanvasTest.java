@@ -63,6 +63,28 @@ class GameCanvasTest {
     }
     // --8<-- [end:test-whole-scale]
 
+    // --8<-- [start:test-width-for]
+    @Test
+    void aWideningCanvasFillsWideScreens() {
+        // 16:9 at 1920 × 1080: 400 units high means 2.7 pixels a unit, and 1920 / 2.7 = 711 units wide.
+        assertEquals(711, GameCanvas.widthFor(1920, 1080, 640, 960, 400, RenderMode.DIRECT));
+        // 16:10 needs nothing more; a 4:3 screen keeps the narrowest width and gets bars above and below.
+        assertEquals(640, GameCanvas.widthFor(1920, 1200, 640, 960, 400, RenderMode.DIRECT));
+        assertEquals(640, GameCanvas.widthFor(1024, 768, 640, 960, 400, RenderMode.DIRECT));
+        // 21:9 at 3440 × 1440 would be 955 units; a maximum of 900 leaves narrow bars.
+        assertEquals(900, GameCanvas.widthFor(3440, 1440, 640, 900, 400, RenderMode.DIRECT));
+        // Pixel mode: 1080 / 400 gives a whole 2, so 1920 / 2 = 960 units, and only bars above and below.
+        assertEquals(960, GameCanvas.widthFor(1920, 1080, 640, 960, 400, RenderMode.PIXEL));
+        // A canvas that may not widen stays as it is.
+        assertEquals(640, GameCanvas.widthFor(1920, 1080, 640, 640, 400, RenderMode.DIRECT));
+        // With the widened width the screen's left edge is logical 0 and its right edge the full width.
+        Point2D.Double left = GameCanvas.toLogical(0, 540, 1920, 1080, 711, 400, RenderMode.DIRECT);
+        Point2D.Double right = GameCanvas.toLogical(1919, 540, 1920, 1080, 711, 400, RenderMode.DIRECT);
+        assertEquals(0, left.x, 0.5);
+        assertEquals(711, right.x, 0.5);
+    }
+    // --8<-- [end:test-width-for]
+
     /** Every mode puts the world and the overlay in the same place on a real screen. */
     @Test
     void allModesShowWorldAndOverlay() throws Exception {
