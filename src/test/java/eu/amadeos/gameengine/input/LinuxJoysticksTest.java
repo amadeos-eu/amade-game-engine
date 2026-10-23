@@ -48,6 +48,55 @@ class LinuxJoysticksTest {
         assertEquals(0, state.buttons());
     }
 
+    // --8<-- [start:test-is-gamepad]
+    /** Bitmaps as a 64-bit kernel writes them to /sys/class/input/js0/device/capabilities/key. */
+    @Test
+    void onlyGamepadsAreGamepads() {
+        assertTrue(LinuxJoysticks.isGamepad("7cdb000000000000 0 0 0 0", "0", 64));           // Xbox pad
+        assertTrue(LinuxJoysticks.isGamepad("ffff00000000 0 0 0 0", "0", 64));               // joystick
+        assertFalse(LinuxJoysticks.isGamepad("70000 0 0 0 0", "0", 64));                     // QEMU tablet
+        assertFalse(LinuxJoysticks.isGamepad("0", "40", 64));                                // accelerometer
+        assertFalse(LinuxJoysticks.isGamepad("400 7cdb000000000000 0 0 0 0", "0", 64));      // touch
+        assertFalse(LinuxJoysticks.isGamepad("0", "0", 64));
+    }
+    // --8<-- [end:test-is-gamepad]
+
+    @Test
+    void bitmapsOf32BitKernels() {
+        assertTrue(LinuxJoysticks.isGamepad("7cdb0000 0 0 0 0 0 0 0 0 0", "0", 32));
+        assertFalse(LinuxJoysticks.isGamepad("70000 0 0 0 0 0 0 0 0", "0", 32));
+    }
+
+    /** A device that is no gamepad gets no slot: the pad behind it gets the first one. */
+    @Test
+    void aTabletIsSkipped() throws Exception {
+        assumeTrue(System.getProperty("os.name").startsWith("Linux"), "named pipes as on Linux");
+        for (String js : List.of("js0", "js1")) {
+            assertEquals(0, new ProcessBuilder("mkfifo", dir.resolve(js).toString()).start().waitFor());
+            Files.createDirectories(dir.resolve("sys/" + js + "/device/capabilities"));
+        }
+        Files.writeString(dir.resolve("sys/js0/device/name"), "QEMU QEMU USB Tablet\n");
+        Files.writeString(dir.resolve("sys/js0/device/capabilities/key"), "70000 0 0 0 0\n");
+        Files.writeString(dir.resolve("sys/js1/device/name"), "Test Pad\n");
+        Files.writeString(dir.resolve("sys/js1/device/capabilities/key"), "7cdb000000000000 0 0 0 0\n");
+        List<Gamepad> pads = IntStream.range(0, Gamepads.SLOTS).mapToObj(Gamepad::new).toList();
+        LinuxJoysticks joysticks = LinuxJoysticks.open(pads, dir, dir.resolve("sys"), 20);
+        try (OutputStream out = Files.newOutputStream(dir.resolve("js1"))) {
+            out.write(LinuxJoysticks.event(BUTTON, 0, 1));
+            out.flush();
+            Gamepad pad = pads.getFirst();
+            waitFor(() -> {
+                pad.poll();
+                return pad.isDown(Gamepad.Button.A);
+            });
+            assertEquals("Test Pad", pad.name());
+            pads.get(1).poll();
+            assertFalse(pads.get(1).connected());
+        } finally {
+            joysticks.close();
+        }
+    }
+
     /** A named pipe in place of /dev/input/js0: the whole way from the bytes to the pad's buttons. */
     @Test
     void aPadIsFoundReadAndLetGoWhenUnplugged() throws Exception {

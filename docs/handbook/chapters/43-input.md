@@ -94,7 +94,7 @@ A position outside the picture, on a black bar, lies outside 0 … logical size;
 
 **How it works.** Java has no gamepads of its own, so `Gamepads.open()` picks a small backend for the operating system:
 
-- **Linux**: the kernel's joystick devices `/dev/input/js0` and on. Each is a file that delivers eight bytes per event; a thread per pad waits for them, and another looks for new pads every second ([chapter 26](26-blast.md#linux-reading-a-device-file)).
+- **Linux**: the kernel's joystick devices `/dev/input/js0` and on. Each is a file that delivers eight bytes per event; a thread per pad waits for them, and another looks for new pads every second ([chapter 26](26-blast.md#linux-reading-a-device-file)) Not every joystick device is a pad: laptop accelerometers, the tablet mouse of a virtual machine and some keyboards get one too. Before a device takes a slot, its key and property bitmaps in `/sys/class/input/jsN/device` are read; a device without pad buttons, or with mouse buttons, touch or the accelerometer property, is skipped and logged once ([chapter 26](26-blast.md#devices-that-are-no-gamepads)).
 - **Windows**: XInput, the gamepad interface of Windows, a C library called through the Foreign Function and Memory API (`java.lang.foreign`), without JNI and without a native library of our own. It is asked for all four slots in each poll; an empty slot only once a second, because asking it is slow ([chapter 26](26-blast.md#windows-calling-xinput)).
 
 Between the backend's thread and the loop, `Gamepad.poll()` takes over the state, as the keyboard does. The stick has a round **dead zone**: no stick rests exactly in the middle, and a pad lying on the table would otherwise walk the player slowly to the left. Pushed past half its way, the stick also counts as the d-pad, so a game that only asks for `UP` and the like works with either.
@@ -105,6 +105,9 @@ Between the backend's thread and the loop, `Gamepad.poll()` takes over the state
 
 !!! warning "Pitfall: native access"
     Calling C is a restricted operation in Java. Start a game that opens gamepads with `--enable-native-access=ALL-UNNAMED`, in its tests, its `run` task and its packaged launcher, and put `Enable-Native-Access: ALL-UNNAMED` in its jar's manifest, or Java prints a warning on Windows.
+
+!!! warning "Pitfall: the keyboard must always work"
+    A pad the player does not even know about must never lock them out. Let keys and pads join the same way, and give every screen that waits for a pad, such as "Gamepad 2 is not connected", a way out with the keyboard. Blast leaves such a match with Esc.
 
 !!! tip "Tip: pads in tests"
     `Gamepads.none()` gives four empty slots without a backend. A test connects a pad with `pad.connect("Test pad")`, presses buttons with `pad.report(Gamepad.bits(Button.A), 0, 0)`, and polls, as a backend would.

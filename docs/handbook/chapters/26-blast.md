@@ -124,6 +124,22 @@ The numbers of the buttons and axes come from the driver. For Xbox pads and the 
 
 Reading a device needs permission. On a desktop the user at the screen usually has it; where they do not, the pad is logged once as "no permission" and not tried again.
 
+#### Devices that are no gamepads
+
+The kernel makes a joystick device for everything that has axes and a few buttons, not only for pads. A laptop's accelerometer gets one, and so does the tablet that QEMU and VirtualBox use as the mouse of a virtual machine: its axes are the mouse pointer, its first button is the left mouse button. Taken for a pad, it fills slot 1, and every click into the window "presses A", so the phantom pad joins the game before the keyboard can.
+
+What a device can do is in `/sys/class/input/js0/device`: `capabilities/key` is a bitmap of its keys and buttons, `properties` one of its properties, both written by the kernel as hex words, the highest first. A pad has buttons in the range of joysticks and gamepads, `BTN_JOYSTICK` (0x120) to `BTN_THUMBR` (0x13e); a mouse has `BTN_LEFT` (0x110), a touchpad `BTN_TOUCH`, an accelerometer the property `INPUT_PROP_ACCELEROMETER`. The scanner asks before it gives a device a slot, and skips the others with one line in the log:
+
+```java title="amade-game-engine · input/LinuxJoysticks.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/input/LinuxJoysticks.java:is-gamepad"
+```
+
+```java title="amade-game-engine · test/input/LinuxJoysticksTest.java"
+--8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/input/LinuxJoysticksTest.java:test-is-gamepad"
+```
+
+Should a pad still vanish in the middle of a match, the pause screen waits for it, and Esc leaves the match for the lobby, where the keyboard players can start again without it.
+
 ### Windows: calling XInput
 
 Windows has no device files for pads. It has a library, XInput, with a C function that fills a small structure with the state of one pad:
