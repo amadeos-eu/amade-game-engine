@@ -33,6 +33,12 @@ import java.util.stream.Stream;
  * common, and the table below follows them: buttons 0 to 7 are A, B, X, Y, LB, RB, Back and Start, axes 0
  * and 1 the left stick, axes 6 and 7 the d-pad. Simple pads deliver their d-pad as axes 0 and 1, which the
  * stick's d-pad of {@link Gamepad} turns into directions too.
+ *
+ * <p>Not every joystick device is a gamepad. The kernel also makes one for laptop accelerometers, for the
+ * absolute mouse of a virtual machine (the tablet of QEMU and VirtualBox) and for some keyboards and mice
+ * with extra keys. Such a device would take a slot and, worse, "press" buttons when the mouse is clicked or
+ * the laptop tilted. So before a device gets a slot, {@link #isGamepad} looks at what its driver says it can
+ * do, and a device that is no gamepad is skipped.
  */
 final class LinuxJoysticks implements Gamepads.Backend {
     static final Path DEVICES = Path.of("/dev/input");
@@ -101,6 +107,11 @@ final class LinuxJoysticks implements Gamepads.Backend {
         synchronized (this) {
             for (Path device : found) {
                 if (open.containsKey(device) || refused.contains(device)) continue;
+                if (!isGamepad(device)) {
+                    log.info("Not a gamepad, skipped: {} ({})", name(device), device);
+                    refused.add(device);
+                    continue;
+                }
                 Gamepad pad = pads.stream().filter(p -> !open.containsValue(p)).findFirst().orElse(null);
                 if (pad == null) return;
                 open.put(device, pad);
@@ -145,6 +156,57 @@ final class LinuxJoysticks implements Gamepads.Backend {
             return "Gamepad";
         }
     }
+
+    /** Buttons from {@code BTN_JOYSTICK} (0x120) to {@code BTN_THUMBR} (0x13e): joysticks and gamepads. */
+    static final int FIRST_PAD_BUTTON = 0x120;
+    static final int LAST_PAD_BUTTON = 0x13e;
+    /** {@code BTN_LEFT}, the left mouse button: a mouse, or the tablet of a virtual machine. */
+    static final int MOUSE_BUTTON = 0x110;
+    /** {@code BTN_TOUCH}: a touchpad, a touch screen or a graphics tablet. */
+    static final int TOUCH = 0x14a;
+    /** {@code INPUT_PROP_ACCELEROMETER}: the device measures how the computer is held. */
+    static final int ACCELEROMETER = 0x06;
+    /** The kernel writes its bitmaps as {@code long}s: 64 bits on a 64-bit system. */
+    private static final int WORD_BITS = System.getProperty("os.arch", "").contains("64") ? 64 : 32;
+
+    /**
+     * Whether the device behind {@code js0} is a gamepad, from the bitmaps of its keys and properties in
+     * {@code /sys/class/input/js0/device/capabilities/key} and {@code .../device/properties}. If they cannot
+     * be read, it counts as one.
+     */
+    private boolean isGamepad(Path device) {
+        Path input = sys.resolve(device.getFileName().toString()).resolve("device");
+        try {
+            String keys = Files.readString(input.resolve("capabilities/key"));
+            Path props = input.resolve("properties");
+            return isGamepad(keys, Files.exists(props) ? Files.readString(props) : "0", WORD_BITS);
+        } catch (IOException | NumberFormatException e) {
+            return true;
+        }
+    }
+
+    // --8<-- [start:is-gamepad]
+    /** A gamepad has pad buttons, neither mouse buttons nor touch, and is no accelerometer. */
+    static boolean isGamepad(String keys, String properties, int wordBits) {
+        if (bit(properties, ACCELEROMETER, wordBits)) return false;
+        if (bit(keys, MOUSE_BUTTON, wordBits) || bit(keys, TOUCH, wordBits)) return false;
+        for (int button = FIRST_PAD_BUTTON; button <= LAST_PAD_BUTTON; button++) {
+            if (bit(keys, button, wordBits)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * One bit of a bitmap as the kernel writes it to sysfs: words in hex, separated by spaces, the highest
+     * first, and without the zero words in front.
+     */
+    static boolean bit(String bitmap, int bit, int wordBits) {
+        String[] words = bitmap.strip().split("\\s+");
+        int word = words.length - 1 - bit / wordBits;
+        if (word < 0) return false;
+        return (Long.parseUnsignedLong(words[word], 16) >>> (bit % wordBits) & 1) == 1;
+    }
+    // --8<-- [end:is-gamepad]
 
     /**
      * The state of one pad, from its events: which buttons are held, where the axes are. No thread and no
