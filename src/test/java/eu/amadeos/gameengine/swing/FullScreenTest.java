@@ -17,6 +17,7 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -69,10 +70,11 @@ class FullScreenTest {
     @Test
     void losingTheFocusWhileSwitchingDoesNotCount() throws Exception {
         onEdt(() -> {
-            frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_DEACTIVATED));
+            deactivations = 0;
+            loseTheFocus();
             assertEquals(1, deactivations, "another program took the focus: the game pauses");
             fullScreen.enter();
-            frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_DEACTIVATED));
+            loseTheFocus();
             assertEquals(1, deactivations, "the switch itself took it for a moment: nothing yet");
         });
     }
@@ -121,6 +123,16 @@ class FullScreenTest {
             assertEquals(1, items.size());
             assertEquals("New", items.get(0).getText());
         });
+    }
+
+    /**
+     * Tells the window's listeners that it lost the focus. frame.dispatchEvent would not do: the focus
+     * manager drops a WINDOW_DEACTIVATED for a window that is not the active one, and on a desktop where
+     * the terminal keeps the focus the test window never becomes active.
+     */
+    private void loseTheFocus() {
+        WindowEvent lost = new WindowEvent(frame, WindowEvent.WINDOW_DEACTIVATED);
+        for (WindowListener listener : frame.getWindowListeners()) listener.windowDeactivated(lost);
     }
 
     /** Lets the events the switch posted (window closed, focus) be handled. */
