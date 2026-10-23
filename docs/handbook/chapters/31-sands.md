@@ -483,6 +483,13 @@ The battlefield is drawn in layers, ground first, the fog over everything that m
 
 The first benchmark of the finished game said 17 to 22 milliseconds a frame at 1920 × 1200, without a graphics card: too slow. The profiler (Java Flight Recorder, `-XX:StartFlightRecording`) said where: 70 % of each frame went into the **panel**, not the battlefield. Its background, its tabs, buttons and build cells were filled with gradients in every frame, and a gradient is drawn pixel by pixel in software. None of it changes from one frame to the next. Drawn once into sprites, `faces`, and copied after that, the frame took 11 to 14 milliseconds. The lesson of chapter 21 again, and the reason the appendix starts with it: measure first, and then look at what you would not have suspected.
 
+On a wide screen the canvas widens, as in [Towers](30-towers.md#a-wider-screen-a-wider-view), up to 1024 units, and the battlefield gets all of the extra width. The panel is laid out for 640 and stays as it is: it is drawn moved to the right edge (`g.translate(width - 640, 0)`), and the mouse is moved back by as much before the panel's buttons, cells and minimap are asked whether they were clicked. Not one of its rectangles needed to change:
+
+??? example "Test: the panel at the right edge"
+    ```java title="amade-sands-game · test/ui/game/SandsGameTest.java"
+    --8<-- "amade-sands-game/src/test/java/eu/amadeos/games/sands/ui/game/SandsGameTest.java:test-wide"
+    ```
+
 ## Step 11: Everything else
 
 - **Events.** The rules say what happened in a step as a list of records, as since chapter 26: fired, hit, burst, destroyed, collapsed, ready, placed, deployed, under attack, the burrower rose, the burrower ate. `Effects` turns them into explosions, smoke, wrecks and sounds, but only where the player sees them, or for the player's own side: the player must not hear a battle in the fog.

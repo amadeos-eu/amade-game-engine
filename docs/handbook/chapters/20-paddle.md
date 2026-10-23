@@ -145,7 +145,14 @@ Three things in these lines need a word.
     --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/swing/FullScreen.java:mirror"
     ```
 
-Switching also takes the focus away for a moment, so a running match pauses, as it does whenever the window loses the focus.
+!!! warning "Pitfall: the match pauses on F11"
+    Paddle pauses a match when the window loses the focus, so that a player who switches to another program does not lose a point meanwhile. `dispose()` takes the focus away too, and for a while every press of F11 paused the match. `FullScreen` notes when a switch began; a window that loses the focus in the second after it counts as left only if it has not got the focus back by then. The game pauses with `fullScreen.whenDeactivated(...)` instead of a `windowDeactivated` listener of its own:
+
+    ```java title="amade-game-engine · swing/FullScreen.java"
+    --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/swing/FullScreen.java:deactivated"
+    ```
+
+**Black bars.** The court is 640 × 400, 16:10. A 16:10 screen shows it without bars; a 16:9 screen of 1920 × 1080 shows it 2.7 times as large, 1728 pixels wide, with black bars of 96 pixels on the left and right. That is right for Paddle and the other games on a fixed field: a wider court would change the game. Games whose world is larger than the screen fill the whole width instead and show more of the map ([chapter 30](30-towers.md#a-wider-screen-a-wider-view)).
 
 ## Step 3: The rules of the ball
 

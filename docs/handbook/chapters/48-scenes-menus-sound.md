@@ -57,7 +57,7 @@ Every item has a component name (`game-new`, `game-full-screen`, …), so tests 
 
 **When to choose it.** For commands given on the map. A Swing popup cannot do it: the canvas covers Swing's lightweight popups, a heavyweight one is a window of its own over a game in full screen, and neither looks like the game. Settings and everything else outside the play stay in the Swing menu bar.
 
-**How it works.** The menu is arithmetic first: where it lies, which row is under the mouse, what a click or a key chooses. `open(title, items, anchorX, anchorY, anchorWidth, anchorHeight)` places it to the right of the anchor, vertically centred, to its left when there is no room, and inside the bounds given to the constructor, the part of the screen it may cover. The game hands it the mouse and the keys in its update step, so the menu needs no listeners and its tests no screen:
+**How it works.** The menu is arithmetic first: where it lies, which row is under the mouse, what a click or a key chooses. `open(title, items, anchorX, anchorY, anchorWidth, anchorHeight)` places it to the right of the anchor, vertically centred, to its left when there is no room, and inside the bounds given to the constructor, the part of the screen it may cover; `setBounds` changes them when the screen widens. The game hands it the mouse and the keys in its update step, so the menu needs no listeners and its tests no screen:
 
 | Method | What it does |
 |---|---|
