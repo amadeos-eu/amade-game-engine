@@ -508,4 +508,4 @@ What stays in the game: the tiles and their classes, the levels, the player, bee
 
 ---
 
-Jump ends Part II. In **Part III**, the camera looks down on a map instead of from the side, and the player commands many units with the mouse instead of steering one: first **Towers**, a tower defence, then **Sands**, a real-time strategy game.
+In the last game of Part II, the player no longer runs and jumps but flies: **Hover Cab**, a cab in the air between rooftops, with jets against gravity, landings that have to be gentle, and passengers who talk.

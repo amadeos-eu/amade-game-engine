@@ -1,6 +1,6 @@
 # 48. Scenes, Menus and Sound
 
-What surrounds the rules: the screens a game shows one after another, the menus every game has, the high-score dialogs, menus drawn into the picture of the game, and sound. These parts make a set of rules feel like a finished game, and they are the same in every game, which is why they are in the engine.
+What surrounds the rules: the screens a game shows one after another, the menus every game has, the high-score dialogs, menus drawn into the picture of the game, sound, and voices that speak. These parts make a set of rules feel like a finished game, and they are the same in every game, which is why they are in the engine.
 
 ## Screens: Scene and SceneStack
 
@@ -122,3 +122,33 @@ A melody written as text in the *Music Macro Language* of the home computers of 
 
 !!! info "Behind the scenes: a hiss nobody hears"
     The mixer adds a hiss of one or two steps out of 32,768 to every block, far below hearing, so the line never carries pure silence. Some wireless headsets switch off after a few seconds of zeros and take longer to wake up again than a game can wait: the first sounds of a round would be lost ([appendix](appendix-java2d.md#sound)).
+
+## Speech: Speech and Phoneme
+
+*Package `audio` · introduced in [28. Hover Cab](28-hover-cab.md#step-6-passengers-who-talk) · source: [`Speech`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/audio/Speech.java), [`Phoneme`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/audio/Phoneme.java)*
+
+**What it is for.** Characters who talk, without recordings: "Hey, cab!", "Pad 3, please!", in any language and in a voice per character. `Speech.say(voice, phrase)` returns a `Sound` to play with the `Mixer`.
+
+**When to choose it.** For short calls and announcements where a voice adds life and recordings would be too many (characters × phrases × languages) or not wanted. It sounds like the talking machines of the early 1980s, which is its charm; for long dialogue, recordings are better.
+
+**How it works.** A **formant synthesizer**: a model of the voice as a source and a filter. The source is the vocal folds, puffs of air at the voice's pitch, plus hiss for an *s* and breath for an *h*; the filter is the mouth, five resonators (Dennis Klatt's two-pole filters of 1980) tuned to the **formants**, the frequencies at which the mouth rings. Each `Phoneme` says where its formants are and how the voice makes it; between phonemes the formants glide through anchors, as a tongue moves, and the sources fade instead of switching. The pitch follows a tune: it sinks over the phrase, rises on stressed vowels, starts high in a call (`!`) and rises at the end of a question (`?`) ([chapter 28](28-hover-cab.md#a-phrase)).
+
+```java title="amade-game-engine · audio/Speech.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/audio/Speech.java:voice"
+```
+
+A phrase is written in the **ARPAbet**, phonemes separated by spaces: `hh ey1 , k ae1 b !`. A `1` stresses a vowel, `,` and `.` are short and long pauses, `/` separates words only for the eye. An unknown phoneme is an error that names it. The sounds were made for English but give a good accent in other languages; keep the phonemes next to the words in the message files, so translators write both.
+
+Speaking a phrase of a second takes 10 to 20 ms, more than a step of the game. Make the phrases ahead, at the start or on a thread of their own, and keep them ([chapter 28](28-hover-cab.md#speaking-ahead)).
+
+| Method | What it does |
+|---|---|
+| `Speech.say(voice, phrase)`, `say(voice, phrase, volume)` | The phrase as a `Sound`, its loudest moment at `volume` |
+| `Voice.MAN`, `WOMAN`, `CHILD`, `OLD_MAN`, `ROBOT` | Voices: pitch in Hz, a factor on the formants (the size of the mouth), pace, breath |
+| `voice.withPitch(hz)` | The same voice higher or lower, to tell two characters apart |
+| `Phoneme.named("ae")` | A phoneme by its ARPAbet name |
+
+??? example "Test: vowels by their formants, voices by their pitch"
+    ```java title="amade-game-engine · test/audio/SpeechTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/audio/SpeechTest.java:test-speech"
+    ```
