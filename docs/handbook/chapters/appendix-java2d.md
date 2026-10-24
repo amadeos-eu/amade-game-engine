@@ -34,6 +34,8 @@ Every rule below is a rule of thumb. Your computer, your graphics driver and you
 
 **Buffers in video memory can be lost.** A `BufferStrategy`'s buffers and a `VolatileImage` live in video memory where there is one, and lose their contents when the system needs that memory (another program, a mode switch, a suspended laptop). Check them with the documented loops: `contentsRestored()` and `contentsLost()` for the strategy, `validate()` and `contentsLost()` for a volatile image, and draw again.
 
+**Copy the buffers, don't flip them.** `createBufferStrategy(2)` flips the buffers where it can, on X11 with the double-buffer extension (XDBE). In full screen on the amadeOS desktop, a flipped picture with text more than about a hundred pixels high stays black. Ask for copied buffers with `BufferCapabilities` whose flip contents are `null`; in a test they were no slower ([chapter 20](20-paddle.md#full-screen)).
+
 **`Toolkit.getDefaultToolkit().sync()` after every frame.** X11 collects drawing commands and sends them in batches. Without `sync()`, frames can arrive in bursts and the game stutters although every frame was drawn in time.
 
 ## Pipelines
