@@ -80,7 +80,7 @@ The loop runs on its own thread named `game-loop`. Each round runs the waiting c
 
 ## Step 2: Drawing actively
 
-Swing paints when *it* decides: `repaint()` only asks for a paint, and the event thread does it later. A game needs the opposite: draw *now*, from the loop thread, every frame. That is **active rendering**, and it needs a `java.awt.Canvas` with a `BufferStrategy`: two images in video memory, one shown while the other is drawn, then swapped.
+Swing paints when *it* decides: `repaint()` only asks for a paint, and the event thread does it later. A game needs the opposite: draw *now*, from the loop thread, every frame. That is **active rendering**, and it needs a `java.awt.Canvas` with a `BufferStrategy`: two buffers in video memory, the one on the screen and a hidden one where the next frame is drawn and that is then shown at once.
 
 ```java title="amade-game-engine · swing/GameCanvas.java"
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/swing/GameCanvas.java:render"
@@ -131,9 +131,16 @@ Three things in these lines need a word.
 
 **No frame, no menu bar.** A full-screen game should show the court and nothing else. A `JFrame` can only lose its title bar and border (`setUndecorated(true)`) while it has no native window, so the switch calls `dispose()` first and shows the window again afterwards. The menu bar is hidden too.
 
-**The screen keeps its resolution.** `GraphicsDevice` can also change the screen's resolution (`setDisplayMode`), which was the classic trick to make old PCs fast: fewer pixels, less to draw. Today it makes monitors flicker and go black for a second, rearranges the windows on the desktop, and on Linux often is not supported at all. The canvas scales anyway, so `FullScreen` never changes the mode. `setFullScreenWindow` is still worth calling instead of only covering the screen with a large window: it tells the window manager that this is a full-screen window, so the desktop's compositor can hand the screen straight to the game, and on Windows the buffers are then flipped instead of copied. Where full screen is not supported, the window simply covers the monitor.
+**The screen keeps its resolution.** `GraphicsDevice` can also change the screen's resolution (`setDisplayMode`), which was the classic trick to make old PCs fast: fewer pixels, less to draw. Today it makes monitors flicker and go black for a second, rearranges the windows on the desktop, and on Linux often is not supported at all. The canvas scales anyway, so `FullScreen` never changes the mode. `setFullScreenWindow` is still worth calling instead of only covering the screen with a large window: it tells the window manager that this is a full-screen window, so the desktop's compositor can hand the screen straight to the game. Where full screen is not supported, the window simply covers the monitor.
 
 **The canvas gets a new native window.** `dispose()` takes away the canvas's native window and its buffers while the game loop may be drawing on them on its own thread. `withoutFrames` in `GameCanvas` makes the switch and the drawing of a frame wait for each other: both hold the same lock. After the switch, the next frame finds no buffers and creates new ones, exactly as at the start.
+
+!!! warning "Pitfall: a black screen in full screen"
+    A `BufferStrategy` can show its hidden buffer in two ways: by *flipping*, where the two buffers trade places, or by *copying* (a blit) the hidden one onto the screen. Asked with `createBufferStrategy(2)`, Java picks flipping where it can, on X11 with the double-buffer extension XDBE. In a window that works. In full screen on the amadeOS desktop, the picture stays black as soon as a frame has text more than about a hundred pixels high, such as Paddle's title on a screen of 1920 × 1080, while the game goes on drawing its frames. It takes three things together: a window manager that puts the window in a frame of its own (as amadeOS's does, while Xvfb without one showed the picture), a window without a title bar, and flipped buffers. The canvas therefore asks for buffers that are copied, which in a test was no slower than flipping:
+
+    ```java title="amade-game-engine · swing/GameCanvas.java"
+    --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/swing/GameCanvas.java:blit"
+    ```
 
 !!! warning "Pitfall: the game ends on F11"
     `dispose()` sends `windowClosed`, and Paddle used to end the program on `windowClosed`. The first test of F11 closed the game. `FullScreen` counts its own `dispose()` calls and passes on only the real closing: `window.whenClosed(...)` replaces the window listener in `AmadePaddleApplication`.

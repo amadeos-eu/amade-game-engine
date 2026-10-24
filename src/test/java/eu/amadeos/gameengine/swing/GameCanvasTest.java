@@ -18,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
@@ -125,6 +126,8 @@ class GameCanvasTest {
             assertEquals(Color.GREEN.getRGB(), shot.getRGB(170, 60), mode + " overlay");
         }
         assertTrue(canvas.frameTimes().framesPerSecond() > 0);
+        // Copied, not flipped: flipped buffers stayed black in full screen on the amadeOS desktop.
+        assertFalse(canvas.getBufferStrategy().getCapabilities().isPageFlipping(), "buffers are copied");
     }
 
     private static void onEdt(Runnable code) throws Exception {

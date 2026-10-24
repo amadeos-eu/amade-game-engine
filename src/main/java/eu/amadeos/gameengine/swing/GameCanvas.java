@@ -3,12 +3,15 @@ package eu.amadeos.gameengine.swing;
 import eu.amadeos.gameengine.loop.FrameTimes;
 
 import javax.swing.SwingUtilities;
+import java.awt.AWTException;
+import java.awt.BufferCapabilities;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
+import java.awt.ImageCapabilities;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
@@ -30,8 +33,8 @@ import java.util.Locale;
  * frame and lays out its view and panels from it.
  *
  * <p>Drawing is <i>active</i>: the game loop calls {@link #render(double)} whenever it wants a frame, and
- * the canvas draws into a hidden buffer and shows it at once ({@link BufferStrategy}). Swing's repaint
- * mechanism is not involved, so nothing waits for the event thread.
+ * the canvas draws into a hidden buffer and shows it at once by copying it onto the screen
+ * ({@link BufferStrategy}). Swing's repaint mechanism is not involved, so nothing waits for the event thread.
  *
  * <p>A frame has two layers: the game's world (playing field, sprites, particles) and an overlay on top of
  * it (score, texts). How the world reaches the screen is the {@link RenderMode}; the overlay is always drawn
@@ -54,6 +57,16 @@ public final class GameCanvas extends Canvas {
     private static final Color FRAME_TIMES_BACKGROUND = new Color(0, 0, 0, 180);
     private static final Color IN_TIME = new Color(0x7CFC00);
     private static final Color LATE = new Color(0xFF5050);
+    // --8<-- [start:blit]
+    /**
+     * Two buffers that are shown by copying the hidden one onto the screen (a {@code null} flip), not by
+     * flipping them. On X11 a flip is a swap of the double-buffer extension (XDBE); under the amadeOS window
+     * manager, a full-screen window's flipped picture stays black as soon as a frame has text more than about
+     * a hundred pixels high, such as a title on a large screen.
+     */
+    private static final BufferCapabilities BLIT = new BufferCapabilities(
+            new ImageCapabilities(true), new ImageCapabilities(true), null);
+    // --8<-- [end:blit]
 
     /** The narrowest logical width: the one the canvas was made with. */
     private final int minLogicalWidth;
@@ -229,7 +242,7 @@ public final class GameCanvas extends Canvas {
             if (!isDisplayable() || getWidth() <= 0 || getHeight() <= 0) return;
             BufferStrategy buffers = getBufferStrategy();
             if (buffers == null) {
-                createBufferStrategy(2);
+                createBuffers();
                 return;
             }
             long start = System.nanoTime();
@@ -252,6 +265,14 @@ public final class GameCanvas extends Canvas {
         }
     }
     // --8<-- [end:render]
+
+    private void createBuffers() {
+        try {
+            createBufferStrategy(2, BLIT);
+        } catch (AWTException e) {
+            createBufferStrategy(2);
+        }
+    }
 
     /** The logical width for the canvas's present size, in the screen's own pixels. */
     private int currentWidth() {
