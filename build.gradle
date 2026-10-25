@@ -6,7 +6,12 @@ plugins {
 // JitPack publishes under com.github.<owner>; using the same coordinates locally lets a game's
 // composite build (includeBuild '../amade-game-engine') replace the JitPack dependency automatically.
 group = 'com.github.datazuul'
-version = '0.1.0'
+// CI computes the version from the Conventional Commits since the last release tag and passes it as
+// -PappVersion (datazuul/amadeos-ci scripts/next-version.sh); a build without it is a local development build.
+// Games take released versions from JitPack by tag (com.github.datazuul:amade-game-engine:v1.0.0).
+version = findProperty('appVersion') ?: '0.0.0-dev.0'
+// Debian sorts 1.1.0~dev.0 before 1.1.0 (with - it would sort after it).
+def debVersion = project.version.toString().replace('-', '~')
 
 java {
     toolchain {
@@ -80,7 +85,7 @@ publishing {
 tasks.register('handbookDeb', Exec) {
     description = 'Builds the Debian package amade-game-handbook (the handbook for reading offline)'
     group = 'distribution'
-    commandLine 'docs/handbook/package-deb.sh', project.version, layout.buildDirectory.dir('distributions').get().asFile.absolutePath
+    commandLine 'docs/handbook/package-deb.sh', debVersion, layout.buildDirectory.dir('distributions').get().asFile.absolutePath
 }
 
 tasks.register('installToAmadeOs') {
@@ -91,7 +96,7 @@ tasks.register('installToAmadeOs') {
     doLast {
         def targetDir = file('../amadeos/config/packages.chroot')
         targetDir.mkdirs()
-        def debFile = new File(layout.buildDirectory.get().asFile, "distributions/amade-game-handbook_${project.version}_all.deb")
+        def debFile = new File(layout.buildDirectory.get().asFile, "distributions/amade-game-handbook_${debVersion}_all.deb")
         copy {
             from debFile
             into targetDir

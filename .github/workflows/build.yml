@@ -1,8 +1,10 @@
 name: Build
 
+# develop builds X.Y.Z-dev.N, release X.Y.Z-pre.N and main the release X.Y.Z, which the release job
+# tags; JitPack builds the tag for the games (see CONTRIBUTING.md of datazuul/amadeos, "Commits and versions").
 on:
   push:
-    branches: [main]
+    branches: [develop, release, main]
   pull_request:
 
 permissions:
@@ -11,8 +13,16 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      channel: ${{ steps.version.outputs.channel }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          # The version is computed from the history since the last release tag.
+          fetch-depth: 0
+      - id: version
+        uses: datazuul/amadeos-ci/version@main
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
@@ -22,7 +32,7 @@ jobs:
           # Plain actions/cache instead of the proprietary enhanced cache that is the v6 default.
           cache-provider: basic
       - name: Test
-        run: xvfb-run --auto-servernum ./gradlew test build --no-daemon
+        run: xvfb-run --auto-servernum ./gradlew test build --no-daemon -PappVersion=${{ steps.version.outputs.version }}
       - name: Check that the tests ran
         run: |
           count=$(grep -ho 'tests="[0-9]*"' build/test-results/test/*.xml | grep -o '[0-9]*' | paste -sd+ | bc)
@@ -36,3 +46,27 @@ jobs:
         with:
           name: test-reports
           path: build/reports/tests/test
+
+  # Only on main, after the release branch was promoted: tag vX.Y.Z and publish the GitHub Release.
+  release:
+    needs: test
+    if: needs.test.outputs.channel == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: datazuul/amadeos-ci/release@main
+        with:
+          version: ${{ needs.test.outputs.version }}
+
+  commits:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: datazuul/amadeos-ci/check-commits@main
