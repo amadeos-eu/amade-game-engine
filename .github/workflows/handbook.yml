@@ -32,6 +32,7 @@ env:
   SANDS_COMMIT: 6eb8b5283889205ea62409a94eb5598fe007be61
   COLONY_COMMIT: 0d6e30a658d1975787eced7fac108fffb7f2e561
   TOWN_COMMIT: afb431f2adf56ea3a4c88b29390327260e49832b
+  TEMPLAR_COMMIT: 9f0a078690332cbe2be0db194d40fdecf2a173a3
 
 jobs:
   build:
@@ -115,6 +116,11 @@ jobs:
           repository: datazuul/amade-town-game
           ref: ${{ env.TOWN_COMMIT }}
           path: amade-town-game
+      - uses: actions/checkout@v7
+        with:
+          repository: datazuul/amade-templar-game
+          ref: ${{ env.TEMPLAR_COMMIT }}
+          path: amade-templar-game
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'

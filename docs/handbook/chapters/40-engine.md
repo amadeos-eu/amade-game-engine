@@ -134,6 +134,7 @@ The order in which the engine grew, and where each part is explained step by ste
 | [31](31-sands.md#what-moved-into-the-engine) | Sands | `select`, `path` (`Formation`, `FieldCache`), `fog`, `minimap`, `economy`, `ai.InfluenceMap`, `save.Snapshot` |
 | [32](32-colony.md#what-moved-into-the-engine) | Colony | `road.RoadNetwork`, `economy` (`Stock`, `Recipe`), `time.Seasons`, `tile.Territory`, `motion.Wander` |
 | [33](33-town.md#what-moved-into-the-engine) | Town | `iso` (`IsoProjection`, `DepthSort`, `DiamondMinimap`), `tile` (`Coverage`, `SupplyGrid`), `sprite.ScrollingLayer`, the wheel of `input.Mouse` |
+| [50](50-templar.md#what-moved-into-the-engine) | The Seal of the Templars | `adventure` (`WalkArea`, `DepthScale`, `Actor`, `Room`, `Hotspot`, `Interaction`, `Inventory`, `Flags`, `Script`, `ScriptRunner`, `SpokenText`, `ReadingTime`) |
 
 Many classes grew later, when another game needed a little more: `Camera` learned the mouse in Towers, `Mouse` the wheel in Town, `Sprite` its opaque caches in Jump and Towers, `SeededRandom` to be saved in Sands. The sections of this part describe each class as it is now.
 

@@ -26,13 +26,14 @@ The handbook grows with the games: a chapter is written when its game is finishe
 | [33. Town](33-town.md) | Town (city builder) | The isometric view and its drawing order, a minimap turned like the view, networks that carry power from plants to loads, services that reach in circles, the mouse wheel, a ground layer painted only where it changed |
 | [40. The Engine at a Glance](40-engine.md) | | Part IV, the engine manual: what each part of the engine is for, when to choose it and how it works |
 | [41. Loop, Time and Drawing](41-loop-and-drawing.md) to [49. Rooms, Scripts and Dialogs](49-adventure.md) | | One chapter per subsystem, each section naming the game that introduced it |
+| [50. The Seal of the Templars](50-templar.md) | The Seal of the Templars (point-and-click adventure) | Painted rooms and walk areas with the shortest way round obstacles, depth, hotspots and layers, an inventory and story flags, scripts for cutscenes and conversations, speech over the speaker's head |
 | [Java2D and X11 Pitfalls](appendix-java2d.md) | | The rules for fast and correct drawing, collected |
 | [Glossary](appendix-glossary.md) | | The words of game programming used in this book, each with the chapter that explains it |
 
 ## What comes next
 
-With Town, Part III has a game of every kind it set out to cover: towers, real-time strategy, an economy and a city.
+With *The Seal of the Templars*, Part V has begun: a story told in painted rooms, written as data and played by the engine's `adventure` package.
 
-Next comes **Part V: Stories**, starting with chapter 50, *The Seal of the Templars*: a point-and-click adventure in painted rooms, with a mystery around a Templar seal and the true history of the order's fall in 1307. What the engine needs for it, rooms, walk areas, an inventory, scripts and conversations, is already described in [chapter 49](49-adventure.md); the chapter will tell how the game is built on it. As always, Part IV, the tables of [chapter 40](40-engine.md) and the [glossary](appendix-glossary.md) get what a game adds.
+Next comes **Act 2** of the same game, in La Rochelle, the Templars' port on the Atlantic. A new act needs few new engine parts; what it adds will be told in chapter 50, and as always in Part IV, the tables of [chapter 40](40-engine.md) and the [glossary](appendix-glossary.md).
 
 Suggestions and corrections are welcome as [issues](https://github.com/datazuul/amade-game-engine/issues) or pull requests. Each page has an edit button at the top.
