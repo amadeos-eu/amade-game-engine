@@ -8,7 +8,7 @@
 #
 # Like the published handbook it includes code from the game repositories, which must be checked
 # out next to amade-game-engine. MkDocs comes from requirements.txt, installed into .venv here if
-# no mkdocs is on the PATH. Prints the path of the package as its last line.
+# no complete mkdocs is on the PATH. Prints the path of the package as its last line.
 set -euo pipefail
 
 version="${1:?version, e.g. 0.1.0}"
@@ -17,7 +17,9 @@ handbook_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 package=amade-game-handbook
 
 mkdocs=mkdocs
-if ! command -v mkdocs >/dev/null 2>&1; then
+# The mkdocs on the PATH only counts when python3 also has the theme and extensions of mkdocs.yml: the
+# plain Debian package mkdocs comes without them.
+if ! command -v mkdocs >/dev/null 2>&1 || ! python3 -c 'import material, pymdownx' 2>/dev/null; then
     if [ ! -x "$handbook_dir/.venv/bin/mkdocs" ]; then
         python3 -m venv "$handbook_dir/.venv"
         "$handbook_dir/.venv/bin/pip" install --quiet -r "$handbook_dir/requirements.txt"
