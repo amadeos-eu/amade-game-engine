@@ -144,8 +144,10 @@ On amadeOS and other Debian systems a game is installed as a Debian package:
 
 ```bash
 ./gradlew deb
-sudo apt install ./build/distributions/amade-mines-game_0.1.0_all.deb
+sudo apt install ./build/distributions/amade-mines-game_0.0.0~dev.0_all.deb
 ```
+
+A build on your own machine has the version `0.0.0-dev.0` (`0.0.0~dev.0` in the package name). CI computes the real version from the commits, and the released packages are on each game's GitHub Releases page; see "Versions and Releases" in the Application Developer's Handbook.
 
 The game then appears in the desktop's menu under *Games*, and `amade-mines-game` starts it from a terminal. `sudo apt remove amade-mines-game` removes it again.
 
