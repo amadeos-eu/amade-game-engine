@@ -14,6 +14,7 @@ Each chapter of this part covers one area. Each section in it describes one feat
 | [46. Paths, Groups and Decisions](46-paths-and-decisions.md) | `path`, `road`, `select`, `ai`, `event` | Finding the way for one or for many, roads between flags, choosing units, states, the computer's view of the map, chain reactions |
 | [47. Chance, Data and Saving](47-data-and-saving.md) | `random`, `replay`, `undo`, `data`, `economy`, `save`, `score` | Repeatable chance, replays, undo, data files, money and production, saving, high scores |
 | [48. Scenes, Menus and Sound](48-scenes-menus-sound.md) | `scene`, `swing`, `menu`, `audio` | Screens of a game, the standard menus and dialogs, menus over the game, sound and music, speech |
+| [49. Rooms, Scripts and Dialogs](49-adventure.md) | `adventure` | Painted rooms and where people walk in them, hotspots, inventory, the story as scripts, conversations |
 
 ## What the engine is, and is not
 
@@ -104,6 +105,13 @@ A few rules hold for nearly every class. Knowing them makes the rest of the manu
 | A menu on the map, beside what it is about | `OverlayMenu` | [48](48-scenes-menus-sound.md#menus-over-the-game-overlaymenu) |
 | Sound effects and music | `Sound`, `Tune`, `Mixer` | [48](48-scenes-menus-sound.md#sound-effects-sound) |
 | Characters who talk, without recordings | `Speech`, `Phoneme` | [48](48-scenes-menus-sound.md#speech-speech-and-phoneme) |
+| A painted floor, and the shortest way round the table | `WalkArea` | [49](49-adventure.md#where-people-walk-walkarea) |
+| People smaller and slower at the back of a room | `DepthScale`, `Actor` | [49](49-adventure.md#smaller-at-the-back-depthscale) |
+| A room as a data file: hotspots, exits, layers in front of people | `Room`, `Hotspot` | [49](49-adventure.md#rooms-room-hotspot-and-layers) |
+| Look, use, talk, leave with two mouse buttons | `Interaction` | [49](49-adventure.md#what-a-click-means-interaction) |
+| What the hero carries, what the story remembers | `Inventory`, `Flags` | [49](49-adventure.md#what-she-carries-what-the-story-remembers-inventory-and-flags) |
+| Cutscenes and conversations written as text | `Script`, `ScriptRunner` | [49](49-adventure.md#the-story-as-a-play-script-and-scriptrunner) |
+| Speech over a character's head | `SpokenText`, `ReadingTime` | [49](49-adventure.md#words-over-the-head-spokentext-and-readingtime) |
 
 ## The packages by chapter
 
