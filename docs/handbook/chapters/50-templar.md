@@ -206,7 +206,7 @@ Adventure games are known for puzzles that cannot be solved: a door that opens o
 --8<-- "amade-templar-game/src/test/java/eu/amadeos/games/templar/domain/PlaythroughTest.java:prologue"
 ```
 
-The test plays on through the workshop, the reading room, the Square du Temple and the Pont Neuf, to the last card of Act 1. Other tests check the dead ends that should be dead ends: the chamber door stays shut until the page is sealed, the street waits until Lefort has read the page, the metro waits until Lena knows where to go. One test checks that Lena's inventory holds only her phone when she wakes up in her workshop, so nothing from 1307 is carried into today.
+The test plays on through the workshop, the reading room, the Square du Temple and the Pont Neuf, to the last card of Act 1, and then through the four scenes of Act 2 to its end screen. Other tests check the dead ends that should be dead ends: the chamber door stays shut until the page is sealed, the street waits until Lefort has read the page, the metro waits until Lena knows where to go. One test checks that Lena's inventory holds only her phone when she wakes up in her workshop, so nothing from 1307 is carried into today.
 
 The test also found mistakes nobody had seen in the pictures. The driver stands in front of the plaque, and the test clicked on the plaque and got the driver's dialog. That was right, people are asked first, and it became part of the puzzle.
 
@@ -219,7 +219,7 @@ A player stuck in an adventure has two choices: try everything with everything, 
 <figcaption>The notebook in the workshop: the goal in blue, the hint in red. A third N closes it.</figcaption>
 </figure>
 
-The notebook knows nothing about puzzles. The scripts set the flag `goal` to a number whenever the story moves on, and the notebook shows `goal.<number>` and `hint.<number>` from the texts. The numbers are grouped by scene: 1 to 9 the prologue, 10 to 13 the workshop, 20 to 23 the reading room, 30 to 33 the square, 40 and 41 the bridge. Because goals are only texts, a writer can make the hints gentler or plainer without touching a line of code.
+The notebook knows nothing about puzzles. The scripts set the flag `goal` to a number whenever the story moves on, and the notebook shows `goal.<number>` and `hint.<number>` from the texts. The numbers are grouped by scene: 1 to 9 the prologue, 10 to 13 the workshop, 20 to 23 the reading room, 30 to 33 the square, 40 and 41 the bridge, 50 to 52 the prison cart, 60 to 63 the harbour, 70 to 75 the café, 80 and 81 the quay. Because goals are only texts, a writer can make the hints gentler or plainer without touching a line of code.
 
 ## Step 7: Everything else
 
@@ -238,6 +238,44 @@ The notebook knows nothing about puzzles. The scripts set the flag `goal` to a n
 **Sound.** A few short sounds, made in code like those of the earlier games: doors, paper, the coffee machine, a coin, wax and seal, the cat, the pigeons, Kev's camera, the alarm at the gate, and a chord when something is discovered. Scripts play them with `sound paper`.
 
 **Room pictures for designing.** `./gradlew shot -Proom=reading/workshop-door -Pargs="out.png 3 1 330 330"` starts the game in a room, waits three seconds and clicks with the left button at (330, 330); `-Plang=de` does it in German. Most of the rooms were designed with this command and an image viewer.
+
+## Step 8: Act 2, La Rochelle
+
+<figure markdown>
+![The prison cart at dawn, 1307](images/templar/cart.jpg){ width="400" }
+![The old harbour of La Rochelle](images/templar/harbour.jpg){ width="400" }
+<figcaption>Aimery in the prison cart, singing to Brother Raoul in Latin under the soldier's nose (left). Lena and Kev at the old harbour, with the two towers, the fisherman and his boat (right).</figcaption>
+</figure>
+
+<figure markdown>
+![The Cour du Temple](images/templar/court.jpg){ width="400" }
+![The quay in fog, 1307](images/templar/quay.jpg){ width="400" }
+<figcaption>The café Le Templier in the Cour du Temple, with its chalkboard and the old relief behind it (left). Brother Raoul on the quay in the fog, with a lantern and the ship that waits for a signal (right).</figcaption>
+</figure>
+
+Act 2 has four scenes, and two of them are flashbacks. The first act ends with Lena on the Pont Neuf. The story then jumps back to the morning of 13 October 1307: Aimery sits in a prison cart in the Rue du Temple, and Brother Raoul, dressed as a carter, stands a few steps away. A soldier walks beside the cart. Aimery must tell Raoul where the page is, but every word in French is heard. In Latin, sung like a psalm, the soldier hears only a prisoner praying. Then Lena and Kev are in La Rochelle. A fisherman at the old harbour knows where the Templars' houses stood, if Lena can read his barometer for him. In the Cour du Temple, Madame Morin's café has a chalkboard written in a code the Templars used, and behind the board an old relief hides a loose stone. Under it lies a lead token from Tomar. The second flashback shows the quay on the night after the arrests: Raoul signals a ship in the fog and gives the page's secret to its captain. Back in the café, the token tells Lena where the ship went. The act ends there: Act 3 is in **Tomar**.
+
+**Another hero, another pocket.** In a flashback the player plays Aimery or Raoul, and Lena's things must not travel to 1307. The cart's `enter` block takes them from the inventory and remembers each in a flag; the harbour gives them back.
+
+``` title="scripts/cart.txt"
+--8<-- "amade-templar-game/src/main/resources/eu/amadeos/games/templar/scripts/cart.txt:handover"
+```
+
+**A counting flag as danger.** Each French word in the cart adds one to `suspicion`. At three the soldier chases Raoul off, but he comes back after a moment, and the psalm starts over. The player loses time, never the game, as in every scene of this story.
+
+``` title="scripts/cart.txt"
+--8<-- "amade-templar-game/src/main/resources/eu/amadeos/games/templar/scripts/cart.txt:suspicion"
+```
+
+**Two things in any order.** The fisherman tells the forecast only when Lena has read the barometer *and* asked him about the Templars. A dialog option takes one condition, so both scripts check the other half and set a third flag, `can-forecast`, which the option asks for. Whichever comes last opens the way.
+
+**Hiding things to show others.** Moving the chalkboard hides the hotspot `chalkboard` and shows `moved-board`; lifting the stone hides `relief` and shows `hollow` and `loose-stone`. The room's `props` are tied to the hotspots, so the picture changes with them, and the notebook's goals move on with `set goal`.
+
+The playthrough test plays the cart scene like this:
+
+``` title="PlaythroughTest.java"
+--8<-- "amade-templar-game/src/test/java/eu/amadeos/games/templar/domain/PlaythroughTest.java:cart"
+```
 
 ## What moved into the engine
 
@@ -265,4 +303,4 @@ What stays in the game: the story, its rooms and scripts, the painters of the ro
 
 ---
 
-*The Seal of the Templars* opens Part V. Act 2 takes the story to **La Rochelle**, the Templars' port on the Atlantic, after the note in the psalter's calendar: "Rupella. Ad navem." To the ship.
+*The Seal of the Templars* opens Part V. Act 3 takes the story to **Tomar** in Portugal, where the Templars lived on as the Order of Christ, after the lead token found in La Rochelle.
