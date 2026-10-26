@@ -488,4 +488,4 @@ What stays in the game: the cab and its shape, the shifts and their reader, pads
 
 ---
 
-Hover Cab ends Part II. In **Part III**, the camera looks down on a map instead of from the side, and the player commands many units with the mouse instead of steering one: first **Towers**, a tower defence, then **Sands**, a real-time strategy game.
+The last game of Part II stays on the side view but lets go of the controls once a shot is fired: **Artillery**, tanks that take turns on hills of breakable ground, with shells under gravity and wind, and a computer that aims by trying shots in its head.

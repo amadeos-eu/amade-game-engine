@@ -164,6 +164,36 @@ A main jet of about twice gravity feels right: the craft rises about as fast as 
     --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/physics/ThrustersTest.java:test-thrusters"
     ```
 
+## Shells in flight: Projectile and Ballistics
+
+*Package `physics` · introduced in [29. Artillery](29-artillery.md#step-3-shells-in-the-air) · source: [`Projectile`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Projectile.java), [`Ballistics`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Ballistics.java)*
+
+**What it is for.** Things that are fired or thrown and then fly on their own: shells, cannonballs, grenades, arrows, a stone from a catapult. A `Projectile` is a position and a velocity; `Ballistics` is the air it flies through, with gravity, wind and drag, and moves it step by step until it hits something.
+
+**When to choose it.** When nothing steers the thing after it has left: no jets, no player input in flight. A thing that walks or jumps on tiles is a [`Body`](#falling-and-standing-body-and-tilecollider); a craft on jets uses [`Thrusters`](#flying-on-jets-thrusters-drag-and-touchdown).
+
+**How it works.** `Projectile.launch(x, y, degrees, speed)` fires at an angle counted as on a protractor, 0 to the right and 90 up. `step(p, seconds, solid)` first changes the velocity by gravity and wind and takes away the drag, then moves with the new velocity. It does not jump to the end of the step: it looks at points along the way, `sample` units apart, and stops the projectile at the first one where the game's `Solid` says there is something. So a fast shell never passes through a thin ridge. What is solid is the game's business: ground, tanks, walls, all at once.
+
+```java title="amade-game-engine · physics/Ballistics.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/physics/Ballistics.java:ballistics"
+```
+
+`fly(start, seconds, maxSeconds, field, solid)` flies a copy to the end: until it hits, leaves the field at a side or below it (above it, it may come back), or the time is up. A flight is nothing but steps of the same size, so a shot tried with `fly` lands exactly where the same shot fired step by step lands. That is what a computer that aims by trying needs ([`ShotSolver`](46-paths-and-decisions.md#aiming-by-trying-shotsolver)).
+
+| Method | What it does |
+|---|---|
+| `Projectile.launch(x, y, degrees, speed)` | A projectile fired at an angle; `x`, `y`, `vx`, `vy` are public fields |
+| `p.x(alpha)`, `p.y(alpha)`, `p.heading()` | Where to draw it between two steps, and which way it points |
+| `new Ballistics(gravity, wind, drag, sample)` | The air: accelerations in units per second per second, the share of speed lost per second, the distance between the points looked at |
+| `withWind(wind)` | The same air with another wind |
+| `step(p, seconds, solid)` | One step; returns the `Hit` or `null` |
+| `fly(start, seconds, maxSeconds, field, solid)` | A whole flight on a copy: `HIT`, `LEFT_THE_FIELD` or `TIME_UP`, where and when |
+
+??? example "Test: a tried shot lands where the fired one lands"
+    ```java title="amade-game-engine · test/physics/BallisticsTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/physics/BallisticsTest.java:test-ballistics"
+    ```
+
 ## Which collision test?
 
 | The things | Use | Because |

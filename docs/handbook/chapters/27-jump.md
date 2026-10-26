@@ -508,4 +508,4 @@ What stays in the game: the tiles and their classes, the levels, the player, bee
 
 ---
 
-In the last game of Part II, the player no longer runs and jumps but flies: **Hover Cab**, a cab in the air between rooftops, with jets against gravity, landings that have to be gentle, and passengers who talk.
+In the next game, the player no longer runs and jumps but flies: **Hover Cab**, a cab in the air between rooftops, with jets against gravity, landings that have to be gentle, and passengers who talk.
