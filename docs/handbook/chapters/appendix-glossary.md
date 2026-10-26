@@ -22,6 +22,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 **Back buffer.** The hidden picture a frame is drawn into before it is shown on the screen, so the player never sees a half-drawn frame. [Paddle](20-paddle.md#step-2-drawing-actively), [appendix](appendix-java2d.md#buffers).
 
+**Ballistics.** How a thing flies once it has been fired or thrown: gravity pulls it down, the wind pushes it sideways, the air slows it. [Artillery](29-artillery.md#step-3-shells-in-the-air), [manual](44-movement.md#shells-in-flight-projectile-and-ballistics).
+
 **Bang-bang control.** Steering with switches that are only on or off: in each step a jet fires if that brings the speed nearer the wanted one. Switched often enough, the pushes average out to just what is needed. [Hover Cab](28-hover-cab.md#which-jets).
 
 **Baseline (layer).** The height where a part of a painted room touches the floor. People whose feet are above it are drawn before it and disappear behind it; the others walk in front. [Manual](49-adventure.md#rooms-room-hotspot-and-layers).
@@ -63,6 +65,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 **Depth scale.** How much smaller, and slower, a person in a painted room becomes towards the back wall, given by the scale at two heights of the picture. [Manual](49-adventure.md#smaller-at-the-back-depthscale).
 
 **Depth sorting.** Drawing the things of a view from back to front, so what stands in front covers what stands behind; also called the painter's algorithm. [Town](33-town.md#step-2-what-covers-what), [manual](45-maps.md#what-covers-what-depthsort).
+
+**Destructible ground.** Ground made of small cells that shots can blast away or heap up anywhere, and that falls when its support is gone. [Artillery](29-artillery.md#step-1-ground-that-breaks), [manual](45-maps.md#ground-that-breaks-ground-and-landscape).
 
 **Determinism.** The same seed and the same input give the same game, step by step, on every computer. Replays, tests of whole games and loaded saves depend on it. [Snake](22-snake.md#step-4-chance-that-repeats), [manual](40-engine.md#ideas-that-run-through-the-engine).
 
@@ -143,6 +147,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 ## M
 
 **Managed image.** An image that Java2D keeps a copy of in video memory, so it is copied fast. Touching its pixel array directly ends that for good. [Appendix](appendix-java2d.md#drawing).
+
+**Midpoint displacement.** A way to make natural-looking hills: put a point between two heights at their average, moved up or down at random, and do the same for each half with smaller moves. [Artillery](29-artillery.md#step-2-a-landscape), [manual](45-maps.md#ground-that-breaks-ground-and-landscape).
 
 **Minimap.** The whole map, small, in a corner of the screen, with a box for what the camera shows. A click on it moves the camera. [Sands](31-sands.md#step-4-the-minimap), [manual](45-maps.md#the-map-in-a-corner-minimap).
 
@@ -237,6 +243,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 **Tint.** A colour multiplied into a picture, so people drawn in daylight colours take on the light of a candlelit or moonlit room. [Templars](50-templar.md#drawn-once-kept).
 
 **Touchdown.** The moment a craft comes down on a landing place, graded by its speed as soft, hard or a crash. [Hover Cab](28-hover-cab.md#step-2-touching-down), [manual](44-movement.md#flying-on-jets-thrusters-drag-and-touchdown).
+
+**Turn order.** Who plays now and who next, in a game played in turns, skipping the players who are out; the round is decided when one is left. [Artillery](29-artillery.md#whose-turn), [manual](46-paths-and-decisions.md#whose-turn-turnorder).
 
 **Tween.** One movement from one value to another in a given time, with an easing. [Solitaire](11-solitaire.md#tween-one-animation-in-time), [manual](42-sprites.md#movement-in-time-easing-and-tween).
 

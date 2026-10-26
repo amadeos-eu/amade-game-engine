@@ -47,7 +47,7 @@ Boxes point out things worth remembering:
 | Part | Games | You learn |
 |---|---|---|
 | I. Games that wait for you | Mines, Solitaire | Model and rules, drawing with Java2D, mouse input, Model-View-Presenter, high scores, drag and drop, animation, undo |
-| II. Action | Paddle, Bricks, Snake, Rocks, Swarm, Maze, Blast, Jump, Hover Cab | Game loop, keyboard, sprites, collision, sound, tile maps, AI, cameras, physics, speech synthesis |
+| II. Action | Paddle, Bricks, Snake, Rocks, Swarm, Maze, Blast, Jump, Hover Cab, Artillery | Game loop, keyboard, sprites, collision, sound, tile maps, AI, cameras, physics, speech synthesis, destructible ground, ballistics |
 | III. Strategy | Towers, Sands, Colony, Town | Mouse in world coordinates, pathfinding for many units, selection, fog of war, saving games, roads and goods, seasons, the isometric view, networks and services |
 | V. Stories | The Seal of the Templars | Painted rooms, walking round obstacles, hotspots and an inventory, the story as scripts, conversations, people drawn from a description, a test that plays the story |
 

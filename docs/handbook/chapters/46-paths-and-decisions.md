@@ -1,6 +1,6 @@
 # 46. Paths, Groups and Decisions
 
-How things find their way, and how the computer decides what to do. The searches of this chapter work on any grid the game describes with one function, "may this tile be entered?"; the decisions are small tools that keep a character's modes in order, give the computer a picture of the battle, and let consequences spread in a fixed order. Choosing units with the mouse is here too, because it is the start of every order in a strategy game.
+How things find their way, and how the computer decides what to do. The searches of this chapter work on any grid the game describes with one function, "may this tile be entered?"; the decisions are small tools that keep a character's modes in order, give the computer a picture of the battle, and let consequences spread in a fixed order. Choosing units with the mouse is here too, because it is the start of every order in a strategy game, and so is the order of turns in a game played in turns.
 
 ## What may be entered: Passable
 
@@ -168,6 +168,23 @@ Slots keep a group apart at the end; on the way, the game pushes overlapping uni
 
 **How it works.** `clear()`, then `add(col, row, strength, reach)` for each thing: the strength falls in a straight line to nothing at `reach` tiles, as the crow flies. Sands builds the map anew each time the computer chooses whom to attack, with the damage per second of each weapon as its strength. What an influence map decides can be **seen**: draw it over the map, as Sands does with F3, and the computer's choice is no longer a mystery.
 
+## Aiming by trying: ShotSolver
+
+*Package `ai` · introduced in [29. Artillery](29-artillery.md#step-5-the-computer-aims) · source: [`ShotSolver`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/ai/ShotSolver.java)*
+
+**What it is for.** A computer that aims a shot set by two numbers, an angle and a power, when no formula says which: a hill in the way, wind, a target higher than the gun. Instead of solving the physics, it **tries** shots in thought with the game's own rules and keeps the best.
+
+**How it works.** The game hands `solve` a `Trial`: for an angle and a power, how far from the target the shot lands, usually by flying it with [`Ballistics.fly`](44-movement.md#shells-in-flight-projectile-and-ballistics) over the real ground. `solve` tries a coarse grid of angles and powers, then `rounds` times looks around the best one found with half the steps. Artillery's search is about five hundred flights, about ten milliseconds. A good shot is never alone, since a slightly different angle lands slightly elsewhere, so the coarse grid does not miss it. The search is exact; a computer opponent adds its mistakes afterwards, of a size that is its level ([chapter 29](29-artillery.md#a-level-is-the-size-of-a-mistake)).
+
+```java title="amade-game-engine · ai/ShotSolver.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/ai/ShotSolver.java:solver"
+```
+
+??? example "Test: over a hill, against the wind"
+    ```java title="amade-game-engine · test/ai/ShotSolverTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/ai/ShotSolverTest.java:test-solver"
+    ```
+
 ## Events that cause events: EventQueue
 
 *Package `event` · introduced in [26. Blast](26-blast.md#step-5-events-and-chain-reactions) · source: [`EventQueue`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/event/EventQueue.java)*
@@ -181,3 +198,20 @@ Slots keep a group apart at the end; on the way, the game pushes overlapping uni
 ```java title="amade-game-engine · event/EventQueue.java"
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/event/EventQueue.java:queue"
 ```
+
+## Whose turn: TurnOrder
+
+*Package `turn` · introduced in [29. Artillery](29-artillery.md#whose-turn) · source: [`TurnOrder`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/turn/TurnOrder.java)*
+
+**What it is for.** Games played in turns: whose turn it is, who comes next, and when it is over. The players are anything (tanks, seats, colours); a test says whether one is still in play.
+
+**How it works.** `new TurnOrder(players, inPlay, first)`. `current()` is whose turn it is, `next()` passes the turn to the next player still in play, in order and round again, skipping the others; `decided()` is true when one or none is left, and `winner()` names the one. Being in play is asked each time, never stored, so a player destroyed in someone else's turn simply drops out. `turns()` counts the turns taken.
+
+```java title="amade-game-engine · turn/TurnOrder.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/turn/TurnOrder.java:turns"
+```
+
+??? example "Test: players out of the game are skipped"
+    ```java title="amade-game-engine · test/turn/TurnOrderTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/turn/TurnOrderTest.java:test-turns"
+    ```

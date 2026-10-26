@@ -1,6 +1,6 @@
 # 45. Maps, Camera and Fog
 
-From Maze on, the games of this book live on maps: a grid of tiles that the rules think in, and a picture of it that the drawing scales. This chapter covers the maps themselves, written as text or drawn in an editor, what spreads over them (land owned, services that reach, power that flows), the isometric view of a map, the camera that shows a part of a world larger than the screen, and what one side of a strategy game knows of the map: the fog of war and the minimap.
+From Maze on, the games of this book live on maps: a grid of tiles that the rules think in, and a picture of it that the drawing scales. This chapter covers the maps themselves, written as text or drawn in an editor, what spreads over them (land owned, services that reach, power that flows), the isometric view of a map, the camera that shows a part of a world larger than the screen, what one side of a strategy game knows of the map (the fog of war and the minimap), and ground that is not made of tiles at all but of cells that can be blasted away.
 
 ## A grid of tiles: TileMap, Cell and Direction
 
@@ -284,3 +284,43 @@ The minimap of an isometric map: the whole map as a small diamond, turned like t
 ```java title="amade-game-engine · iso/DiamondMinimap.java"
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/iso/DiamondMinimap.java:minimap"
 ```
+
+## Ground that breaks: Ground and Landscape
+
+*Package `terrain` · introduced in [29. Artillery](29-artillery.md#step-1-ground-that-breaks) · source: [`Ground`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/terrain/Ground.java), [`Landscape`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/terrain/Landscape.java)*
+
+**What it is for.** Ground that can be blasted, dug and heaped up anywhere, by any amount, and that falls when its support is gone: an artillery duel, a digging game, worms with bazookas, a mine. A `Ground` is a grid of small cells, each a byte, 0 for air and any other number for a kind of earth the game names. A `Landscape` makes the line of hills to fill it from.
+
+**When to choose it.** When the shape of the ground is not made of tiles a level designer placed, but of holes the players make. A level of walls and platforms is a [`TileMap`](#a-grid-of-tiles-tilemap-cell-and-direction); its tiles are whole or gone, never bitten into.
+
+**How it works.** `new Ground(width, height, cell)` in units; with cells of half a unit, a field of 640 × 400 is about a million bytes. The cells are stored column after column, because nearly every question runs down a column: where is the surface here, does this column hang over air. `fill(surface, layering)` fills each column from a height down, the layering choosing the kind of each cell by its depth. `carve` blows a round hole, `heap` fills the air in a circle with earth, `recolour` changes the kind of the earth in a circle, for a scorched rim.
+
+```java title="amade-game-engine · terrain/Ground.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/terrain/Ground.java:carve"
+```
+
+`settle(passes)` lets earth that hangs over air fall by one cell per pass, a whole run at a time; call it every step and the earth falls at a speed you can watch. Only **loose** columns are looked at, those a change touched, so a ground at rest costs nothing. Earth falls straight down; it does not slide into a slope.
+
+```java title="amade-game-engine · terrain/Ground.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/terrain/Ground.java:settle"
+```
+
+`takeChanges()` returns the range of columns changed since it was last called, or `null`: the picture of the ground, an image with a pixel per cell, is painted again only there ([chapter 29](29-artillery.md#drawing-only-what-changed)). `copy()` makes an independent ground, to try something or to replay a shot.
+
+`Landscape.generate(samples, base, amplitude, roughness, random)` makes a line of heights by **midpoint displacement**: the ends at random heights, then each midpoint at the average of its neighbours moved by a random amount that shrinks by `roughness` with each halving. 0.5 gives gentle hills, 0.7 jagged peaks. `clamp`, `flatten` and `bump` shape the line, `sample(line, spacing)` turns it into a function of x for `fill`.
+
+| Method | What it does |
+|---|---|
+| `new Ground(width, height, cell)` | Empty ground, in units, of cells `cell` units wide |
+| `fill(surface, layering)` | Earth below a line, of kinds by depth |
+| `carve(x, y, r)`, `heap(x, y, r, kind)`, `recolour(x, y, r, kind)` | A crater, a heap, a change of kind; each returns the cells changed |
+| `settle(passes)`, `settling()` | Lets earth fall; whether some may still fall |
+| `solid(x, y)`, `material(x, y)` | Earth at a point; beside the ground is air, below it earth |
+| `surface(x)`, `surface(from, to)` | The highest earth in a column, or over a width: where a thing that wide rests |
+| `takeChanges()`, `copy()` | The columns to paint again; an independent copy |
+| `Landscape.generate`, `clamp`, `flatten`, `bump`, `sample` | A line of hills, shaped, and as a function of x |
+
+??? example "Test: the roof of a cave falls in"
+    ```java title="amade-game-engine · test/terrain/GroundTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/terrain/GroundTest.java:test-ground"
+    ```
