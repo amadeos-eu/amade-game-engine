@@ -91,6 +91,9 @@ nav:
       - 46. Paths, Groups and Decisions: 46-paths-and-decisions.md
       - 47. Chance, Data and Saving: 47-data-and-saving.md
       - 48. Scenes, Menus and Sound: 48-scenes-menus-sound.md
+      - 49. Rooms, Scripts and Dialogs: 49-adventure.md
+  - "Part V: Stories":
+      - 50. The Seal of the Templars: 50-templar.md
   - Appendices:
       - Java2D and X11 Pitfalls: appendix-java2d.md
       - Glossary: appendix-glossary.md
