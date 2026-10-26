@@ -34,6 +34,6 @@ The handbook grows with the games: a chapter is written when its game is finishe
 
 With *The Seal of the Templars*, Part V has begun: a story told in painted rooms, written as data and played by the engine's `adventure` package.
 
-Act 2, in La Rochelle, is part of chapter 50 now. Next comes **Act 3** of the same game, in Tomar, where the Templars lived on in Portugal. A new act needs few new engine parts; what it adds will be told in chapter 50, and as always in Part IV, the tables of [chapter 40](40-engine.md) and the [glossary](appendix-glossary.md).
+The game is complete: Act 2 in La Rochelle and Act 3 in Tomar, with the epilogue, are part of chapter 50 now. The next story of Part V has not been chosen yet. What it adds to the engine will be told in its chapter, and as always in Part IV, the tables of [chapter 40](40-engine.md) and the [glossary](appendix-glossary.md).
 
 Suggestions and corrections are welcome as [issues](https://github.com/datazuul/amade-game-engine/issues) or pull requests. Each page has an edit button at the top.

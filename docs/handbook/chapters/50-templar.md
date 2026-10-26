@@ -19,6 +19,7 @@ Games of this kind grew out of the text adventures of the 1970s, where one typed
     - **Puzzles that are tested**: a test that plays the whole story with clicks
     - **Hints**: a notebook that knows the next goal
     - Texts in five languages that **fit the screen**
+    - A **quiz** that starts over without punishing, and an **epilogue** that tells history from invention
 
 The complete game is in [amade-templar-game](https://github.com/datazuul/amade-templar-game). The engine parts it uses are described in [chapter 49](49-adventure.md); this chapter tells how a game is built on them.
 
@@ -219,7 +220,7 @@ A player stuck in an adventure has two choices: try everything with everything, 
 <figcaption>The notebook in the workshop: the goal in blue, the hint in red. A third N closes it.</figcaption>
 </figure>
 
-The notebook knows nothing about puzzles. The scripts set the flag `goal` to a number whenever the story moves on, and the notebook shows `goal.<number>` and `hint.<number>` from the texts. The numbers are grouped by scene: 1 to 9 the prologue, 10 to 13 the workshop, 20 to 23 the reading room, 30 to 33 the square, 40 and 41 the bridge, 50 to 52 the prison cart, 60 to 63 the harbour, 70 to 75 the café, 80 and 81 the quay. Because goals are only texts, a writer can make the hints gentler or plainer without touching a line of code.
+The notebook knows nothing about puzzles. The scripts set the flag `goal` to a number whenever the story moves on, and the notebook shows `goal.<number>` and `hint.<number>` from the texts. The numbers are grouped by scene: 1 to 9 the prologue, 10 to 13 the workshop, 20 to 23 the reading room, 30 to 33 the square, 40 and 41 the bridge, 50 to 52 the prison cart, 60 to 63 the harbour, 70 to 75 the café, 80 and 81 the quay, 90 to 94 the Charola, 100 to 106 the archive, 110 to 112 the cloister. Because goals are only texts, a writer can make the hints gentler or plainer without touching a line of code.
 
 ## Step 7: Everything else
 
@@ -277,6 +278,44 @@ The playthrough test plays the cart scene like this:
 --8<-- "amade-templar-game/src/test/java/eu/amadeos/games/templar/domain/PlaythroughTest.java:cart"
 ```
 
+## Step 9: Act 3, Tomar, and the end
+
+<figure markdown>
+![The Charola at Tomar](images/templar/charola.jpg){ width="400" }
+![The archive in the tower](images/templar/archive.jpg){ width="400" }
+<figcaption>Dona Inês by her showcase in the Charola, the Templars' round church at Tomar (left). The archive in the tower, with the window open and the pigeon on the sill (right).</figcaption>
+</figure>
+
+<figure markdown>
+![The cemetery cloister](images/templar/cloister.jpg){ width="400" }
+![What really happened](images/templar/epilogue.jpg){ width="400" }
+<figcaption>The cloister, where Hélène has lifted the slab with the cross (left). One page of the epilogue (right).</figcaption>
+</figure>
+
+The last act plays in the Convent of Christ at Tomar, the seat of the order that took over the Templars of Portugal. In the Charola, the round church, a showcase holds stone moulds for pilgrims' tokens, and one of them has the shape of Lena's token from La Rochelle. Dona Inês, the guide, opens it only for someone who knows the Templars. The mould leads to the archive in the tower, where the other half of the chirograph lies under the pastedown of a register, as the first half did in the psalter. Lena joins the halves, reads the last line aloud, "a chest in the cloister, under the stone with the cross", and Hélène, who was listening at the door, locks her in. Lena gets out with a pencil, a café napkin, a pastry from the book lift, and the pigeon, which Kev cannot help filming. In the cloister the chest is open, and it holds no gold, only the King's own promises to pay. The two halves of the chirograph prove what they add up to.
+
+**Questions that start over.** Dona Inês asks three questions; the answers are things the player has already seen. A counting flag `quiz` says which question is being asked, and each option belongs to one question. A right answer moves the flag on, a wrong one sets it back to 0 and closes the questions. Nothing is lost; the player only has to start again.
+
+``` title="scripts/charola.txt"
+--8<-- "amade-templar-game/src/main/resources/eu/amadeos/games/templar/scripts/charola.txt:quiz"
+```
+
+The questions are a dialog of their own, opened from inside Dona Inês's dialog with `dialog quiz`. `exit` in the questions closes only them, and her own options come back, because the engine keeps open dialogs on a stack.
+
+**One person, three rooms.** Dona Inês, Kev, Hélène and the pigeon appear in all three rooms. Each room has its own person in `story.txt`, `ines`, `ines-archive` and `ines-cloister`, because a person stands in one room. `Cast.of` gives them all the same look, and the speech colour of `kev-cloister` is Kev's, found by the part before the dash.
+
+The playthrough test plays the Charola like this:
+
+``` title="PlaythroughTest.java"
+--8<-- "amade-templar-game/src/test/java/eu/amadeos/games/templar/domain/PlaythroughTest.java:charola"
+```
+
+**The epilogue.** When the flag `finished` is set, the game shows "The End" and then seven pages of *What really happened*: the arrests, the trial and Chinon, the end of the order, Portugal, the legends, chirographs, and what the game made up. Each page is a heading and a text from the language files, wrapped to the width of a panel with `SpokenText.wrap`.
+
+``` title="TemplarGame.java"
+--8<-- "amade-templar-game/src/main/java/eu/amadeos/games/templar/ui/game/TemplarGame.java:epilogue"
+```
+
 ## What moved into the engine
 
 | From The Seal of the Templars | Engine package | Why |
@@ -303,4 +342,4 @@ What stays in the game: the story, its rooms and scripts, the painters of the ro
 
 ---
 
-*The Seal of the Templars* opens Part V. Act 3 takes the story to **Tomar** in Portugal, where the Templars lived on as the Order of Christ, after the lead token found in La Rochelle.
+*The Seal of the Templars* opens Part V. Its story is complete: a prologue, three acts, two flashbacks and an epilogue, in fourteen rooms, built on one engine package and about three and a half thousand lines of script.
