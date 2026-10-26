@@ -12,7 +12,7 @@ import java.util.function.BooleanSupplier;
 
 /**
  * Plays the blocks of a {@link Script}, one step after the other, in the game loop. Most steps take time:
- * Lena speaks until the player has read the line, walks until she is there, a title stays until it fades.
+ * Maria speaks until the player has read the line, walks until she is there, a title stays until it fades.
  * The runner hands such a step to the {@link Stage}, the game's side, and waits until the stage says it is
  * done; only then does it go on. A block is thus a <b>cutscene</b>, written as a list, played as a story.
  *
@@ -27,7 +27,7 @@ import java.util.function.BooleanSupplier;
  * runner.update(seconds);
  * if (!runner.isBusy() &amp;&amp; mouse.wasPressed(1)) {
  *     Hotspot h = room.hotspotAt(pointer);
- *     if (h != null) lena.walkTo(room.floor(), h.stand(), () -&gt; runner.start("use", h.id()));
+ *     if (h != null) maria.walkTo(room.floor(), h.stand(), () -&gt; runner.start("use", h.id()));
  * }
  * </pre>
  */

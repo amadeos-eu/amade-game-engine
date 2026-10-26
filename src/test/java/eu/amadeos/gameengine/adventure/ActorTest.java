@@ -14,20 +14,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ActorTest {
     @Test
     void walksTheWayAtItsSpeedAndThenDoesWhatWasAsked() {
-        Actor lena = new Actor("lena", new Vector(0, 0), Direction.DOWN, 50);
+        Actor maria = new Actor("maria", new Vector(0, 0), Direction.DOWN, 50);
         AtomicInteger arrived = new AtomicInteger();
-        lena.walk(List.of(new Vector(0, 0), new Vector(100, 0), new Vector(100, 100)), arrived::incrementAndGet);
-        lena.update(1, DepthScale.FLAT);
-        assertEquals(new Vector(50, 0), lena.position());
-        assertEquals(Direction.RIGHT, lena.facing());
-        lena.update(1.5, DepthScale.FLAT);
-        assertEquals(new Vector(100, 25), lena.position(), "round the corner within one step");
-        assertEquals(Direction.DOWN, lena.facing());
-        assertTrue(lena.isWalking());
-        lena.update(10, DepthScale.FLAT);
-        assertFalse(lena.isWalking());
+        maria.walk(List.of(new Vector(0, 0), new Vector(100, 0), new Vector(100, 100)), arrived::incrementAndGet);
+        maria.update(1, DepthScale.FLAT);
+        assertEquals(new Vector(50, 0), maria.position());
+        assertEquals(Direction.RIGHT, maria.facing());
+        maria.update(1.5, DepthScale.FLAT);
+        assertEquals(new Vector(100, 25), maria.position(), "round the corner within one step");
+        assertEquals(Direction.DOWN, maria.facing());
+        assertTrue(maria.isWalking());
+        maria.update(10, DepthScale.FLAT);
+        assertFalse(maria.isWalking());
         assertEquals(1, arrived.get());
-        assertEquals(200, lena.stride(), 1e-9);
+        assertEquals(200, maria.stride(), 1e-9);
     }
 
     // --8<-- [start:test-depth]
@@ -57,13 +57,13 @@ class ActorTest {
 
     @Test
     void placingOrANewWalkCancelsWhatWasToHappen() {
-        Actor lena = new Actor("lena", new Vector(0, 0), Direction.DOWN, 50);
+        Actor maria = new Actor("maria", new Vector(0, 0), Direction.DOWN, 50);
         AtomicInteger arrived = new AtomicInteger();
-        lena.walk(List.of(new Vector(100, 0)), arrived::incrementAndGet);
-        lena.place(new Vector(5, 5), Direction.UP);
-        lena.update(10, DepthScale.FLAT);
+        maria.walk(List.of(new Vector(100, 0)), arrived::incrementAndGet);
+        maria.place(new Vector(5, 5), Direction.UP);
+        maria.update(10, DepthScale.FLAT);
         assertEquals(0, arrived.get());
-        lena.walk(List.of(), arrived::incrementAndGet);
+        maria.walk(List.of(), arrived::incrementAndGet);
         assertEquals(1, arrived.get(), "an empty way arrives at once");
     }
 }

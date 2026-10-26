@@ -106,19 +106,19 @@ The `Inventory` holds item names in the order they were found, each once. `Flags
 
 *Package `adventure` · introduced in [50. The Seal of the Templars](50-templar.md) · sources: [`Script`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/Script.java), [`ScriptRunner`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/ScriptRunner.java)*
 
-**What it is for.** What Lena answers when one looks at the psalter is not Java code. It is a line in a script, a text file that reads like a play:
+**What it is for.** What Maria answers when one looks at the psalter is not Java code. It is a line in a script, a text file that reads like a play:
 
 ```
 on use bonefolder psalter
   if not found-page
-    walk lena to psalter
-    face lena up
-    anim lena reach
-    say lena psalter.found
+    walk maria to psalter
+    face maria up
+    anim maria reach
+    say maria psalter.found
     gain page
     set found-page
   else
-    say lena psalter.empty
+    say maria psalter.empty
   end
 end
 ```
@@ -131,7 +131,7 @@ A block starts with `on` and the words of its trigger (`look`, `use`, `talk`, `e
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/adventure/Script.java:parse"
 ```
 
-Most steps take time: Lena speaks until the player has read the line, walks until she is there. The `ScriptRunner` hands such a step to the game's `Stage` and asks every frame whether it is done; only then does it go on. A block is thus a **cutscene**, written as a list and played as a story. While it plays, `isBusy()` is true and the player only watches.
+Most steps take time: Maria speaks until the player has read the line, walks until she is there. The `ScriptRunner` hands such a step to the game's `Stage` and asks every frame whether it is done; only then does it go on. A block is thus a **cutscene**, written as a list and played as a story. While it plays, `isBusy()` is true and the player only watches.
 
 ```java title="amade-game-engine · adventure/ScriptRunner.java"
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/adventure/ScriptRunner.java:stage"

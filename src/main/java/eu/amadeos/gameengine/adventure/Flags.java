@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.TreeMap;
 
 /**
- * Everything the story remembers, as named numbers: whether Lena has read the plaque ({@code read-plaque}
+ * Everything the story remembers, as named numbers: whether Maria has read the plaque ({@code read-plaque}
  * is 1), how often she asked the archivist ({@code asked-lefort} is 3). A flag never set is 0. Flags are the
  * whole memory of an adventure besides the items and where everyone is, so a saved game is little more than
  * this map.
