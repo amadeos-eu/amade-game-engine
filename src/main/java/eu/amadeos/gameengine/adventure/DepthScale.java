@@ -9,7 +9,7 @@ package eu.amadeos.gameengine.adventure;
  *
  * <pre>
  * DepthScale depth = new DepthScale(262, 0.85, 400, 1.15);   // smaller at the wall, larger at the front
- * double k = depth.at(lena.position().y());
+ * double k = depth.at(maria.position().y());
  * sprite.draw(g, x - width * k / 2, y - height * k);           // feet at the position
  * </pre>
  */

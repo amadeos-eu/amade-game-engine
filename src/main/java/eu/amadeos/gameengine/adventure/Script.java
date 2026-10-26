@@ -12,22 +12,22 @@ import java.util.Objects;
 
 /**
  * What happens in an adventure, written as text: a list of <b>blocks</b>, each started by what the player
- * does and ended by {@code end}. The game never says in Java what Lena answers when one looks at the psalter;
+ * does and ended by {@code end}. The game never says in Java what Maria answers when one looks at the psalter;
  * the script does, so the story can be written, read and changed like a play.
  *
  * <pre>
  * on look psalter                  # right click on the psalter
- *   say lena psalter.look          # Lena says the text psalter.look of the game's texts
+ *   say maria psalter.look          # Maria says the text psalter.look of the game's texts
  * end
  *
  * on use bonefolder psalter        # the bone folder from the inventory, used on the psalter
  *   if not found-page
- *     anim lena reach
- *     say lena psalter.found
+ *     anim maria reach
+ *     say maria psalter.found
  *     gain page
  *     set found-page
  *   else
- *     say lena psalter.empty
+ *     say maria psalter.empty
  *   end
  * end
  *
@@ -36,7 +36,7 @@ import java.util.Objects;
  * end
  *
  * option lefort coffee lefort.q.coffee once if has coffee
- *   say lena lefort.coffee.1
+ *   say maria lefort.coffee.1
  *   say lefort lefort.coffee.2
  *   lose coffee
  * end

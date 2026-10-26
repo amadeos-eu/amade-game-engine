@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RoomTest {
     static final String WORKSHOP = """
-            # Lena's workshop
+            # Maria's workshop
             room workshop
             background workshop.png
             depth 262 0.85 400 1.15

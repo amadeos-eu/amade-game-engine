@@ -20,13 +20,13 @@ class ScriptTest {
     void findsTheBlockForATriggerExactWordsFirst() {
         Script script = parse("""
                 on look *
-                  say lena nothing-special
+                  say maria nothing-special
                 end
                 on look psalter
-                  say lena psalter.look
+                  say maria psalter.look
                 end
                 on use * psalter
-                  say lena psalter.no
+                  say maria psalter.no
                 end
                 """);
         assertEquals(List.of("look", "psalter"), script.find("look", "psalter").trigger());
@@ -45,7 +45,7 @@ class ScriptTest {
                       set clean-cut
                     end
                   else
-                    say lena psalter.empty
+                    say maria psalter.empty
                   end
                   sound page
                 end
@@ -84,16 +84,16 @@ class ScriptTest {
     @Test
     void mistakesAreFoundWhenTheScriptIsRead() {
         assertEquals("test.script:2: unknown command sya",
-                assertThrows(TextData.DataException.class, () -> parse("on look x\n  sya lena x\nend\n"))
+                assertThrows(TextData.DataException.class, () -> parse("on look x\n  sya maria x\nend\n"))
                         .getMessage());
         assertEquals("test.script:1: block without end",
-                assertThrows(TextData.DataException.class, () -> parse("on look x\n  say lena x\n")).getMessage());
+                assertThrows(TextData.DataException.class, () -> parse("on look x\n  say maria x\n")).getMessage());
         assertEquals("test.script:2: else without if",
                 assertThrows(TextData.DataException.class, () -> parse("on look x\n else\nend\n")).getMessage());
         assertEquals("test.script:2: say takes 2 words, found 1",
-                assertThrows(TextData.DataException.class, () -> parse("on look x\n say lena\nend\n")).getMessage());
+                assertThrows(TextData.DataException.class, () -> parse("on look x\n say maria\nend\n")).getMessage());
         assertEquals("test.script:3: missing end of the block at line 1",
-                assertThrows(TextData.DataException.class, () -> parse("on look x\n say lena x\non use x\nend\n"))
+                assertThrows(TextData.DataException.class, () -> parse("on look x\n say maria x\non use x\nend\n"))
                         .getMessage());
     }
 }

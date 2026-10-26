@@ -77,20 +77,20 @@ class ScriptRunnerTest {
     static final String SCRIPT = """
             on use bonefolder psalter
               if not found-page
-                walk lena to psalter
-                face lena up
-                anim lena reach
-                say lena psalter.found
+                walk maria to psalter
+                face maria up
+                anim maria reach
+                say maria psalter.found
                 gain page
                 show page
                 set found-page
               else
-                say lena psalter.empty
+                say maria psalter.empty
               end
             end
 
             on talk lefort
-              say lena lefort.hello
+              say maria lefort.hello
               dialog lefort
               say lefort lefort.goodbye
             end
@@ -128,16 +128,16 @@ class ScriptRunnerTest {
         assertTrue(runner.start("use", "bonefolder", "psalter"));
         assertFalse(runner.start("look", "window"), "busy: nothing else starts meanwhile");
         runner.update(0.02);
-        assertEquals(List.of("lena walks to psalter"), stage.log, "waits until she is there");
+        assertEquals(List.of("maria walks to psalter"), stage.log, "waits until she is there");
         play();
-        assertEquals(List.of("lena walks to psalter", "lena faces UP", "lena reach", "lena: psalter.found",
+        assertEquals(List.of("maria walks to psalter", "maria faces UP", "maria reach", "maria: psalter.found",
                 "show page"), stage.log);
         assertTrue(inventory.has("page"));
         assertTrue(flags.is("found-page"));
         stage.log.clear();
         runner.start("use", "bonefolder", "psalter");
         play();
-        assertEquals(List.of("lena: psalter.empty"), stage.log, "the second time, the else part");
+        assertEquals(List.of("maria: psalter.empty"), stage.log, "the second time, the else part");
     }
     // --8<-- [end:test-cutscene]
 
@@ -152,7 +152,7 @@ class ScriptRunnerTest {
         assertEquals(List.of("chirograph", "bye"), ids(), "back to the options");
         runner.choose("chirograph");
         play();
-        assertEquals(List.of("lena: lefort.hello", "lefort: lefort.chirograph", "lefort: lefort.again"), stage.log);
+        assertEquals(List.of("maria: lefort.hello", "lefort: lefort.chirograph", "lefort: lefort.again"), stage.log);
         runner.choose("bye");
         play();
         assertFalse(runner.isBusy());
