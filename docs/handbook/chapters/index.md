@@ -1,4 +1,4 @@
-# Amade Game Developer's Handbook
+# amadeOS Game Developer's Handbook
 
 This book teaches you how to program games by building them: first a game of Mines, then Solitaire, and step by step action games, a tower defence and finally a small real-time strategy game. While the games grow, so does the engine underneath them, **amade-game-engine**. You will not only use an engine, you will see why each part of it exists, because you write the game that first needs it.
 

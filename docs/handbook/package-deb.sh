@@ -57,7 +57,7 @@ Architecture: all
 Installed-Size: $(du -sk "$staging/usr" | cut -f1)
 Recommends: firefox-esr | www-browser, xdg-utils
 Maintainer: amadeOS Project <developers@datazuul.com>
-Description: Amade Game Developer's Handbook
+Description: amadeOS Game Developer's Handbook
  Learn game programming in Java by building the amadeOS games and their
  engine, amade-game-engine, one game at a time: from Mines and Solitaire
  through action games to strategy and city building. The pages open in

@@ -1,6 +1,6 @@
 name: Handbook
 
-# Builds the Amade Game Developer's Handbook (docs/handbook) and publishes it on GitHub Pages.
+# Builds the amadeOS Game Developer's Handbook (docs/handbook) and publishes it on GitHub Pages.
 # The code excerpts come from the game repositories, checked out next to this one at the commits
 # below, the state the chapters describe. Raise a commit when a chapter is updated for it.
 
