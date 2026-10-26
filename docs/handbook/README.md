@@ -1,4 +1,4 @@
-# Amade Game Developer's Handbook
+# amadeOS Game Developer's Handbook
 
 The handbook teaches game programming in Java by building the amadeOS games and their engine, one game at a time. It is published at <https://datazuul.github.io/amade-game-engine/>.
 
