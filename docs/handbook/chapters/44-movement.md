@@ -194,6 +194,27 @@ A main jet of about twice gravity feels right: the craft rises about as fast as 
     --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/physics/BallisticsTest.java:test-ballistics"
     ```
 
+## Walking and shooting on a grid of walls: Mover and Hitscan
+
+*Package `raycast` · introduced in [60. Rivet](60-rivet.md#step-6-walking-and-turning) · source: [`Mover`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Mover.java), [`Hitscan`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Hitscan.java)*
+
+**What it is for.** Moving a round body through a [`GridMap`](45-maps.md#seen-from-inside-gridmap-raycaster-and-lightmap) of walls and doors, sliding along walls instead of sticking to them; and shots that arrive at once along a line, stopped by the first wall or the first target.
+
+**When to choose it.** In a first-person game on a grid, or any game seen from above whose bodies are circles among square walls. Bodies that fall and jump on tiles use [`Body` and `TileCollider`](#falling-and-standing-body-and-tilecollider); shots that fly visibly are [`Projectile`](#shells-in-flight-projectile-and-ballistics)s or the game's own.
+
+**How it works.** `Mover.slide(map, x, y, dx, dy, radius)` cuts the move into pieces no longer than half the radius and moves each along x, then along y, each stopped if the circle would overlap a blocked cell. A move into a wall at an angle keeps its part along the wall. `Mover.overlaps` is the test itself. `Hitscan.shoot(map, x, y, angle, range, targets)` casts a ray for the wall, then checks every target, a circle seen from above, and returns the nearest one in front of the wall, or where the shot met the wall. Height does not count. `Hitscan.enter` is the ray-circle test, for a game's own use.
+
+```java title="amade-game-engine · raycast/Hitscan.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/raycast/Hitscan.java:hitscan"
+```
+
+| Method | What it does |
+|---|---|
+| `Mover.slide(map, x, y, dx, dy, radius)` | Where the body ends up, as a `Position` |
+| `Mover.overlaps(map, x, y, radius)` | Whether a body there would overlap a wall or a closed door |
+| `Hitscan.shoot(map, x, y, angle, range, targets)` | The `Hit`: distance, point, target, or `wall()` |
+| `Hitscan.enter(x, y, dx, dy, cx, cy, r)` | Where a ray enters a circle, or -1 |
+
 ## Which collision test?
 
 | The things | Use | Because |

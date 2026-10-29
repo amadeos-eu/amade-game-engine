@@ -84,6 +84,24 @@ Each player gets a `Controls` of their own: two players on one keyboard in Paddl
 
 A position outside the picture, on a black bar, lies outside 0 … logical size; check it before you use it. A map larger than the screen needs one more conversion, from the screen to the world: [`Camera.worldX`](45-maps.md#a-world-larger-than-the-screen-camera). A click or a drag on that map becomes a selection with [`BoxSelect`](46-paths-and-decisions.md#choosing-units-selection-and-boxselect).
 
+## Turning with the mouse: MouseLook
+
+*Package `input` · introduced in [60. Rivet](60-rivet.md#the-mouse) · source: [`MouseLook`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/MouseLook.java)*
+
+**What it is for.** Steering with the mouse in a first-person view: the game asks how far the mouse moved since the last step, not where it is, and the mouse never reaches the edge of the screen.
+
+**When to choose it.** When the mouse turns the player rather than pointing at something. For pointing, clicking and dragging, use [`Mouse`](#the-mouse-mouse); a game can have both, as Rivet does (`Mouse` for the buttons and the wheel, `MouseLook` for turning).
+
+**How it works.** `attach(canvas)` listens to the mouse's movements. `capture(true)`, on the Swing thread, hides the pointer and puts it into the middle of the canvas; after each move a `Robot` puts it back, and the distance from the middle is the movement. The event of the robot's own move is recognised and not counted. Where a program may not move the pointer (some Wayland desktops), `recentres()` is false and the differences between positions are used instead, which stop at the screen's edge. Capture the look only while the game is played, and let it go on menus and in the pause.
+
+| Method | What it does |
+|---|---|
+| `attach(component)` | Listens to the game's canvas |
+| `capture(on)`, `captured()` | Hidden and kept in the middle, or free; call `capture` on the Swing thread |
+| `poll()` | Once per step on the loop thread, before asking |
+| `dx()`, `dy()` | Screen pixels moved right and down between the last two polls |
+| `recentres()` | Whether the pointer is put back, or only position differences are used |
+
 ## Gamepads: Gamepads and Gamepad
 
 *Package `input` · introduced in [26. Blast](26-blast.md#step-2-gamepads) · source: [`Gamepads`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/Gamepads.java), [`Gamepad`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/Gamepad.java), [`LinuxJoysticks`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/LinuxJoysticks.java), [`XInput`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/XInput.java)*

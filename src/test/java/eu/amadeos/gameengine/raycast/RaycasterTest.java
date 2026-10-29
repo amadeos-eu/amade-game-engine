@@ -23,6 +23,7 @@ class RaycasterTest {
         return n;
     }
 
+    // --8<-- [start:test-raycaster]
     @Test
     void aWallTwiceAsFarIsHalfAsHigh() {
         Raycaster r = new Raycaster(64, 100);
@@ -34,6 +35,7 @@ class RaycasterTest {
         r.render(map, light, new Camera(2.75, 2.5, 0), List.of());         // 1.25 ahead
         assertEquals(2 * far, wallPixels(r, 32), 2);
     }
+    // --8<-- [end:test-raycaster]
 
     @Test
     void theFloorIsBelowAndTheCeilingAbove() {

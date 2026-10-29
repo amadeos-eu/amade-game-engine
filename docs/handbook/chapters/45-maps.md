@@ -324,3 +324,40 @@ The minimap of an isometric map: the whole map as a small diamond, turned like t
     ```java title="amade-game-engine · test/terrain/GroundTest.java"
     --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/terrain/GroundTest.java:test-ground"
     ```
+
+## Seen from inside: GridMap, Raycaster and LightMap
+
+*Package `raycast` · introduced in [60. Rivet](60-rivet.md#step-1-a-world-of-cells) · source: [`GridMap`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/GridMap.java), [`Door`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Door.java), [`Raycaster`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Raycaster.java), [`Camera`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Camera.java), [`Texture`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Texture.java), [`LightMap`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/LightMap.java), [`Billboard`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Billboard.java), [`Views`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Views.java)*
+
+**What it is for.** A world seen through the player's eyes: corridors, halls and doors on a grid of square cells, walls of one height, a floor and a ceiling or open sky, things standing in it, all lit by lamps and fading into fog. The `Raycaster` draws it with one ray per column of the picture, fast enough in software for 60 frames a second at 640 × 400.
+
+**When to choose it.** For a first-person view of a world that is flat in plan: every wall as high as every other, no rooms above rooms, no looking up and down. For anything more (slopes, stairs, bridges) a raycaster is the wrong tool; that needs a real 3D renderer, which the engine does not have.
+
+**How it works.** A `GridMap` holds a wall texture, a floor texture and a ceiling texture per cell (`null` ceiling is sky) and the `Door`s. `cast` follows a ray from cell border to cell border (the DDA of Amanatides and Woo) and reports the distance, the side and where on the face it hit; doors are thin walls in the middle of their cell, and a ray passes where the door has slid away. `blocks` and `sees` answer the game's questions with the same ray.
+
+`Raycaster.render(map, lights, camera, billboards)` draws floor and ceiling row by row, then the walls column by column, then the billboards from far to near, each column of a billboard hidden behind a nearer wall. The rays' directions are the camera's direction plus a part of the camera plane, and distances are measured in lengths of that direction, which removes the fisheye. `ZOOM` 1.2 gives about 68 degrees across a picture of 640 × 400. The picture is an image of its own; draw it with `g.drawImage(raycaster.frame(), …)`.
+
+```java title="amade-game-engine · raycast/Raycaster.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/raycast/Raycaster.java:walls"
+```
+
+A `Texture` is square, a power of two in size, with a **glow** per texel: glowing texels ignore the room's light. The `LightMap` bakes the light once per level: an ambient colour, plus every lamp that sees a cell's centre, fading with distance, so walls cast shadows; between cell centres it is mixed smoothly. `flash` adds a light for one frame, `beginFrame` removes the last frame's. A `Billboard` is a thing in the world, a picture that faces the eye, with `Views` from several sides chosen by the angle between its facing and the eye ([`ModelRenderer`](42-sprites.md#things-in-3d-sdf-model-and-modelrenderer) renders them).
+
+| Method | What it does |
+|---|---|
+| `new GridMap(w, h)`, `setWall`, `setFloor`, `setCeiling`, `addDoor` | The world, cell by cell; a `null` ceiling shows the sky |
+| `cast(x, y, dx, dy, max, ray)`, `blocks(x, y)`, `sees(...)`, `passable()` | A ray, a body's question, a line of sight, cells for path searches |
+| `updateDoors(dt, occupied)` | Moves the doors; an open door waits while its cell is occupied |
+| `new Door(x, y, alongX, face, frame).timing(seconds, stayOpen)`, `open()` | A sliding door; a secret door has a wall's face and stays open |
+| `Texture.of(image, glowMask)`, `Texture.of(size, argb, glow)` | A texture from a picture, or from texels |
+| `new LightMap(map, r, g, b, lights)`, `flash`, `beginFrame`, `sample` | Baked light, flashes for one frame, the light at a point |
+| `new Camera(x, y, angle)`, `eye` | Where the eye is, and how high: 0.5 is halfway up a wall |
+| `new Raycaster(w, h)`, `setFog`, `setSky`, `render`, `frame()` | The view; fog colour and density; a panorama round the horizon |
+| `depth(column)`, `project(camera, x, y, z)` | A column's wall distance; where a point of the world is on the picture |
+| `new Billboard(views, x, y, size)`, `lift`, `facing`, `frame`, `flash`, `shadow` | A thing in the world |
+| `new Views(textures)`, `Views.of(texture)`, `pick(frame, facing, fromViewer)` | Pictures by frame and direction |
+
+??? example "Test: a wall twice as far is half as high"
+    ```java title="amade-game-engine · test/raycast/RaycasterTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/raycast/RaycasterTest.java:test-raycaster"
+    ```

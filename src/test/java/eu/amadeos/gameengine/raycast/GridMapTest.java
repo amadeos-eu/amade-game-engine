@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class GridMapTest {
     private final GridMap.Ray ray = new GridMap.Ray();
 
+    // --8<-- [start:test-cast]
     @Test
     void aRayStopsAtTheFirstWall() {
         GridMap map = Maps.of(
@@ -27,6 +28,7 @@ class GridMapTest {
         assertEquals(0.5, ray.distance, 1e-9);
         assertEquals(1, ray.side);
     }
+    // --8<-- [end:test-cast]
 
     @Test
     void theDistanceIsCountedInLengthsOfTheDirection() {

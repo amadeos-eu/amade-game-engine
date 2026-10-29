@@ -95,6 +95,8 @@ nav:
       - 49. Rooms, Scripts and Dialogs: 49-adventure.md
   - "Part V: Stories":
       - 50. The Seal of the Templars: 50-templar.md
+  - "Part VI: Three Dimensions":
+      - 60. Rivet: 60-rivet.md
   - Appendices:
       - Java2D and X11 Pitfalls: appendix-java2d.md
       - Glossary: appendix-glossary.md

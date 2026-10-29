@@ -16,6 +16,7 @@ class LightMapTest {
             "#######");
     private final float[] rgb = new float[3];
 
+    // --8<-- [start:test-lightmap]
     @Test
     void aLampLightsWhatItSeesAndNotWhatIsBehindAWall() {
         LightMap light = new LightMap(map, 0.1, 0.1, 0.1, List.of(new LightMap.Light(1.5, 1.5, 1, 0.5, 0, 4)));
@@ -26,6 +27,7 @@ class LightMapTest {
         light.sample(4.5, 1.5, rgb);                    // behind the wall at x = 3
         assertEquals(0.1, rgb[0], 1e-5);
     }
+    // --8<-- [end:test-lightmap]
 
     @Test
     void lightFadesWithDistance() {

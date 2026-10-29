@@ -8,6 +8,7 @@ class ViewsTest {
     private final Texture[] sides = {Maps.solid(0xff000001), Maps.solid(0xff000002), Maps.solid(0xff000003), Maps.solid(0xff000004)};
     private final Views views = new Views(new Texture[][]{sides});
 
+    // --8<-- [start:test-views]
     @Test
     void theViewerInFrontSeesTheFront() {
         // facing east, the viewer stands east of the thing
@@ -19,4 +20,5 @@ class ViewsTest {
         // the nearest view
         assertSame(sides[0], views.pick(0, Math.PI / 2, Math.PI / 2 + 0.6));
     }
+    // --8<-- [end:test-views]
 }

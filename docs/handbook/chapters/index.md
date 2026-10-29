@@ -50,8 +50,9 @@ Boxes point out things worth remembering:
 | II. Action | Paddle, Bricks, Snake, Rocks, Swarm, Maze, Blast, Jump, Hover Cab, Artillery | Game loop, keyboard, sprites, collision, sound, tile maps, AI, cameras, physics, speech synthesis, destructible ground, ballistics |
 | III. Strategy | Towers, Sands, Colony, Town | Mouse in world coordinates, pathfinding for many units, selection, fog of war, saving games, roads and goods, seasons, the isometric view, networks and services |
 | V. Stories | The Seal of the Templars | Painted rooms, walking round obstacles, hotspots and an inventory, the story as scripts, conversations, people drawn from a description, a test that plays the story |
+| VI. Three Dimensions | Rivet | Raycasting, floors, ceilings and sky, light maps and fog, doors, turning with the mouse, billboards from several sides, models from distance functions, hitscan shots |
 
-Part IV, [the engine manual](40-engine.md), comes after the games of Parts I to III; Part V, *Stories*, follows it. It describes the engine by subsystem rather than by game: what each part is for, when to choose it, how it works, and which chapter introduced it. Use it to look things up once you have read the games, or when you start a game of your own.
+Part IV, [the engine manual](40-engine.md), comes after the games of Parts I to III; Part V, *Stories*, and Part VI, *Three Dimensions*, follow it. It describes the engine by subsystem rather than by game: what each part is for, when to choose it, how it works, and which chapter introduced it. Use it to look things up once you have read the games, or when you start a game of your own.
 
 Two appendices close the book: [Java2D and X11 pitfalls](appendix-java2d.md), the rules for fast and correct drawing, and a [glossary](appendix-glossary.md) of the words of game programming, each with the chapter that explains it.
 

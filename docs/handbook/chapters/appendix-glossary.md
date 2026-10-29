@@ -28,15 +28,19 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 **Baseline (layer).** The height where a part of a painted room touches the floor. People whose feet are above it are drawn before it and disappear behind it; the others walk in front. [Manual](49-adventure.md#rooms-room-hotspot-and-layers).
 
-**Bézier curve.** A smooth curve defined by four points: it starts at the first, ends at the last, and the two in between pull it into shape. Flight paths are built from them. [Swarm](24-swarm.md#step-3-flight-paths), [manual](44-movement.md#curves-to-fly-along-flightpath).
+**Billboard.** A flat picture standing in a 3D view that always turns its face to the eye. Pictures of the thing from several sides, chosen by the angle it is seen from, make it look solid. [Rivet](60-rivet.md#step-7-things-in-the-world), [manual](45-maps.md#seen-from-inside-gridmap-raycaster-and-lightmap).
 
 **Box selection.** A drag with the mouse opens a rectangle, and every unit of the player's side inside it is chosen. [Sands](31-sands.md#step-1-choosing-and-commanding), [manual](46-paths-and-decisions.md#choosing-units-selection-and-boxselect).
 
 **Breadth-first search.** A search that spreads from the goals like a wave, one step at a time, and so finds for every tile the number of steps to the nearest goal. [Maze](25-maze.md#step-5-breadth-first-search-the-way-home), [manual](46-paths-and-decisions.md#one-goal-every-tile-distancemap).
 
+**Bézier curve.** A smooth curve defined by four points: it starts at the first, ends at the last, and the two in between pull it into shape. Flight paths are built from them. [Swarm](24-swarm.md#step-3-flight-paths), [manual](44-movement.md#curves-to-fly-along-flightpath).
+
 ## C
 
 **Camera.** The part of a world larger than the screen that is shown. The game draws the world shifted by the camera's position, and turns mouse positions on the screen back into positions in the world. [Jump](27-jump.md#step-6-the-camera), [Towers](30-towers.md#step-5-the-mouse-in-the-world), [manual](45-maps.md#a-world-larger-than-the-screen-camera).
+
+**Camera plane.** In a raycaster, a vector at right angles to the view's direction. The ray of each column is the direction plus a part of the plane; the plane's length sets the field of view. [Rivet](60-rivet.md#without-the-fisheye).
 
 **Carrier.** A settler who takes wares along one stretch of road, from flag to flag. [Colony](32-colony.md#step-2-carriers).
 
@@ -59,6 +63,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 ## D
 
 **Data file.** A plain text file that holds what a designer changes without a compiler: levels, waves, stages, the properties of units and buildings. [Swarm](24-swarm.md#step-4-stages-as-data), [Towers](30-towers.md#step-3-units-towers-and-waves-as-data), [manual](47-data-and-saving.md#data-files-textdata).
+
+**DDA (digital differential analyser).** Following a ray through a grid from one cell border to the next, always to the nearer of the next vertical and horizontal line, so it visits exactly the cells the ray passes. [Rivet](60-rivet.md#following-a-ray), [manual](45-maps.md#seen-from-inside-gridmap-raycaster-and-lightmap).
 
 **Demand.** What a game's places need and ask for: a building site that needs planks, a town that wants more homes or shops. [Colony](32-colony.md#step-3-demand-who-needs-what), [Town](33-town.md#step-6-demand-mood-and-the-budget).
 
@@ -88,6 +94,10 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 ## F
 
+**Field of view.** How wide an angle a first-person view shows, about 68 degrees in Rivet. Wider shows more and makes everything smaller. [Rivet](60-rivet.md#without-the-fisheye).
+
+**Fisheye.** A flat wall drawn bulging, because the slices were sized by the distance along each ray instead of the distance in front of the camera. [Rivet](60-rivet.md#without-the-fisheye).
+
 **Fixed time step.** The rules always advance by the same amount of time, usually 1/120 of a second, however fast the computer draws. That makes the rules the same on every computer and testable. [Paddle](20-paddle.md#step-1-the-game-loop), [manual](41-loop-and-drawing.md#the-game-loop-gameloop-and-fixedstep).
 
 **Flag.** A point on the map where roads meet and wares wait to be carried on. A new flag on a road splits it in two. [Colony](32-colony.md#step-1-roads-from-flag-to-flag), [manual](46-paths-and-decisions.md#roads-between-flags-roadnetwork).
@@ -112,15 +122,19 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 **Game loop.** The heart of a real-time game: a thread that runs the rules in fixed steps and draws frames, again and again, until the game ends. [Paddle](20-paddle.md#step-1-the-game-loop), [manual](41-loop-and-drawing.md#the-game-loop-gameloop-and-fixedstep).
 
+**Gamepad.** A game controller with buttons and sticks, read from a device file on Linux and through XInput on Windows. [Blast](26-blast.md#step-2-gamepads), [manual](43-input.md#gamepads-gamepads-and-gamepad).
+
 **Garbage collection.** Java frees objects nobody uses any more by itself, and may pause the program to do it. A game avoids making objects in every frame, so the collector has nothing to do while it runs. [Bricks](21-bricks.md#step-5-particles), [appendix](appendix-java2d.md#drawing).
 
-**Gamepad.** A game controller with buttons and sticks, read from a device file on Linux and through XInput on Windows. [Blast](26-blast.md#step-2-gamepads), [manual](43-input.md#gamepads-gamepads-and-gamepad).
+**Glow.** A part of a texture or a model that shines by itself and ignores the room's light and shadow: a lamp, a screen, a machine's eye. [Rivet](60-rivet.md#glow-and-fog), [manual](45-maps.md#seen-from-inside-gridmap-raycaster-and-lightmap).
 
 ## H
 
 **Hard edges.** Scaling a picture without blending neighbouring pixels, so pixel art stays crisp instead of blurred. [Swarm](24-swarm.md#pixel-art-needs-hard-edges), [manual](42-sprites.md#pictures-sprite).
 
 **Heavyweight component.** An AWT component such as `Canvas` that is a native window of its own inside the Swing window. It is drawn over Swing's lightweight components, which needs care with popup menus and keys. [Paddle](20-paddle.md#a-heavyweight-in-a-swing-window).
+
+**Hitscan.** A shot that arrives at once along a line, instead of flying: the first wall or target on the line is hit. [Rivet](60-rivet.md#step-10-shooting), [manual](44-movement.md#walking-and-shooting-on-a-grid-of-walls-mover-and-hitscan).
 
 **Hotspot.** A part of a room picture the player can point at: it has a name, an outline, and a place where the hero stands to use it. [Templars](50-templar.md#step-1-the-story-as-data), [manual](49-adventure.md#rooms-room-hotspot-and-layers).
 
@@ -142,6 +156,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 ## L
 
+**Light map.** The light of a level worked out once per cell, with the lamps' shadows, and looked up while drawing instead of lit again for every pixel. Short flashes come on top for one frame. [Rivet](60-rivet.md#the-light-map), [manual](45-maps.md#seen-from-inside-gridmap-raycaster-and-lightmap).
+
 **Logical coordinates.** The fixed size a game draws in, 640 × 400 in most games of this book, whatever the size of the window. The canvas scales the picture; the rules and the mouse never see real pixels. [Paddle](20-paddle.md#logical-coordinates), [manual](41-loop-and-drawing.md#the-canvas-gamecanvas-and-rendermode).
 
 ## M
@@ -155,6 +171,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 **Mixer.** The part that adds several sounds into one stream for the sound card, so effects and music play at the same time. [Paddle](20-paddle.md#the-mixer), [manual](48-scenes-menus-sound.md#playing-mixer).
 
 **Model-View-Presenter (MVP).** The rules (model) and the window (view) never talk to each other directly; a presenter without Swing sits between them. [Structure](02-structure.md#model-view-presenter).
+
+**Mouse look.** Turning the view by moving the mouse: the game uses how far the mouse moved, and keeps the hidden pointer in the middle of the window so it never stops at the screen's edge. [Rivet](60-rivet.md#the-mouse), [manual](43-input.md#turning-with-the-mouse-mouselook).
 
 ## O
 
@@ -190,6 +208,10 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 ## R
 
+**Ray marching (sphere tracing).** Finding where a ray meets a model described by distances: step forward by the distance the model reports, which can never pass the surface, until it is almost zero. [Rivet](60-rivet.md#marching-rays), [manual](42-sprites.md#things-in-3d-sdf-model-and-modelrenderer).
+
+**Raycasting.** Drawing a world of square cells and walls of one height from inside, with one ray per column of the picture: the distance to the wall a ray hits sets the height of that column's slice. [Rivet](60-rivet.md#step-2-one-ray-per-column), [manual](45-maps.md#seen-from-inside-gridmap-raycaster-and-lightmap).
+
 **Recipe.** What a workshop makes of what: its inputs, the good made and the time it takes. [Colony](32-colony.md#step-4-goods-and-recipes), [manual](47-data-and-saving.md#goods-and-recipes-stock-and-recipe).
 
 **Render mode.** How the world reaches the screen: `DIRECT`, scaled to any size and sharp, or `PIXEL`. [Bricks](21-bricks.md#pixel-mode), [manual](41-loop-and-drawing.md#the-canvas-gamecanvas-and-rendermode).
@@ -209,6 +231,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 **Seed.** The number a random generator starts from. The same seed gives the same numbers. [Snake](22-snake.md#step-4-chance-that-repeats), [manual](47-data-and-saving.md#chance-that-repeats-seededrandom).
 
 **Shroud.** The black over the parts of the map a side has never seen. [Sands](31-sands.md#step-3-fog-of-war), [manual](45-maps.md#what-a-side-sees-fogofwar-and-fogpainter).
+
+**Signed distance function.** For a point in space, how far it is from the surface of a shape, negative inside. Shapes combine by taking the smaller distance, holes by the larger; a model is built from them in a few lines. [Rivet](60-rivet.md#step-8-models-from-distances), [manual](42-sprites.md#things-in-3d-sdf-model-and-modelrenderer).
 
 **Snapshot.** A whole game written down as keys and values, exact enough that a loaded game goes on as the saved one would have. [Sands](31-sands.md#step-9-saving-the-whole-game), [manual](47-data-and-saving.md#a-whole-game-snapshot).
 
