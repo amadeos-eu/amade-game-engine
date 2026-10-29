@@ -93,6 +93,16 @@ public final class ModelRenderer {
      * camera sees them. The picture is transparent where the model is not.
      */
     public BufferedImage picture(Model model, int width, int height, double focal, Placement at, List<Lamp> cameraLamps) {
+        return picture(model, width, height, focal, width / 2.0, height / 2.0, at, cameraLamps);
+    }
+
+    /**
+     * A window of the camera's view: the same as {@link #picture(Model, int, int, double, Placement, List)},
+     * but the camera's axis passes through ({@code axisX}, {@code axisY}) of the picture, which may lie
+     * outside it. A tool in the lower right of the screen is rendered without the empty rest of the screen.
+     */
+    public BufferedImage picture(Model model, int width, int height, double focal, double axisX, double axisY, Placement at,
+                                 List<Lamp> cameraLamps) {
         double[][] r = rotation(at);   // columns: the model's x, y and z axes in camera space
         List<Lamp> local = cameraLamps.stream().map(l -> l.point()
                 ? Lamp.at(dot(r, 0, l.x() - at.x(), l.y() - at.y(), l.z() - at.z()), dot(r, 1, l.x() - at.x(), l.y() - at.y(), l.z() - at.z()),
@@ -105,7 +115,7 @@ public final class ModelRenderer {
         IntStream.range(0, height).parallel().forEach(j -> {
             double[] out = new double[4];
             for (int i = 0; i < width; i++) {
-                double dx = (i + 0.5 - width / 2.0) / focal, dy = -(j + 0.5 - height / 2.0) / focal, l = Sdf.length(dx, dy, 1);
+                double dx = (i + 0.5 - axisX) / focal, dy = -(j + 0.5 - axisY) / focal, l = Sdf.length(dx, dy, 1);
                 dx /= l; dy /= l;
                 double dz = 1 / l;
                 if (trace(model, ox, oy, oz, dot(r, 0, dx, dy, dz), dot(r, 1, dx, dy, dz), dot(r, 2, dx, dy, dz), 6, local, out)) {

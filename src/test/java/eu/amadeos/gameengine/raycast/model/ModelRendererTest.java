@@ -62,4 +62,16 @@ class ModelRendererTest {
         // turned 180°, the front with the glowing dot looks at the camera
         assertEquals(0xff2000, image.getRGB(20, 20) & 0xffffff);
     }
+
+    @Test
+    void aWindowOfTheViewShowsTheModelWhereTheAxisPutsIt() {
+        // the axis 10 pixels left of the window: the ball, straight ahead, is drawn around x = -10, outside
+        ModelRenderer.Placement ahead = new ModelRenderer.Placement(0, 0, 3, 180, 0, 0);
+        List<ModelRenderer.Lamp> lamp = List.of(ModelRenderer.Lamp.from(0, 1, -1, 1, 1, 1));
+        BufferedImage outside = new ModelRenderer().picture(BALL, 40, 40, 40, -30, 20, ahead, lamp);
+        for (int x = 0; x < 40; x++) assertEquals(0, outside.getRGB(x, 20) >>> 24);
+        BufferedImage shifted = new ModelRenderer().picture(BALL, 40, 40, 40, 10, 20, ahead, lamp);
+        assertEquals(0xff2000, shifted.getRGB(10, 20) & 0xffffff);
+        assertEquals(0, shifted.getRGB(39, 20) >>> 24);
+    }
 }
