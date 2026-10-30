@@ -1,6 +1,6 @@
 plugins {
     id 'java-library'
-    id 'maven-publish'
+    id 'com.vanniktech.maven.publish' version '0.37.0'
 }
 
 // JitPack publishes under com.github.<owner>; using the same coordinates locally lets a game's
@@ -17,8 +17,24 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
     }
-    withSourcesJar()
-    withJavadocJar()
+    // The sources and javadoc jars, which Maven Central requires, come from mavenPublishing below.
+}
+
+// Releases from main also go to Maven Central as eu.amadeos:amade-game-engine; the release workflow passes
+// -PmavenCentral. Every other build keeps the JitPack coordinates, so the games' pins and composite builds still match.
+// Operating steps (Central Portal, signing key, secrets): chapter 8 of the amadeOS Betriebshandbuch.
+def centralRelease = providers.gradleProperty('mavenCentral').isPresent()
+// The amade-commons this engine builds on, pinned on JitPack: a commit on develop, a release tag (vX.Y.Z) before
+// main (Promote checks this pin). On Maven Central the same release is eu.amadeos:amade-commons:X.Y.Z.
+def commonsDependency = 'com.github.amadeos-eu:amade-commons:fac730fed3'
+if (centralRelease) {
+    def commonsPin = commonsDependency.tokenize(':').last()
+    def release = commonsPin =~ /^v(\d+\.\d+\.\d+)$/
+    if (!release.matches()) {
+        throw new GradleException("Maven Central needs an amade-commons release, but the pin is '${commonsPin}'. " +
+                'Release amade-commons first and pin its tag (vX.Y.Z).')
+    }
+    commonsDependency = 'eu.amadeos:amade-commons:' + release.group(1)
 }
 
 repositories {
@@ -29,7 +45,8 @@ repositories {
 dependencies {
     // Theme, Motif look, start-up, XDG and i18n helpers; games get them through this library.
     // With ../amade-commons checked out, settings.gradle builds that checkout instead (composite build).
-    api 'com.github.amadeos-eu:amade-commons:fac730fed3'
+    // The pin itself is commonsDependency above.
+    api commonsDependency
 
     testImplementation platform('org.junit:junit-bom:5.10.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -60,22 +77,43 @@ jar {
     }
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            artifactId = 'amade-game-engine'
-            from components.java
-            pom {
-                name = 'amade-game-engine'
-                description = 'Game library for amadeOS games: high scores, game menu, later loop, rendering and input'
-                url = 'https://github.com/amadeos-eu/amade-game-engine'
-                licenses {
-                    license {
-                        name = 'EUPL-1.2'
-                        url = 'https://interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12'
-                    }
-                }
+mavenPublishing {
+    coordinates(centralRelease ? 'eu.amadeos' : project.group.toString(), 'amade-game-engine', project.version.toString())
+    if (centralRelease) {
+        publishToMavenCentral(true)
+        signAllPublications()
+    }
+    pom {
+        name = 'amade-game-engine'
+        description = 'Game library for amadeOS games: high scores, game menu, game loop, rendering and input'
+        url = 'https://github.com/amadeos-eu/amade-game-engine'
+        licenses {
+            license {
+                name = 'EUPL-1.2'
+                url = 'https://interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12'
+                distribution = 'repo'
             }
+        }
+        developers {
+            developer {
+                id = 'datazuul'
+                name = 'Ralf Eichinger'
+                email = 'developers@datazuul.com'
+                url = 'https://github.com/datazuul'
+            }
+        }
+        organization {
+            name = 'amadeOS'
+            url = 'https://www.amadeos.eu'
+        }
+        scm {
+            url = 'https://github.com/amadeos-eu/amade-game-engine'
+            connection = 'scm:git:https://github.com/amadeos-eu/amade-game-engine.git'
+            developerConnection = 'scm:git:ssh://git@github.com/amadeos-eu/amade-game-engine.git'
+        }
+        issueManagement {
+            system = 'GitHub'
+            url = 'https://github.com/amadeos-eu/amade-game-engine/issues'
         }
     }
 }
