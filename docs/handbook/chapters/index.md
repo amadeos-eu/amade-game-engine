@@ -2,7 +2,7 @@
 
 This book teaches you how to program games by building them: first a game of Mines, then Solitaire, and step by step action games, a tower defence and finally a small real-time strategy game. While the games grow, so does the engine underneath them, **amade-game-engine**. You will not only use an engine, you will see why each part of it exists, because you write the game that first needs it.
 
-All games are real programs. They run on the [amadeOS](https://github.com/datazuul/amadeos) desktop, follow its look and its colour themes, and they run on Windows and other Linux systems as well. Every piece of code in this book is taken from those games. It compiles, it is tested, and you can check it out and change it.
+All games are real programs. They run on the [amadeOS](https://github.com/amadeos-eu/amadeos) desktop, follow its look and its colour themes, and they run on Windows and other Linux systems as well. Every piece of code in this book is taken from those games. It compiles, it is tested, and you can check it out and change it.
 
 ## Who this book is for
 

@@ -19,7 +19,7 @@ It is also the first game in this handbook that is drawn **isometric**: the map 
     - **Demand, mood and the budget**: three numbers that pull on each other, taxes that push everything
     - **A view that zooms**, and a ground that is painted only where it changed
 
-The complete game is in [amade-town-game](https://github.com/datazuul/amade-town-game).
+The complete game is in [amade-town-game](https://github.com/amadeos-eu/amade-town-game).
 
 ## The rules
 

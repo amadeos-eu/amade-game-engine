@@ -19,7 +19,7 @@ The original came from an arcade hall in 1980, and its ghosts are famous for see
     - **A\***: the cheapest way, when some tiles cost more than others, and a computer player that fears the ghosts
     - **Autotiling**: the picture of a wall from its neighbours, sixteen pieces from four bits
 
-The complete game is in [amade-maze-game](https://github.com/datazuul/amade-maze-game).
+The complete game is in [amade-maze-game](https://github.com/amadeos-eu/amade-maze-game).
 
 ## The rules
 

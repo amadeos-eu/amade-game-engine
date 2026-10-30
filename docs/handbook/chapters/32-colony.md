@@ -20,7 +20,7 @@ Settlement games are built from a few ideas that look simple and are not: goods 
     - **A computer that builds**: a plan in a text file, places scored by what the worker needs, a tower when there is no room
     - **Roads with the mouse**: a building laid out, the road following the mouse from its flag, click by click
 
-The complete game is in [amade-colony-game](https://github.com/datazuul/amade-colony-game).
+The complete game is in [amade-colony-game](https://github.com/amadeos-eu/amade-colony-game).
 
 ## The rules
 

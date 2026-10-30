@@ -20,7 +20,7 @@ Tower defence grew out of custom maps for strategy games around 2002, and its tw
     - **The ground**: drawn once, in squares, each when the camera first sees it
     - **Turned sprites**: 32 directions cached once
 
-The complete game is in [amade-towers-game](https://github.com/datazuul/amade-towers-game).
+The complete game is in [amade-towers-game](https://github.com/amadeos-eu/amade-towers-game).
 
 ## The rules
 

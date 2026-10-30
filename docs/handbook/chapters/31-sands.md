@@ -20,7 +20,7 @@ The early 1990s set the rules that real-time strategy has followed since: harves
     - **Saving a whole game**: hundreds of things in a save file, numbers exact to the bit, and a loaded battle that goes on exactly as it would have
     - **A ground drawn on other threads**: dunes, rock and crystal, worked out pixel by pixel, in squares, while the game runs
 
-The complete game is in [amade-sands-game](https://github.com/datazuul/amade-sands-game).
+The complete game is in [amade-sands-game](https://github.com/amadeos-eu/amade-sands-game).
 
 ## The rules
 

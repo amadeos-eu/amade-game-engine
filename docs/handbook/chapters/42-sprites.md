@@ -4,7 +4,7 @@ What a game shows, apart from plain shapes: pictures from files and pictures dra
 
 ## Pictures: Sprite
 
-*Package `sprite` · introduced in [21. Bricks](21-bricks.md#step-4-sprites); hard edges in [24. Swarm](24-swarm.md#pixel-art-needs-hard-edges), seamless tiles and transparency in [27. Jump](27-jump.md#tiles-without-gaps), opaque drawings in [30. Towers](30-towers.md#the-ground) · source: [`Sprite`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/sprite/Sprite.java)*
+*Package `sprite` · introduced in [21. Bricks](21-bricks.md#step-4-sprites); hard edges in [24. Swarm](24-swarm.md#pixel-art-needs-hard-edges), seamless tiles and transparency in [27. Jump](27-jump.md#tiles-without-gaps), opaque drawings in [30. Towers](30-towers.md#the-ground) · source: [`Sprite`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/sprite/Sprite.java)*
 
 **What it is for.** A picture with a size in logical coordinates, say a brick of 40 × 16 units, whatever the size of the window. Its source is an image file, usually drawn larger than the logical size so it stays sharp on large screens, or a **drawing in code**, a function that paints into a box of the sprite's size.
 
@@ -47,7 +47,7 @@ The cache also gets the least transparency the picture needs, because copying co
 
 ## A ground painted once: ScrollingLayer
 
-*Package `sprite` · introduced in [33. Town](33-town.md#a-ground-that-is-painted-only-where-it-changed) · source: [`ScrollingLayer`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/sprite/ScrollingLayer.java)*
+*Package `sprite` · introduced in [33. Town](33-town.md#a-ground-that-is-painted-only-where-it-changed) · source: [`ScrollingLayer`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/sprite/ScrollingLayer.java)*
 
 **What it is for.** A layer of the world that rarely changes and costs much to draw: the ground of a big map with a thousand tiles in view, and the shadows on it. The layer keeps the view as one opaque picture in screen pixels and copies it, instead of drawing the tiles again in every frame.
 
@@ -76,7 +76,7 @@ The painter must cover every pixel of the region it gets, so fill a background f
 
 ## Many pictures in one: SpriteSheet
 
-*Package `sprite` · introduced in [24. Swarm](24-swarm.md#step-1-a-sprite-sheet) · source: [`SpriteSheet`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/sprite/SpriteSheet.java)*
+*Package `sprite` · introduced in [24. Swarm](24-swarm.md#step-1-a-sprite-sheet) · source: [`SpriteSheet`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/sprite/SpriteSheet.java)*
 
 **What it is for.** Many small pictures in one image, in a grid of equal cells: the frames of a flapping insect, the looks of a bomber, the stages of an explosion. One file instead of fifty, drawn and edited side by side, so the frames of an animation line up.
 
@@ -88,7 +88,7 @@ The painter must cover every pixel of the region it gets, so fill a background f
 
 ## Which frame when: Animation
 
-*Package `sprite` · introduced in [24. Swarm](24-swarm.md#animation) · source: [`Animation`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/sprite/Animation.java)*
+*Package `sprite` · introduced in [24. Swarm](24-swarm.md#animation) · source: [`Animation`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/sprite/Animation.java)*
 
 **What it is for.** Which frame of a sheet to show a given number of seconds after an animation started: a list of frame numbers, a time per frame, and what happens at the end, `LOOP` (wings, flames), `ONCE` (an explosion, a door) or `PING_PONG` (breathing, swaying).
 
@@ -106,7 +106,7 @@ Seen from above or from the side in space, things point in every direction. A sp
 
 ### Turned in advance: Rotations
 
-*Package `sprite` · introduced in [30. Towers](30-towers.md#turned-sprites) · source: [`Rotations`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/sprite/Rotations.java)*
+*Package `sprite` · introduced in [30. Towers](30-towers.md#turned-sprites) · source: [`Rotations`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/sprite/Rotations.java)*
 
 `Rotations.of(steps, size, drawing)` draws a picture, pointing right at angle 0, once for each of `steps` directions, each a square `Sprite` of `size` units with its own cache. `draw(g, x, y, angle)` shows the nearest one with its middle at `x`, `y`; any angle works, negative or above 2π. At 32 directions the steps are 11.25°, and a turret turns smoothly to the eye. Towers and Sands draw their turrets, tanks and creeps this way.
 
@@ -116,7 +116,7 @@ Seen from above or from the side in space, things point in every direction. A sp
 
 ### Figures of lines: Outline
 
-*Package `shape` · introduced in [23. Rocks](23-rocks.md#step-2-turning) · source: [`Outline`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/shape/Outline.java)*
+*Package `shape` · introduced in [23. Rocks](23-rocks.md#step-2-turning) · source: [`Outline`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/shape/Outline.java)*
 
 A figure given by its corners around its own centre, pairs of x and y, angle 0 pointing right: `Outline.closed(...)` joins the last corner to the first, `Outline.open(...)` does not (a flame behind a ship). `draw(g, x, y, angle, scale)` and `fill(...)` turn every corner with the same formula as `Vector.rotated`, sine and cosine worked out once for all corners, into one `Path2D` that the outline keeps and reuses: drawing creates no objects. `radius()` is the farthest corner, a circle that holds the figure at any angle, which is exactly what [`Circle`](44-movement.md#circles-circle) collision needs.
 
@@ -126,7 +126,7 @@ A figure given by its corners around its own centre, pairs of x and y, angle 0 p
 
 ## Things in 3D: Sdf, Model and ModelRenderer
 
-*Package `raycast.model` · introduced in [60. Rivet](60-rivet.md#step-8-models-from-distances) · source: [`Sdf`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/model/Sdf.java), [`Model`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/model/Model.java), [`Material`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/model/Material.java), [`ModelRenderer`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/model/ModelRenderer.java)*
+*Package `raycast.model` · introduced in [60. Rivet](60-rivet.md#step-8-models-from-distances) · source: [`Sdf`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/model/Sdf.java), [`Model`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/model/Model.java), [`Material`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/model/Material.java), [`ModelRenderer`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/model/ModelRenderer.java)*
 
 **What it is for.** Pictures of solid things, rendered by the engine instead of drawn by hand: a machine from eight sides for a first-person view, a tool held in front of the camera, a turret seen from any angle. A `Model` is described by **signed distance functions**: for a point in space, how far it is from the surface, negative inside. The `ModelRenderer` turns it into pictures, with lamps, soft shadows, occlusion in the creases, highlights and a rim along the outline.
 
@@ -155,7 +155,7 @@ A figure given by its corners around its own centre, pairs of x and y, angle 0 p
 
 ## Movement in time: Easing and Tween
 
-*Package `anim` · introduced in [11. Solitaire](11-solitaire.md#easing-how-a-movement-feels) · source: [`Easing`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/anim/Easing.java), [`Tween`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/anim/Tween.java)*
+*Package `anim` · introduced in [11. Solitaire](11-solitaire.md#easing-how-a-movement-feels) · source: [`Easing`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/anim/Easing.java), [`Tween`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/anim/Tween.java)*
 
 **What it is for.** A movement from one value to another in a given time that feels natural: a card thrown onto its pile starts fast and lands gently. An `Easing` maps the share of the time that has passed, 0 to 1, to the share of the way: `LINEAR`, `EASE_OUT` (thrown and landing) and `EASE_IN_OUT` (carried). A `Tween` is one such movement in time: a start, a duration, an easing.
 
@@ -169,7 +169,7 @@ A figure given by its corners around its own centre, pairs of x and y, angle 0 p
 
 ## Splinters and sparks: Particles
 
-*Package `fx` · introduced in [21. Bricks](21-bricks.md#step-5-particles) · source: [`Particles`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/fx/Particles.java)*
+*Package `fx` · introduced in [21. Bricks](21-bricks.md#step-5-particles) · source: [`Particles`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/fx/Particles.java)*
 
 **What it is for.** Many small, short-lived squares: splinters of a brick, sparks of a shot, dust behind a tank. Each flies in a straight line, falls with gravity if you give it one, and fades out during the second half of its life. Every action game from Bricks on uses them.
 

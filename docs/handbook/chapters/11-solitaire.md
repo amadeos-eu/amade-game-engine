@@ -17,7 +17,7 @@ The second game is the patience that came with every desktop of the 1990s: **Klo
     - **Hit testing**: which card is under the mouse when cards overlap
     - A **physics** toy for the victory animation: gravity, bouncing, trails
 
-The complete game is in [amade-solitaire-game](https://github.com/datazuul/amade-solitaire-game).
+The complete game is in [amade-solitaire-game](https://github.com/amadeos-eu/amade-solitaire-game).
 
 ## The rules
 

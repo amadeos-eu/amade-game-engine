@@ -38,4 +38,4 @@ With *The Seal of the Templars*, Part V has begun: a story told in painted rooms
 
 With *Rivet*, Part VI has begun: a world seen from inside, drawn by the engine's raycaster, with machines rendered from distance functions. What the next games of either part add to the engine will be told in their chapters, and as always in Part IV, the tables of [chapter 40](40-engine.md) and the [glossary](appendix-glossary.md).
 
-Suggestions and corrections are welcome as [issues](https://github.com/datazuul/amade-game-engine/issues) or pull requests. Each page has an edit button at the top.
+Suggestions and corrections are welcome as [issues](https://github.com/amadeos-eu/amade-game-engine/issues) or pull requests. Each page has an edit button at the top.

@@ -4,7 +4,7 @@ How things find their way, and how the computer decides what to do. The searches
 
 ## What may be entered: Passable
 
-*Package `path` · introduced in [25. Maze](25-maze.md#step-5-breadth-first-search-the-way-home) · source: [`Passable`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/path/Passable.java)*
+*Package `path` · introduced in [25. Maze](25-maze.md#step-5-breadth-first-search-the-way-home) · source: [`Passable`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/path/Passable.java)*
 
 Every search asks the game, not the map, whether a tile can be entered: `(col, row) -> boolean`. The same map gives different answers to different walkers. A ghost flying home may pass the door of its house, which is a wall to everyone else; a vehicle of Sands drives on sand and rock, the burrower only on sand; a tower that is only planned closes its tile for the question "would the way stay open?". So the searches never need to know what a tile is.
 
@@ -24,7 +24,7 @@ The rule of thumb: when **many** things want to reach **one** place, search once
 
 ## One goal, every tile: DistanceMap
 
-*Package `path` · introduced in [25. Maze](25-maze.md#step-5-breadth-first-search-the-way-home) · source: [`DistanceMap`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/path/DistanceMap.java)*
+*Package `path` · introduced in [25. Maze](25-maze.md#step-5-breadth-first-search-the-way-home) · source: [`DistanceMap`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/path/DistanceMap.java)*
 
 **What it is for.** For every tile of a map, the number of steps to the nearest of one or more goals, found by **breadth-first search**: the goals have distance 0, their open neighbours 1, the neighbours of those 2, a wave that spreads through the corridors until it has filled them. `downhill(col, row)` is then the first step on a shortest way from anywhere. Search from where one stands instead, and the distances of the dots say which is the **nearest** of many things.
 
@@ -36,7 +36,7 @@ The rule of thumb: when **many** things want to reach **one** place, search once
 
 ## The cheapest way for one: AStar
 
-*Package `path` · introduced in [25. Maze](25-maze.md#step-6-a-the-computer-player) · source: [`AStar`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/path/AStar.java)*
+*Package `path` · introduced in [25. Maze](25-maze.md#step-6-a-the-computer-player) · source: [`AStar`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/path/AStar.java)*
 
 **What it is for.** The cheapest way from one tile to another when tiles cost differently to enter: a way past a ghost can cost more than a longer way round it. `AStar.find(map, from, to, cost)` returns a `Path`: the cells, the steps, the cost and how many tiles the search looked at; `found()` and `first()` for the step to take now.
 
@@ -50,7 +50,7 @@ The two searches work well together. The pilot of Maze, the computer player, pla
 
 ## Many units, one goal: FlowField
 
-*Package `path` · introduced in [30. Towers](30-towers.md#step-1-the-flow-field) · source: [`FlowField`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/path/FlowField.java)*
+*Package `path` · introduced in [30. Towers](30-towers.md#step-1-the-flow-field) · source: [`FlowField`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/path/FlowField.java)*
 
 **What it is for.** For every tile of a map, which way leads to the goal: a field of arrows that any number of units follow at once. A hundred orcs cost one search, not a hundred, and a new tower costs one new search, however many orcs must find a new way round it. The field also answers whether every tile still reaches the goal, which is how Towers refuses a tower that would close the way ([chapter 30](30-towers.md#may-a-tower-stand-here)).
 
@@ -77,13 +77,13 @@ The two searches work well together. The pilot of Maze, the computer player, pla
 
 ### Many fields: FieldCache
 
-*Package `path` · introduced in [31. Sands](31-sands.md#one-field-for-the-group) · source: [`FieldCache`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/path/FieldCache.java)*
+*Package `path` · introduced in [31. Sands](31-sands.md#one-field-for-the-group) · source: [`FieldCache`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/path/FieldCache.java)*
 
 In a strategy game every order has a goal of its own. `toward(goal)` gives the field towards a tile, from the cache or searched now: a group shares one field, two groups sent to the same place share it too, and the harvesters, all driving home to the same refinery, share theirs for the whole game. When a building goes up or comes down, `invalidate()` forgets every field, and each is searched again when it is next asked for. Only the 32 fields used last are kept, an access-ordered `LinkedHashMap` that drops its eldest entry, because a field of a map of 64 × 64 is 20 KB. `searches()` counts what the cache did not save: a test proves that six tanks with one order cost one search.
 
 ## Roads between flags: RoadNetwork
 
-*Package `road` · introduced in [32. Colony](32-colony.md#step-1-roads-from-flag-to-flag) · source: [`RoadNetwork`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/road/RoadNetwork.java)*
+*Package `road` · introduced in [32. Colony](32-colony.md#step-1-roads-from-flag-to-flag) · source: [`RoadNetwork`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/road/RoadNetwork.java)*
 
 **What it is for.** Roads that the player lays from flag to flag, and the way of a ware over them. A road joins two flags and runs over the cells between; a new flag on a road makes two roads of it. A ware at a flag asks which road it takes next to reach the flag of the house it is meant for.
 
@@ -108,7 +108,7 @@ In a strategy game every order has a goal of its own. `toward(goal)` gives the f
 
 ## Groups on the move: Formation
 
-*Package `path` · introduced in [31. Sands](31-sands.md#a-slot-for-each) · source: [`Formation`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/path/Formation.java)*
+*Package `path` · introduced in [31. Sands](31-sands.md#a-slot-for-each) · source: [`Formation`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/path/Formation.java)*
 
 **What it is for.** Where a group of units stands when it arrives. Five tanks sent to one tile cannot all stand on it: each needs a **slot** of its own near the tile the player clicked, and each must take the slot that suits it, or they cross each other's way at the end and jostle.
 
@@ -126,7 +126,7 @@ Slots keep a group apart at the end; on the way, the game pushes overlapping uni
 
 ## Choosing units: Selection and BoxSelect
 
-*Package `select` · introduced in [31. Sands](31-sands.md#step-1-choosing-and-commanding) · source: [`Selection`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/select/Selection.java), [`BoxSelect`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/select/BoxSelect.java)*
+*Package `select` · introduced in [31. Sands](31-sands.md#step-1-choosing-and-commanding) · source: [`Selection`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/select/Selection.java), [`BoxSelect`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/select/BoxSelect.java)*
 
 **What it is for.** The conventions of strategy games since the nineties. A click picks one thing, a drag opens a box and picks all in it, Shift adds to the choice (and a Shift-click on something already picked takes it out), Ctrl and a number keep the choice as a group that the number alone calls back. `Selection` keeps what is picked and the nine groups; `BoxSelect` tells a click from a box.
 
@@ -148,7 +148,7 @@ Slots keep a group apart at the end; on the way, the game pushes overlapping uni
 
 ## One state at a time: StateMachine
 
-*Package `ai` · introduced in [25. Maze](25-maze.md#step-3-ghosts-as-state-machines) · source: [`StateMachine`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/ai/StateMachine.java)*
+*Package `ai` · introduced in [25. Maze](25-maze.md#step-3-ghosts-as-state-machines) · source: [`StateMachine`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/ai/StateMachine.java)*
 
 **What it is for.** Something that is always in exactly one of a few states, an enum, and changes between them only along ways allowed in advance: a ghost that waits, hunts, flees or flies home; a door; the phases of a round.
 
@@ -162,7 +162,7 @@ Slots keep a group apart at the end; on the way, the game pushes overlapping uni
 
 ## Strength on the map: InfluenceMap
 
-*Package `ai` · introduced in [31. Sands](31-sands.md#whom-to-attack-the-influence-map) · source: [`InfluenceMap`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/ai/InfluenceMap.java)*
+*Package `ai` · introduced in [31. Sands](31-sands.md#whom-to-attack-the-influence-map) · source: [`InfluenceMap`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/ai/InfluenceMap.java)*
 
 **What it is for.** The computer opponent's picture of the battle. Every unit and building spreads its strength around it, full on its own tile and less further away, nothing beyond its reach; added up, the map shows where a side is strong and where it is weak, without looking at single units. With one per side, an opponent's questions become arithmetic: where is the enemy strongest (`strongest()`)? Which of its buildings is defended worst (`weakest(candidates)`)? Is this crystal field safe for a harvester (`at(col, row)` is 0)?
 
@@ -170,7 +170,7 @@ Slots keep a group apart at the end; on the way, the game pushes overlapping uni
 
 ## Aiming by trying: ShotSolver
 
-*Package `ai` · introduced in [29. Artillery](29-artillery.md#step-5-the-computer-aims) · source: [`ShotSolver`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/ai/ShotSolver.java)*
+*Package `ai` · introduced in [29. Artillery](29-artillery.md#step-5-the-computer-aims) · source: [`ShotSolver`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/ai/ShotSolver.java)*
 
 **What it is for.** A computer that aims a shot set by two numbers, an angle and a power, when no formula says which: a hill in the way, wind, a target higher than the gun. Instead of solving the physics, it **tries** shots in thought with the game's own rules and keeps the best.
 
@@ -187,7 +187,7 @@ Slots keep a group apart at the end; on the way, the game pushes overlapping uni
 
 ## Events that cause events: EventQueue
 
-*Package `event` · introduced in [26. Blast](26-blast.md#step-5-events-and-chain-reactions) · source: [`EventQueue`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/event/EventQueue.java)*
+*Package `event` · introduced in [26. Blast](26-blast.md#step-5-events-and-chain-reactions) · source: [`EventQueue`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/event/EventQueue.java)*
 
 **What it is for.** Consequences that spread: a bomb explodes, its flames reach a second bomb, which explodes too, and its flames reach a player. Each event is handled by one method of the rules, and the handler may `post` further events; `process(handler)` handles them all, in the order they were posted, until none is left.
 
@@ -201,7 +201,7 @@ Slots keep a group apart at the end; on the way, the game pushes overlapping uni
 
 ## Whose turn: TurnOrder
 
-*Package `turn` · introduced in [29. Artillery](29-artillery.md#whose-turn) · source: [`TurnOrder`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/turn/TurnOrder.java)*
+*Package `turn` · introduced in [29. Artillery](29-artillery.md#whose-turn) · source: [`TurnOrder`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/turn/TurnOrder.java)*
 
 **What it is for.** Games played in turns: whose turn it is, who comes next, and when it is over. The players are anything (tanks, seats, colours); a test says whether one is still in play.
 

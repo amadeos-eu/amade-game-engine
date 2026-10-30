@@ -18,7 +18,7 @@ The original came out in 1983 and became a party game when it let five people pl
     - **Events**: consequences as messages on a queue, so that a chain reaction runs wave by wave
     - **Danger maps**: when flames will reach each tile, along chains, for a computer player that does not blow itself up
 
-The complete game is in [amade-blast-game](https://github.com/datazuul/amade-blast-game).
+The complete game is in [amade-blast-game](https://github.com/amadeos-eu/amade-blast-game).
 
 ## The rules
 

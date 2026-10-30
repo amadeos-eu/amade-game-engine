@@ -19,7 +19,7 @@ Artillery games are among the oldest computer games: tanks or cannons on a line 
     - **A replay without a recording**: the battle copied before the shot, fired again with the same aim
     - The **mouse** as a second way to aim, next to the keys and the gamepad
 
-The complete game is in [amade-artillery-game](https://github.com/datazuul/amade-artillery-game).
+The complete game is in [amade-artillery-game](https://github.com/amadeos-eu/amade-artillery-game).
 
 ## The rules
 

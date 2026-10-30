@@ -19,7 +19,7 @@ With pictures and splinters, drawing a frame begins to cost real time, and on a 
     - More **sound effects**: noise for a crash, melodies, and many sounds at once through the mixer
     - **Measuring** frame times, finding what is slow, and fixing it: a sprite cache, a pixel mode, and an idea that did not work
 
-The complete game is in [amade-bricks-game](https://github.com/datazuul/amade-bricks-game).
+The complete game is in [amade-bricks-game](https://github.com/amadeos-eu/amade-bricks-game).
 
 ## The rules
 

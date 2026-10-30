@@ -4,7 +4,7 @@ The state of a game, where it comes from and where it goes: random numbers that 
 
 ## Chance that repeats: SeededRandom
 
-*Package `random` · introduced in [22. Snake](22-snake.md#step-4-chance-that-repeats); saving its state in [31. Sands](31-sands.md#step-9-saving-the-whole-game) · source: [`SeededRandom`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/random/SeededRandom.java)*
+*Package `random` · introduced in [22. Snake](22-snake.md#step-4-chance-that-repeats); saving its state in [31. Sands](31-sands.md#step-9-saving-the-whole-game) · source: [`SeededRandom`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/random/SeededRandom.java)*
 
 **What it is for.** Random numbers that repeat exactly: the same seed gives the same numbers, on every computer, with every Java version. Replays, tests of whole games, a game of the day and loaded saves all depend on it.
 
@@ -28,7 +28,7 @@ The state of a game, where it comes from and where it goes: random numbers that 
 
 ## A game as its input: Replay
 
-*Package `replay` · introduced in [22. Snake](22-snake.md#step-5-replays) · source: [`Replay`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/replay/Replay.java)*
+*Package `replay` · introduced in [22. Snake](22-snake.md#step-5-replays) · source: [`Replay`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/replay/Replay.java)*
 
 **What it is for.** A whole game as a seed and the player's actions, each with the tick at which the rules received it. When the rules are deterministic (all chance from a `SeededRandom` with this seed, all time from ticks), feeding the same actions at the same ticks plays the same game again, to the last point. A title screen that replays a good game, a bug report that can be played back, a test that plays a whole game: all of them are a replay.
 
@@ -45,7 +45,7 @@ The state of a game, where it comes from and where it goes: random numbers that 
 
 ## Undo and redo: History
 
-*Package `undo` · introduced in [11. Solitaire](11-solitaire.md#step-4-undo-by-snapshots) · source: [`History`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/undo/History.java)*
+*Package `undo` · introduced in [11. Solitaire](11-solitaire.md#step-4-undo-by-snapshots) · source: [`History`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/undo/History.java)*
 
 **What it is for.** Undo and redo in a game of moves. Before each move the game records a copy of its state; undo hands the last copy back. This is simpler than undoing each kind of move by hand, and it cannot go wrong for moves with side effects (a card turned over, a score changed), as long as the copies are complete.
 
@@ -57,7 +57,7 @@ The state of a game, where it comes from and where it goes: random numbers that 
 
 ## Data files: TextData
 
-*Package `data` · introduced in [24. Swarm](24-swarm.md#step-4-stages-as-data) · source: [`TextData`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/data/TextData.java)*
+*Package `data` · introduced in [24. Swarm](24-swarm.md#step-4-stages-as-data) · source: [`TextData`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/data/TextData.java)*
 
 **What it is for.** A game's data as plain text, one thing per line: words separated by spaces, the first word saying what the line is. Stages and their flight paths in Swarm, the maze of Maze, the arena of Blast, the waves of Towers. A designer, or a player, changes the game without a compiler.
 
@@ -74,7 +74,7 @@ The state of a game, where it comes from and where it goes: random numbers that 
 
 ## Things with properties: Catalog
 
-*Package `data` · introduced in [30. Towers](30-towers.md#step-3-units-towers-and-waves-as-data) · source: [`Catalog`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/data/Catalog.java)*
+*Package `data` · introduced in [30. Towers](30-towers.md#step-3-units-towers-and-waves-as-data) · source: [`Catalog`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/data/Catalog.java)*
 
 **What it is for.** The units, towers, weapons and buildings of a game, one block each in a data file: a line naming the thing, then its properties, one per line. The numbers a designer changes again and again while the game is played. With `like`, a block starts with all properties of an earlier one of its kind and changes some:
 
@@ -100,7 +100,7 @@ unit orc-chief like orc
 
 ## Money and production: Credits and Production
 
-*Package `economy` · introduced in [31. Sands](31-sands.md#step-5-crystals-credits-and-power) · source: [`Credits`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/economy/Credits.java), [`Production`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/economy/Production.java)*
+*Package `economy` · introduced in [31. Sands](31-sands.md#step-5-crystals-credits-and-power) · source: [`Credits`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/economy/Credits.java), [`Production`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/economy/Production.java)*
 
 **What it is for.** The money of one side and what it builds. `Credits` is money with a **store**: what the harvesters bring in fills the refineries and silos, and what they cannot hold is lost, which makes the player spend instead of saving up for ever. `Production` is a queue of orders, the first one in the works, **paid while it is made**: a tank of 300 credits that takes 20 seconds costs 15 credits a second. Without money the work stops and waits; with too little power it goes slower; a cancelled order gives back what was paid so far.
 
@@ -124,7 +124,7 @@ unit orc-chief like orc
 
 ## Goods and recipes: Stock and Recipe
 
-*Package `economy` · introduced in [32. Colony](32-colony.md#step-4-goods-and-recipes) · source: [`Stock`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/economy/Stock.java), [`Recipe`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/economy/Recipe.java)*
+*Package `economy` · introduced in [32. Colony](32-colony.md#step-4-goods-and-recipes) · source: [`Stock`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/economy/Stock.java), [`Recipe`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/economy/Recipe.java)*
 
 **What it is for.** Goods counted by kind, and what a workshop makes of them. A `Stock` is a count for each value of an `enum` of goods, with a limit per good if wanted: a storehouse, a building site, the door of a bakery. A `Recipe` is a list of inputs, the good made and the seconds it takes; each input is a **set** of goods, any one of which will do. Colony's residence needs bread *or* fish, and cloth.
 
@@ -147,7 +147,7 @@ unit orc-chief like orc
 
 ## Progress on disk: SaveFile
 
-*Package `save` · introduced in [27. Jump](27-jump.md#step-8-saving-progress) · source: [`SaveFile`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/save/SaveFile.java)*
+*Package `save` · introduced in [27. Jump](27-jump.md#step-8-saving-progress) · source: [`SaveFile`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/save/SaveFile.java)*
 
 **What it is for.** A player's progress on disk: which levels are open, the best times, what was collected; in Sands also the whole running battle. Settings may get lost without harm, progress may not. So a save file is written with more care than settings:
 
@@ -167,7 +167,7 @@ The content is keys and values, sorted, as in a properties file, so a person can
 
 ### A whole game: Snapshot
 
-*Package `save` · introduced in [31. Sands](31-sands.md#step-9-saving-the-whole-game) · source: [`Snapshot`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/save/Snapshot.java)*
+*Package `save` · introduced in [31. Sands](31-sands.md#step-9-saving-the-whole-game) · source: [`Snapshot`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/save/Snapshot.java)*
 
 Progress is a handful of numbers. A running battle is a few hundred things, each with a dozen values, in lists. A `Snapshot.Writer` gives them names a save file can hold and a person can read, `unit.count=2`, `unit.0.kind=tank`, `unit.0.x=212.5`, nested as deep as needed with `child(key)` and `add(key)`; a `Snapshot.Reader` reads them back with `text`, `integer`, `whole`, `number`, `bool`, `choice` (an enum), `child` and `list`, and says which key is missing or malformed when a file does not fit.
 
@@ -196,7 +196,7 @@ The test a game writes on top of that: run a game, save it, load it, run both on
 
 ## High scores: HighScores
 
-*Package `score` · introduced in [10. Mines](10-mines.md#step-10-high-scores) · source: [`HighScores`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/score/HighScores.java), [`Score`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/score/Score.java), [`Ranking`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/score/Ranking.java), [`PlayerName`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/score/PlayerName.java)*
+*Package `score` · introduced in [10. Mines](10-mines.md#step-10-high-scores) · source: [`HighScores`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/score/HighScores.java), [`Score`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/score/Score.java), [`Ranking`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/score/Ranking.java), [`PlayerName`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/score/PlayerName.java)*
 
 **What it is for.** The best ten results of a game, one **table** per difficulty or variant. A `Ranking` says whether lower wins (times, moves) or higher (points); on a tie, the older entry stays in front. `PlayerName` remembers the name typed last time and offers it again, the login name the first time.
 

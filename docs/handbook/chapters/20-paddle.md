@@ -18,7 +18,7 @@ Part I's games waited for you. Nothing in Mines or Solitaire happened until you 
     - **Two threads, one game**: the loop thread, the Swing thread, and how they talk safely
     - **Sound** made from numbers: samples, waves and their overtones, envelopes, and a **mixer** that plays several sounds at once
 
-The complete game is in [amade-paddle-game](https://github.com/datazuul/amade-paddle-game).
+The complete game is in [amade-paddle-game](https://github.com/amadeos-eu/amade-paddle-game).
 
 ## The rules
 

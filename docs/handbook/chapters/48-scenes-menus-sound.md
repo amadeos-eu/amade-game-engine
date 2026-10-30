@@ -4,7 +4,7 @@ What surrounds the rules: the screens a game shows one after another, the menus 
 
 ## Screens: Scene and SceneStack
 
-*Package `scene` · introduced in [20. Paddle](20-paddle.md#step-6-scenes); the overlay in [21. Bricks](21-bricks.md#two-layers-the-world-and-the-overlay) · source: [`Scene`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/scene/Scene.java), [`SceneStack`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/scene/SceneStack.java)*
+*Package `scene` · introduced in [20. Paddle](20-paddle.md#step-6-scenes); the overlay in [21. Bricks](21-bricks.md#two-layers-the-world-and-the-overlay) · source: [`Scene`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/scene/Scene.java), [`SceneStack`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/scene/SceneStack.java)*
 
 **What it is for.** The screens of a real-time game: a title, the match, a pause screen, the end. A `Scene` advances in fixed steps (`update(seconds)`) and draws itself in logical coordinates (`render(g, alpha)`), with an optional `renderOverlay` for what lies on top of the world, such as the score. Both run on the game loop thread.
 
@@ -25,7 +25,7 @@ A scene is the right place for what belongs to one screen only: the title's demo
 
 ## The standard menus: GameMenus and GameTexts
 
-*Package `swing` · introduced in [10. Mines](10-mines.md#step-10-high-scores); undo and redo in [11. Solitaire](11-solitaire.md#step-11-what-moved-into-the-engine), full screen in [20. Paddle](20-paddle.md#full-screen), graphics and frame times in [21. Bricks](21-bricks.md#a-display-for-frame-times) · source: [`GameMenus`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/swing/GameMenus.java), [`GameTexts`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/swing/GameTexts.java)*
+*Package `swing` · introduced in [10. Mines](10-mines.md#step-10-high-scores); undo and redo in [11. Solitaire](11-solitaire.md#step-11-what-moved-into-the-engine), full screen in [20. Paddle](20-paddle.md#full-screen), graphics and frame times in [21. Bricks](21-bricks.md#a-display-for-frame-times) · source: [`GameMenus`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/swing/GameMenus.java), [`GameTexts`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/swing/GameTexts.java)*
 
 **What it is for.** The menu entries every game has, with the same texts, mnemonics and keys in all of them, in the five languages of amadeOS (English, German, French, Spanish and Italian). The game adds its own entries between them.
 
@@ -45,13 +45,13 @@ Every item has a component name (`game-new`, `game-full-screen`, …), so tests 
 
 ### High-score dialogs: HighScoreDialog
 
-*Package `swing` · introduced in [10. Mines](10-mines.md#step-10-high-scores) · source: [`HighScoreDialog`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/swing/HighScoreDialog.java)*
+*Package `swing` · introduced in [10. Mines](10-mines.md#step-10-high-scores) · source: [`HighScoreDialog`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/swing/HighScoreDialog.java)*
 
 `HighScoreDialog.show(parent, scores, tables, format, selected, highlight)` shows the [high scores](47-data-and-saving.md#high-scores-highscores), one tab per table, with a new entry highlighted and a *Reset* button that asks first; `format` turns a value into text, `42 s` or `1,250`. `HighScoreDialog.askName(parent, message, playerName)` asks for the name after a good result, offering the one typed last time, and remembers the new one. Both are modal Swing dialogs and must be called on the event thread. A real-time game that runs in full screen shows its own end screen as a scene instead, with the place in the table drawn into the picture.
 
 ## Menus over the game: OverlayMenu
 
-*Package `menu` · introduced in [30. Towers](30-towers.md#step-6-menus-over-the-game) · source: [`OverlayMenu`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/menu/OverlayMenu.java)*
+*Package `menu` · introduced in [30. Towers](30-towers.md#step-6-menus-over-the-game) · source: [`OverlayMenu`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/menu/OverlayMenu.java)*
 
 **What it is for.** A menu inside the game's picture that opens beside the place it belongs to, such as the tile the player clicked, and offers a few things to choose: the towers to build there and what they cost. Each `Item` has a value, an optional icon, a label, an optional detail on the right (a price) and whether it can be chosen; a tower the player cannot pay shows, but greyed.
 
@@ -79,7 +79,7 @@ Every item has a component name (`game-new`, `game-full-screen`, …), so tests 
 
 ## Sound effects: Sound
 
-*Package `audio` · introduced in [20. Paddle](20-paddle.md#step-8-sound) · source: [`Sound`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/audio/Sound.java)*
+*Package `audio` · introduced in [20. Paddle](20-paddle.md#step-8-sound) · source: [`Sound`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/audio/Sound.java)*
 
 **What it is for.** A short sound as raw samples: 44,100 numbers per second, each the position of the loudspeaker's membrane between -32768 and 32767. That is all a sound card plays. The effects of the early arcade games were not recordings but tones the machine made, and so are the sounds of this book.
 
@@ -93,7 +93,7 @@ Make the sounds once, at the start, in a sound bank of the game: a sound is a fe
 
 ### Tunes as text: Tune
 
-*Package `audio` · introduced in [24. Swarm](24-swarm.md#tunes-as-text) · source: [`Tune`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/audio/Tune.java)*
+*Package `audio` · introduced in [24. Swarm](24-swarm.md#tunes-as-text) · source: [`Tune`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/audio/Tune.java)*
 
 A melody written as text in the *Music Macro Language* of the home computers of the 1980s, one voice per string: `Tune.voice(Sound.Wave.SQUARE, 0.3, "t140 o4 l8 c e g > c")`. Notes `c` to `b` with `+`, `#` or `-` and an optional length (`4` a quarter, a dot half as long again), `r` a rest, `l` the default length, `o` the octave (in octave 4, `a` is 440 Hz), `>` and `<` an octave up and down, `t` the tempo in quarter notes per minute; spaces and bars `|` are only for the eye. Each note sounds a little shorter than its length, so repeated notes are heard apart, and notes are placed by their beat, so voices of different rhythm stay together. `Sound.mix` plays melody and bass as one sound.
 
@@ -103,7 +103,7 @@ A melody written as text in the *Music Macro Language* of the home computers of 
 
 ### Playing: Mixer
 
-*Package `audio` · introduced in [20. Paddle](20-paddle.md#the-mixer); music in [24. Swarm](24-swarm.md#a-voice-for-the-music) · source: [`Mixer`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/audio/Mixer.java)*
+*Package `audio` · introduced in [20. Paddle](20-paddle.md#the-mixer); music in [24. Swarm](24-swarm.md#a-voice-for-the-music) · source: [`Mixer`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/audio/Mixer.java)*
 
 **What it is for.** Sound effects, several at once: a brick breaks while the ball hits the wall, and both must be heard together without either waiting for the other. And one piece of music, once or again and again, on a voice of its own that no effect can push out.
 
@@ -125,7 +125,7 @@ A melody written as text in the *Music Macro Language* of the home computers of 
 
 ## Speech: Speech and Phoneme
 
-*Package `audio` · introduced in [28. Hover Cab](28-hover-cab.md#step-6-passengers-who-talk) · source: [`Speech`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/audio/Speech.java), [`Phoneme`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/audio/Phoneme.java)*
+*Package `audio` · introduced in [28. Hover Cab](28-hover-cab.md#step-6-passengers-who-talk) · source: [`Speech`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/audio/Speech.java), [`Phoneme`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/audio/Phoneme.java)*
 
 **What it is for.** Characters who talk, without recordings: "Hey, cab!", "Pad 3, please!", in any language and in a voice per character. `Speech.say(voice, phrase)` returns a `Sound` to play with the `Mixer`.
 

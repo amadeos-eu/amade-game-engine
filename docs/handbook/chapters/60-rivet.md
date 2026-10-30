@@ -21,7 +21,7 @@ Every game so far was flat: seen from the side, from above, or at an angle from 
     - **The tool in the hand**, a perspective picture lit by the room
     - **Hitscan shots**, machines that see, hear and chase through doors, and an automap
 
-The complete game is in [amade-rivet-game](https://github.com/datazuul/amade-rivet-game).
+The complete game is in [amade-rivet-game](https://github.com/amadeos-eu/amade-rivet-game).
 
 ## The rules
 
