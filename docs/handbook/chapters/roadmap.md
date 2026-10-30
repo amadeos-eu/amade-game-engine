@@ -28,13 +28,14 @@ The handbook grows with the games: a chapter is written when its game is finishe
 | [40. The Engine at a Glance](40-engine.md) | | Part IV, the engine manual: what each part of the engine is for, when to choose it and how it works |
 | [41. Loop, Time and Drawing](41-loop-and-drawing.md) to [49. Rooms, Scripts and Dialogs](49-adventure.md) | | One chapter per subsystem, each section naming the game that introduced it |
 | [50. The Seal of the Templars](50-templar.md) | The Seal of the Templars (point-and-click adventure) | Painted rooms and walk areas with the shortest way round obstacles, depth, hotspots and layers, an inventory and story flags, scripts for cutscenes and conversations, speech over the speaker's head |
+| [60. Rivet](60-rivet.md) | Rivet (first-person shooter) | A raycaster with floors, ceilings, sky, fog, sliding and secret doors, light baked per cell and flashes, billboards from several sides, models from signed distance functions rendered by ray marching, a tool held in perspective, walking that slides along walls, hitscan shots, turning with the mouse |
 | [Java2D and X11 Pitfalls](appendix-java2d.md) | | The rules for fast and correct drawing, collected |
 | [Glossary](appendix-glossary.md) | | The words of game programming used in this book, each with the chapter that explains it |
 
 ## What comes next
 
-With *The Seal of the Templars*, Part V has begun: a story told in painted rooms, written as data and played by the engine's `adventure` package.
+With *The Seal of the Templars*, Part V has begun: a story told in painted rooms, written as data and played by the engine's `adventure` package. The next story of Part V has not been chosen yet.
 
-The game is complete: Act 2 in La Rochelle and Act 3 in Tomar, with the epilogue, are part of chapter 50 now. The next story of Part V has not been chosen yet. What it adds to the engine will be told in its chapter, and as always in Part IV, the tables of [chapter 40](40-engine.md) and the [glossary](appendix-glossary.md).
+With *Rivet*, Part VI has begun: a world seen from inside, drawn by the engine's raycaster, with machines rendered from distance functions. What the next games of either part add to the engine will be told in their chapters, and as always in Part IV, the tables of [chapter 40](40-engine.md) and the [glossary](appendix-glossary.md).
 
 Suggestions and corrections are welcome as [issues](https://github.com/datazuul/amade-game-engine/issues) or pull requests. Each page has an edit button at the top.

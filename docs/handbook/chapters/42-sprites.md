@@ -124,6 +124,35 @@ A figure given by its corners around its own centre, pairs of x and y, angle 0 p
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/shape/Outline.java:path"
 ```
 
+## Things in 3D: Sdf, Model and ModelRenderer
+
+*Package `raycast.model` · introduced in [60. Rivet](60-rivet.md#step-8-models-from-distances) · source: [`Sdf`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/model/Sdf.java), [`Model`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/model/Model.java), [`Material`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/model/Material.java), [`ModelRenderer`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/model/ModelRenderer.java)*
+
+**What it is for.** Pictures of solid things, rendered by the engine instead of drawn by hand: a machine from eight sides for a first-person view, a tool held in front of the camera, a turret seen from any angle. A `Model` is described by **signed distance functions**: for a point in space, how far it is from the surface, negative inside. The `ModelRenderer` turns it into pictures, with lamps, soft shadows, occlusion in the creases, highlights and a rim along the outline.
+
+**When to choose it.** When a thing must look three-dimensional from several sides and you would rather describe it in a few dozen lines than paint it eight times. Rendering is far too slow for every frame (it marches up to 160 steps per pixel), so render at the start, on a thread of its own, and keep the pictures, in memory and in a cache file. A flat thing seen from one side is a plain [`Sprite`](#pictures-sprite); a thing seen from above that turns is [`Rotations`](#turned-in-advance-rotations).
+
+**How it works.** `Sdf` has the shapes (sphere, rounded box, capsule, cylinder, torus, cone) and `smoothUnion`; all sit at the origin, and a shape is moved by moving the point the other way. A model overrides `shape(x, y, z)` and reports each part with `part(distance, number)`; the nearest part wins and `material(number, x, y, z)` gives its `Material`: a colour, how much it shines, whether it glows. Model space is -1 … 1, y up, the front facing +z; for a billboard the feet stand at y = -1.
+
+```java title="amade-game-engine · raycast/model/Model.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/raycast/model/Model.java:model"
+```
+
+`billboard(model, size, pitch)` renders the model from the front, seen a little from above, into a [`Texture`](45-maps.md#seen-from-inside-gridmap-raycaster-and-lightmap) with holes where the model is not and glow where it glows. `views(frame, frames, directions, size, pitch)` renders every animation frame from every direction, in parallel on all cores, as `Views` for a `Billboard`. `picture(model, width, height, focal, axisX, axisY, placement, lamps)` renders it in perspective, as a camera at the origin looking along +z sees it at a `Placement`: a tool in the hand. The camera's axis may meet the picture anywhere, even outside it, so a picture can be just the window of the view where the tool is.
+
+| Method | What it does |
+|---|---|
+| `Sdf.sphere`, `box`, `capsule`, `cylinder`, `torus`, `cone`, `smoothUnion` | Distances to shapes, and a joint with a fillet |
+| `Model.shape`, `part`, `material` | What the model is made of; called from many threads at once |
+| `model.distance(x, y, z)`, `materialAt`, `turned(degrees)` | The model's distance and material at a point; the model turned about its upright axis |
+| `Material.paint`, `metal`, `matte`, `light` | Common surfaces; `new Material(rgb, shine, glow)` for any other |
+| `new ModelRenderer().lamps(lamps, ambient)` | The lights; `STUDIO` is a key light from the upper left front and a cool fill |
+| `billboard(model, size, pitch)`, `views(...)` | Pictures for billboards, from one or from many sides |
+| `picture(model, w, h, focal, [axisX, axisY,] at, lamps)` | A picture in perspective; `Lamp.at` for a point light such as a muzzle flash |
+
+!!! warning "Pitfall: a model is asked from many threads"
+    The renderer asks one model from every core at once. Keep nothing in fields of a model while `shape` runs; `Model` keeps its own scratch state in a `ThreadLocal`, so `part` is safe.
+
 ## Movement in time: Easing and Tween
 
 *Package `anim` · introduced in [11. Solitaire](11-solitaire.md#easing-how-a-movement-feels) · source: [`Easing`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/anim/Easing.java), [`Tween`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/anim/Tween.java)*

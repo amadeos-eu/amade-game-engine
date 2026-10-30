@@ -34,6 +34,7 @@ env:
   COLONY_COMMIT: 0d6e30a658d1975787eced7fac108fffb7f2e561
   TOWN_COMMIT: afb431f2adf56ea3a4c88b29390327260e49832b
   TEMPLAR_COMMIT: c0aa1117f2bcc1135ee1f43125c16acfd6c472b6
+  RIVET_COMMIT: ab5b01f3db2387549692877212963c1d6508006b
 
 jobs:
   build:
@@ -127,6 +128,11 @@ jobs:
           repository: datazuul/amade-templar-game
           ref: ${{ env.TEMPLAR_COMMIT }}
           path: amade-templar-game
+      - uses: actions/checkout@v7
+        with:
+          repository: datazuul/amade-rivet-game
+          ref: ${{ env.RIVET_COMMIT }}
+          path: amade-rivet-game
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'

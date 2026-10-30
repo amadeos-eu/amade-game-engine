@@ -7,10 +7,10 @@ Each chapter of this part covers one area. Each section in it describes one feat
 | Chapter | Packages | For |
 |---|---|---|
 | [41. Loop, Time and Drawing](41-loop-and-drawing.md) | `loop`, `time`, `swing` | The game loop, rules with a pace of their own, countdowns, the canvas, full screen, frame times |
-| [42. Sprites and Effects](42-sprites.md) | `sprite`, `shape`, `anim`, `fx` | Pictures that copy fast, a ground painted only where it changed, sheets and animation, turned pictures, figures of lines, tweens, particles |
-| [43. Input](43-input.md) | `input` | Keyboard, actions instead of keys, mouse, gamepads |
-| [44. Movement, Physics and Collision](44-movement.md) | `math`, `motion`, `physics`, `collision`, `pool`, `entity` | Vectors and angles, flight paths, falling and jumping, flying on jets and landing, shells under gravity and wind, what hits what (down to the pixel), many things at once |
-| [45. Maps, Camera and Fog](45-maps.md) | `tile`, `tiled`, `iso`, `camera`, `fog`, `minimap`, `terrain` | Tile maps, reach and networks on them, maps from an editor, the isometric view, worlds larger than the screen, what a side sees, ground that breaks |
+| [42. Sprites and Effects](42-sprites.md) | `sprite`, `shape`, `raycast.model`, `anim`, `fx` | Pictures that copy fast, a ground painted only where it changed, sheets and animation, turned pictures, figures of lines, things rendered in 3D, tweens, particles |
+| [43. Input](43-input.md) | `input` | Keyboard, actions instead of keys, mouse, turning with the mouse, gamepads |
+| [44. Movement, Physics and Collision](44-movement.md) | `math`, `motion`, `physics`, `raycast`, `collision`, `pool`, `entity` | Vectors and angles, flight paths, falling and jumping, flying on jets and landing, shells under gravity and wind, walking and shooting among walls, what hits what (down to the pixel), many things at once |
+| [45. Maps, Camera and Fog](45-maps.md) | `tile`, `tiled`, `iso`, `camera`, `fog`, `minimap`, `terrain`, `raycast` | Tile maps, reach and networks on them, maps from an editor, the isometric view, worlds larger than the screen, what a side sees, ground that breaks, a world seen from inside |
 | [46. Paths, Groups and Decisions](46-paths-and-decisions.md) | `path`, `road`, `select`, `ai`, `event`, `turn` | Finding the way for one or for many, roads between flags, choosing units, states, the computer's view of the map, aiming by trying, chain reactions, turns |
 | [47. Chance, Data and Saving](47-data-and-saving.md) | `random`, `replay`, `undo`, `data`, `economy`, `save`, `score` | Repeatable chance, replays, undo, data files, money and production, saving, high scores |
 | [48. Scenes, Menus and Sound](48-scenes-menus-sound.md) | `scene`, `swing`, `menu`, `audio` | Screens of a game, the standard menus and dialogs, menus over the game, sound and music, speech |
@@ -26,7 +26,7 @@ It also has no editor, no scene graph and no physics engine in the usual sense. 
 
 A few rules hold for nearly every class. Knowing them makes the rest of the manual shorter.
 
-**The rules never see Swing.** Everything the domain of a game uses (vectors, tile maps, paths, timers, the economy) is plain Java without `java.awt`, so the rules can be tested in milliseconds without a screen ([chapter 2](02-structure.md#domain-the-rules)). Only `swing`, `sprite`, `fx`, `shape`, `fog.FogPainter`, `minimap`, `menu` drawing and `audio` touch the screen or the sound card. `collision.PixelMask` uses Java2D, but only to draw shapes into an image in memory, which works headless; the rules may use it.
+**The rules never see Swing.** Everything the domain of a game uses (vectors, tile maps, paths, timers, the economy) is plain Java without `java.awt`, so the rules can be tested in milliseconds without a screen ([chapter 2](02-structure.md#domain-the-rules)). Only `swing`, `sprite`, `fx`, `shape`, `fog.FogPainter`, `minimap`, `menu` drawing and `audio` touch the screen or the sound card. `collision.PixelMask` uses Java2D, but only to draw shapes into an image in memory, which works headless; the rules may use it. The `raycast` classes the rules need (`GridMap`, `Door`, `Mover`, `Hitscan`, `LightMap`) work headless too.
 
 **No class reads the clock by itself.** `FixedStep`, `Ticker`, `Timers`, `Jump`, `Camera.follow`, `Production` and the others are told how many seconds passed. `GameClock`, `Keyboard` and `Tween` take their time from a function you pass, `System::nanoTime` in the game and a number the test moves in tests. So a test can play a minute of a game in a millisecond, and every second of it is the same each time.
 
@@ -62,8 +62,10 @@ A few rules hold for nearly every class. Knowing them makes the rest of the manu
 | Many frames in one image, and which one to show | `SpriteSheet`, `Animation` | [42](42-sprites.md#many-pictures-in-one-spritesheet), [42](42-sprites.md#which-frame-when-animation) |
 | A picture that turns | `Rotations` or `Outline` | [42](42-sprites.md#turning-pictures-or-lines) |
 | Splinters, sparks, dust | `Particles` | [42](42-sprites.md#splinters-and-sparks-particles) |
+| A thing that looks solid from every side, described in code instead of drawn | `Sdf`, `Model`, `ModelRenderer` | [42](42-sprites.md#things-in-3d-sdf-model-and-modelrenderer) |
 | "Does the player move up?" from keys or a pad | `Controls` | [43](43-input.md#actions-instead-of-keys-controls) |
 | The mouse in game units | `Mouse` | [43](43-input.md#the-mouse-mouse) |
+| Turning with the mouse, the pointer kept in the middle | `MouseLook` | [43](43-input.md#turning-with-the-mouse-mouselook) |
 | Gamepads on Linux and Windows | `Gamepads`, `Gamepad` | [43](43-input.md#gamepads-gamepads-and-gamepad) |
 | Things that fly at an angle | `Vector`, `Angles` | [44](44-movement.md#points-and-directions-vector-and-angles) |
 | A field without edges | `Wrap` | [44](44-movement.md#a-field-without-edges-wrap) |
@@ -72,6 +74,7 @@ A few rules hold for nearly every class. Knowing them makes the rest of the manu
 | Falling, standing, jumping on tiles | `Body`, `TileCollider`, `Jump` | [44](44-movement.md#falling-and-standing-body-and-tilecollider) |
 | A craft on jets against gravity, fuel, air, a soft or hard landing | `Thrusters`, `Body.drag`, `Touchdown` | [44](44-movement.md#flying-on-jets-thrusters-drag-and-touchdown) |
 | Shells, grenades, arrows: fired, then flying under gravity and wind until they hit | `Projectile`, `Ballistics` | [44](44-movement.md#shells-in-flight-projectile-and-ballistics) |
+| Walking among walls and doors without sticking; shots that arrive at once | `Mover`, `Hitscan` | [44](44-movement.md#walking-and-shooting-on-a-grid-of-walls-mover-and-hitscan) |
 | Collision of fast boxes, of circles, of many things | `Sweep`, `Circle`, `Grid` | [44](44-movement.md#which-collision-test) |
 | Collision exact to the pixel, for shapes that are neither boxes nor circles | `PixelMask` | [44](44-movement.md#exact-to-the-pixel-pixelmask) |
 | Shots with a limit, without garbage | `Pool` | [44](44-movement.md#a-fixed-number-of-things-pool) |
@@ -88,6 +91,7 @@ A few rules hold for nearly every class. Knowing them makes the rest of the manu
 | What a side has seen and sees now | `FogOfWar`, `FogPainter` | [45](45-maps.md#what-a-side-sees-fogofwar-and-fogpainter) |
 | The whole map in a corner | `Minimap`, `DiamondMinimap` | [45](45-maps.md#the-map-in-a-corner-minimap), [45](45-maps.md#an-isometric-map-in-a-corner-diamondminimap) |
 | Ground that can be blasted, heaped and falls; hills from random numbers | `Ground`, `Landscape` | [45](45-maps.md#ground-that-breaks-ground-and-landscape) |
+| A world seen through the player's eyes: walls, doors, floor, sky, light and fog | `GridMap`, `Raycaster`, `LightMap`, `Billboard` | [45](45-maps.md#seen-from-inside-gridmap-raycaster-and-lightmap) |
 | The way for one, or for many to one goal | `AStar`, `DistanceMap`, `FlowField` | [46](46-paths-and-decisions.md#which-search) |
 | Roads from flag to flag, the next road for a ware | `RoadNetwork` | [46](46-paths-and-decisions.md#roads-between-flags-roadnetwork) |
 | Groups that arrive side by side | `Formation`, `FieldCache` | [46](46-paths-and-decisions.md#groups-on-the-move-formation) |
@@ -140,6 +144,7 @@ The order in which the engine grew, and where each part is explained step by ste
 | [32](32-colony.md#what-moved-into-the-engine) | Colony | `road.RoadNetwork`, `economy` (`Stock`, `Recipe`), `time.Seasons`, `tile.Territory`, `motion.Wander` |
 | [33](33-town.md#what-moved-into-the-engine) | Town | `iso` (`IsoProjection`, `DepthSort`, `DiamondMinimap`), `tile` (`Coverage`, `SupplyGrid`), `sprite.ScrollingLayer`, the wheel of `input.Mouse` |
 | [50](50-templar.md#what-moved-into-the-engine) | The Seal of the Templars | `adventure` (`WalkArea`, `DepthScale`, `Actor`, `Room`, `Hotspot`, `Interaction`, `Inventory`, `Flags`, `Script`, `ScriptRunner`, `SpokenText`, `ReadingTime`) |
+| [60](60-rivet.md#what-moved-into-the-engine) | Rivet | `raycast` (`GridMap`, `Door`, `Texture`, `LightMap`, `Camera`, `Billboard`, `Views`, `Raycaster`, `Mover`, `Hitscan`), `raycast.model` (`Sdf`, `Model`, `Material`, `ModelRenderer`), `input.MouseLook` |
 
 Many classes grew later, when another game needed a little more: `Camera` learned the mouse in Towers, `Mouse` the wheel in Town, `Sprite` its opaque caches in Jump and Towers, `SeededRandom` to be saved in Sands. The sections of this part describe each class as it is now.
 
