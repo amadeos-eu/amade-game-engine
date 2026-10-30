@@ -45,92 +45,92 @@ jobs:
           path: amade-game-engine
       - uses: actions/checkout@v7
         with:
-          repository: datazuul/amade-mines-game
+          repository: amadeos-eu/amade-mines-game
           ref: ${{ env.MINES_COMMIT }}
           path: amade-mines-game
       - uses: actions/checkout@v7
         with:
-          repository: datazuul/amade-solitaire-game
+          repository: amadeos-eu/amade-solitaire-game
           ref: ${{ env.SOLITAIRE_COMMIT }}
           path: amade-solitaire-game
       - uses: actions/checkout@v7
         with:
-          repository: datazuul/amade-paddle-game
+          repository: amadeos-eu/amade-paddle-game
           ref: ${{ env.PADDLE_COMMIT }}
           path: amade-paddle-game
       - uses: actions/checkout@v7
         with:
-          repository: datazuul/amade-bricks-game
+          repository: amadeos-eu/amade-bricks-game
           ref: ${{ env.BRICKS_COMMIT }}
           path: amade-bricks-game
       - uses: actions/checkout@v7
         with:
-          repository: datazuul/amade-snake-game
+          repository: amadeos-eu/amade-snake-game
           ref: ${{ env.SNAKE_COMMIT }}
           path: amade-snake-game
       - uses: actions/checkout@v7
         with:
-          repository: datazuul/amade-rocks-game
+          repository: amadeos-eu/amade-rocks-game
           ref: ${{ env.ROCKS_COMMIT }}
           path: amade-rocks-game
       - uses: actions/checkout@v7
         with:
-          repository: datazuul/amade-swarm-game
+          repository: amadeos-eu/amade-swarm-game
           ref: ${{ env.SWARM_COMMIT }}
           path: amade-swarm-game
       - uses: actions/checkout@v7
         with:
-          repository: datazuul/amade-maze-game
+          repository: amadeos-eu/amade-maze-game
           ref: ${{ env.MAZE_COMMIT }}
           path: amade-maze-game
       - uses: actions/checkout@v7
         with:
-          repository: datazuul/amade-blast-game
+          repository: amadeos-eu/amade-blast-game
           ref: ${{ env.BLAST_COMMIT }}
           path: amade-blast-game
       - uses: actions/checkout@v7
         with:
-          repository: datazuul/amade-jump-game
+          repository: amadeos-eu/amade-jump-game
           ref: ${{ env.JUMP_COMMIT }}
           path: amade-jump-game
       - uses: actions/checkout@v7
         with:
-          repository: datazuul/amade-hover-cab-game
+          repository: amadeos-eu/amade-hover-cab-game
           ref: ${{ env.HOVER_CAB_COMMIT }}
           path: amade-hover-cab-game
       - uses: actions/checkout@v7
         with:
-          repository: datazuul/amade-artillery-game
+          repository: amadeos-eu/amade-artillery-game
           ref: ${{ env.ARTILLERY_COMMIT }}
           path: amade-artillery-game
       - uses: actions/checkout@v7
         with:
-          repository: datazuul/amade-towers-game
+          repository: amadeos-eu/amade-towers-game
           ref: ${{ env.TOWERS_COMMIT }}
           path: amade-towers-game
       - uses: actions/checkout@v7
         with:
-          repository: datazuul/amade-sands-game
+          repository: amadeos-eu/amade-sands-game
           ref: ${{ env.SANDS_COMMIT }}
           path: amade-sands-game
       - uses: actions/checkout@v7
         with:
-          repository: datazuul/amade-colony-game
+          repository: amadeos-eu/amade-colony-game
           ref: ${{ env.COLONY_COMMIT }}
           path: amade-colony-game
       - uses: actions/checkout@v7
         with:
-          repository: datazuul/amade-town-game
+          repository: amadeos-eu/amade-town-game
           ref: ${{ env.TOWN_COMMIT }}
           path: amade-town-game
       - uses: actions/checkout@v7
         with:
-          repository: datazuul/amade-templar-game
+          repository: amadeos-eu/amade-templar-game
           ref: ${{ env.TEMPLAR_COMMIT }}
           path: amade-templar-game
       - uses: actions/checkout@v7
         with:
-          repository: datazuul/amade-rivet-game
+          repository: amadeos-eu/amade-rivet-game
           ref: ${{ env.RIVET_COMMIT }}
           path: amade-rivet-game
       - uses: actions/setup-python@v7

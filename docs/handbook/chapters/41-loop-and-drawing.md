@@ -4,7 +4,7 @@ A real-time game is a loop: read the input, advance the rules, draw a frame, aga
 
 ## The game loop: GameLoop and FixedStep
 
-*Package `loop` · introduced in [20. Paddle](20-paddle.md#step-1-the-game-loop) · source: [`GameLoop`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/loop/GameLoop.java), [`FixedStep`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/loop/FixedStep.java)*
+*Package `loop` · introduced in [20. Paddle](20-paddle.md#step-1-the-game-loop) · source: [`GameLoop`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/loop/GameLoop.java), [`FixedStep`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/loop/FixedStep.java)*
 
 **What it is for.** Every game from Paddle to Sands runs on a `GameLoop`: a thread of its own that runs commands posted from Swing, advances the rules in **fixed steps**, usually 120 a second, and draws a frame, at most 60 a second. You give it two functions: `update(seconds)`, which advances the rules by exactly one step, and `render(alpha)`, which draws.
 
@@ -41,7 +41,7 @@ The loop itself is short. Commands come first, so a menu's *New Game* takes effe
 
 ## A pace of its own: Ticker
 
-*Package `loop` · introduced in [22. Snake](22-snake.md#step-2-a-pace-of-its-own) · source: [`Ticker`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/loop/Ticker.java)*
+*Package `loop` · introduced in [22. Snake](22-snake.md#step-2-a-pace-of-its-own) · source: [`Ticker`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/loop/Ticker.java)*
 
 **What it is for.** Rules that move in ticks slower than the update step: the snake that moves one cell every 150 ms, the walls that fall one by one at the end of a round of Blast, the heartbeat of Rocks that beats faster the longer a wave lasts. The loop still steps 120 times a second, for input and effects; the ticker counts the steps' time and says when a tick is due.
 
@@ -55,7 +55,7 @@ The loop itself is short. Commands come first, so a menu's *New Game* takes effe
 
 ## Many countdowns: Timers
 
-*Package `time` · introduced in [26. Blast](26-blast.md#step-4-timers) · source: [`Timers`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/time/Timers.java)*
+*Package `time` · introduced in [26. Blast](26-blast.md#step-4-timers) · source: [`Timers`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/time/Timers.java)*
 
 **What it is for.** Many countdowns at once, each belonging to a key: the fuse of every bomb, the flames on every tile, the time a power-up blinks. `start(key, seconds)` starts or restarts one, `update(seconds, expired)` lets time pass and hands over the keys whose time ran out.
 
@@ -76,7 +76,7 @@ Besides `start` and `update` there are `running(key)`, `left(key)`, `cancel(key)
 
 ## The time of a game: GameClock
 
-*Package `time` · introduced in [10. Mines](10-mines.md#time-you-can-test), moved into the engine with [11. Solitaire](11-solitaire.md#step-11-what-moved-into-the-engine) · source: [`GameClock`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/time/GameClock.java)*
+*Package `time` · introduced in [10. Mines](10-mines.md#time-you-can-test), moved into the engine with [11. Solitaire](11-solitaire.md#step-11-what-moved-into-the-engine) · source: [`GameClock`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/time/GameClock.java)*
 
 **What it is for.** The time one game took, as a high score records it: it starts with the first move (`start()` only counts the first call), stops when the game ends, and shows whole seconds the way a player expects, a started second counting as one.
 
@@ -86,7 +86,7 @@ Besides `start` and `update` there are `running(key)`, `left(key)`, `cancel(key)
 
 ## The seasons of a year: Seasons
 
-*Package `time` · introduced in [32. Colony](32-colony.md#seasons) · source: [`Seasons`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/time/Seasons.java)*
+*Package `time` · introduced in [32. Colony](32-colony.md#seasons) · source: [`Seasons`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/time/Seasons.java)*
 
 **What it is for.** A year of seasons, each as long as the game wants: Colony's mission 3 has a long winter of 170 seconds and a short spring. It answers which season it is, which year, how far the season is, and, after each step, how many seasons began in it, so that "Winter" is said exactly once.
 
@@ -121,7 +121,7 @@ Besides `start` and `update` there are `running(key)`, `left(key)`, `cancel(key)
 
 ## The canvas: GameCanvas and RenderMode
 
-*Package `swing` · introduced in [20. Paddle](20-paddle.md#step-2-drawing-actively), render modes and the overlay in [21. Bricks](21-bricks.md#pixel-mode) · source: [`GameCanvas`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/swing/GameCanvas.java), [`RenderMode`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/swing/RenderMode.java)*
+*Package `swing` · introduced in [20. Paddle](20-paddle.md#step-2-drawing-actively), render modes and the overlay in [21. Bricks](21-bricks.md#pixel-mode) · source: [`GameCanvas`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/swing/GameCanvas.java), [`RenderMode`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/swing/RenderMode.java)*
 
 **What it is for.** The drawing surface of every real-time game. The game draws in fixed **logical coordinates**, 640 × 400 in most games, as if the screen always had that size; the canvas scales the picture to its real size, keeps the proportions and fills the rest with black bars. Drawing is **active**: the game loop calls `render(alpha)` whenever it wants a frame, and the canvas draws into a hidden buffer of a `BufferStrategy` and shows it at once by copying it onto the screen, never by flipping, which can leave the screen black in full screen on X11 ([appendix](appendix-java2d.md#buffers)). Swing's `repaint()` is not involved, so nothing waits for the event thread.
 
@@ -177,7 +177,7 @@ Both the screen's buffers and the pixel-mode buffer live in video memory where t
 
 ## Full screen: FullScreen
 
-*Package `swing` · introduced in [20. Paddle](20-paddle.md#full-screen) · source: [`FullScreen`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/swing/FullScreen.java)*
+*Package `swing` · introduced in [20. Paddle](20-paddle.md#full-screen) · source: [`FullScreen`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/swing/FullScreen.java)*
 
 **What it is for.** Switching the game window between a normal window and full screen, with F11 from `GameMenus.fullScreen`. In full screen the window has no frame and no menu bar, and the menu shortcuts keep working.
 
@@ -199,7 +199,7 @@ Both the screen's buffers and the pixel-mode buffer live in video memory where t
 
 ## Frame times: FrameTimes
 
-*Package `loop` · introduced in [21. Bricks](21-bricks.md#a-display-for-frame-times) · source: [`FrameTimes`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/loop/FrameTimes.java)*
+*Package `loop` · introduced in [21. Bricks](21-bricks.md#a-display-for-frame-times) · source: [`FrameTimes`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/loop/FrameTimes.java)*
 
 **What it is for.** The numbers behind the frame-time display that every game shows with F12: how long the frames of the last second took to draw, on average and at worst, and how many there were. At 60 frames a second a frame has 16.7 ms; the display turns red when the worst frame took longer.
 
@@ -209,7 +209,7 @@ Both the screen's buffers and the pixel-mode buffer live in video memory where t
 
 ## Animation on the event thread: Animator
 
-*Package `swing` · introduced in [11. Solitaire](11-solitaire.md#animator-frames-on-the-event-thread) · source: [`Animator`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/swing/Animator.java)*
+*Package `swing` · introduced in [11. Solitaire](11-solitaire.md#animator-frames-on-the-event-thread) · source: [`Animator`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/swing/Animator.java)*
 
 **What it is for.** Movement in a game that has no game loop: a card that flies to its pile, the cards that bounce after a won game of Solitaire. The animator calls a frame function about 60 times a second on the event thread, with the current `System.nanoTime()`, for as long as the function says there is more to show.
 

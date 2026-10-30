@@ -18,7 +18,7 @@ Everything here is in the package `adventure`. Apart from the spoken text on the
 
 ## Where people walk: WalkArea
 
-*Package `adventure` · introduced in [50. The Seal of the Templars](50-templar.md) · source: [`WalkArea`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/WalkArea.java)*
+*Package `adventure` · introduced in [50. The Seal of the Templars](50-templar.md) · source: [`WalkArea`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/WalkArea.java)*
 
 **What it is for.** The floor of a painted room is not a grid of tiles but a shape: a polygon round the floor, with holes where the workbench, a well or a sleeping dog stands. `contains(p)` says whether a point is on the floor, `nearest(p)` moves a click off the floor to the nearest point on it, and `path(from, to)` returns the shortest way as a list of points to walk to, one after the other.
 
@@ -36,7 +36,7 @@ Everything here is in the package `adventure`. Apart from the spoken text on the
 
 ## Smaller at the back: DepthScale
 
-*Package `adventure` · introduced in [50. The Seal of the Templars](50-templar.md) · source: [`DepthScale`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/DepthScale.java)*
+*Package `adventure` · introduced in [50. The Seal of the Templars](50-templar.md) · source: [`DepthScale`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/DepthScale.java)*
 
 **What it is for.** A painted room has depth: whoever walks to the back wall walks up the screen and must become smaller, and slower, or they seem to climb a wall. `DepthScale(farY, farScale, nearY, nearScale)` gives the scale at both heights and a straight line between them; `at(y)` is the scale of someone whose feet are at `y`. `DepthScale.FLAT` keeps everyone the same size, for rooms seen from the side.
 
@@ -46,7 +46,7 @@ Everything here is in the package `adventure`. Apart from the spoken text on the
 
 ## People: Actor
 
-*Package `adventure` · introduced in [50. The Seal of the Templars](50-templar.md) · source: [`Actor`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/Actor.java)*
+*Package `adventure` · introduced in [50. The Seal of the Templars](50-templar.md) · source: [`Actor`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/Actor.java)*
 
 **What it is for.** Someone in a room: a position where the feet are, a direction to look in, and a speed. `walkTo(area, target, then)` walks the shortest way and runs `then` on arrival: walk to the psalter, *then* use it. `place` puts the actor somewhere at once, as when she enters a room.
 
@@ -62,7 +62,7 @@ Everything here is in the package `adventure`. Apart from the spoken text on the
 
 ## Rooms: Room, Hotspot and layers
 
-*Package `adventure` · introduced in [50. The Seal of the Templars](50-templar.md) · sources: [`Room`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/Room.java), [`Hotspot`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/Hotspot.java)*
+*Package `adventure` · introduced in [50. The Seal of the Templars](50-templar.md) · sources: [`Room`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/Room.java), [`Hotspot`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/Hotspot.java)*
 
 **What it is for.** A room as a [data file](47-data-and-saving.md#data-files-textdata): the picture behind everything, the floor and its holes, the depth, the **hotspots** (things one can point at, each with an outline, a place to stand and a direction to face), the **spots** where people arrive, and the **layers** that stand in front of people.
 
@@ -88,7 +88,7 @@ hidden page
 
 ## What a click means: Interaction
 
-*Package `adventure` · introduced in [50. The Seal of the Templars](50-templar.md) · source: [`Interaction`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/Interaction.java)*
+*Package `adventure` · introduced in [50. The Seal of the Templars](50-templar.md) · source: [`Interaction`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/Interaction.java)*
 
 The early adventures had a row of verbs at the bottom of the screen: *Look at*, *Pick up*, *Use*, *Talk to*. Later ones let the thing decide. The engine does the same with two buttons: the right one **looks**, the left one **talks** to a person, **leaves** through an exit and **uses** everything else; with an item from the inventory in hand, it uses the item *on* the thing. `Interaction.trigger` turns a click into the words a script block starts with.
 
@@ -98,13 +98,13 @@ The early adventures had a row of verbs at the bottom of the screen: *Look at*, 
 
 ## What she carries, what the story remembers: Inventory and Flags
 
-*Package `adventure` · introduced in [50. The Seal of the Templars](50-templar.md) · sources: [`Inventory`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/Inventory.java), [`Flags`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/Flags.java)*
+*Package `adventure` · introduced in [50. The Seal of the Templars](50-templar.md) · sources: [`Inventory`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/Inventory.java), [`Flags`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/Flags.java)*
 
 The `Inventory` holds item names in the order they were found, each once. `Flags` are everything the story remembers, as named numbers: `found-page` is 1 once the page is found, `asked` counts the questions. A flag never set is 0. Besides where everyone stands and which hotspots are hidden, these two are the whole state of an adventure, so a [saved game](47-data-and-saving.md#progress-on-disk-savefile) is little more than `inventory.save()` and `flags.all()`.
 
 ## The story as a play: Script and ScriptRunner
 
-*Package `adventure` · introduced in [50. The Seal of the Templars](50-templar.md) · sources: [`Script`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/Script.java), [`ScriptRunner`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/ScriptRunner.java)*
+*Package `adventure` · introduced in [50. The Seal of the Templars](50-templar.md) · sources: [`Script`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/Script.java), [`ScriptRunner`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/ScriptRunner.java)*
 
 **What it is for.** What Maria answers when one looks at the psalter is not Java code. It is a line in a script, a text file that reads like a play:
 
@@ -163,7 +163,7 @@ The words after `option` are the dialog, the option's name and the key of the te
 
 ## Words over the head: SpokenText and ReadingTime
 
-*Package `adventure` · introduced in [50. The Seal of the Templars](50-templar.md) · sources: [`SpokenText`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/SpokenText.java), [`ReadingTime`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/ReadingTime.java)*
+*Package `adventure` · introduced in [50. The Seal of the Templars](50-templar.md) · sources: [`SpokenText`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/SpokenText.java), [`ReadingTime`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/adventure/ReadingTime.java)*
 
 Classic adventures show speech without a balloon: the words float over the speaker's head in the speaker's own colour, with a dark rim so they can be read on any part of the picture. `SpokenText.draw` breaks the text into lines that fit, centres them over the head and keeps them inside the screen. `ReadingTime.of(text)` says how long a line stays when nobody clicks it away: a second to notice it plus the time to read it at fifteen characters a second, at least 1.5 and at most 8 seconds. The [speech synthesis of chapter 48](48-scenes-menus-sound.md#speech-speech-and-phoneme) can mumble along, if a game wants voices without recordings.
 

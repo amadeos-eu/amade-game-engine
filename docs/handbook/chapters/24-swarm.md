@@ -19,7 +19,7 @@ The original came from an arcade hall in 1981, and its insects were small pictur
     - **A spatial grid** for collisions, and when it pays off
     - **Music**: tunes written as text, played by the mixer next to the sound effects
 
-The complete game is in [amade-swarm-game](https://github.com/datazuul/amade-swarm-game).
+The complete game is in [amade-swarm-game](https://github.com/amadeos-eu/amade-swarm-game).
 
 ## The rules
 

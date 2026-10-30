@@ -19,7 +19,7 @@ The original came from an arcade hall in 1979, and it drew with lines on a vecto
     - **Object pools**: four shots, made once, used again and again
     - **The mouse** as a second way to steer, and sound made from filtered noise
 
-The complete game is in [amade-rocks-game](https://github.com/datazuul/amade-rocks-game).
+The complete game is in [amade-rocks-game](https://github.com/amadeos-eu/amade-rocks-game).
 
 ## The rules
 

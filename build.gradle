@@ -5,10 +5,10 @@ plugins {
 
 // JitPack publishes under com.github.<owner>; using the same coordinates locally lets a game's
 // composite build (includeBuild '../amade-game-engine') replace the JitPack dependency automatically.
-group = 'com.github.datazuul'
+group = 'com.github.amadeos-eu'
 // CI computes the version from the Conventional Commits since the last release tag and passes it as
-// -PappVersion (datazuul/amadeos-ci scripts/next-version.sh); a build without it is a local development build.
-// Games take released versions from JitPack by tag (com.github.datazuul:amade-game-engine:v1.0.0).
+// -PappVersion (amadeos-eu/amadeos-ci scripts/next-version.sh); a build without it is a local development build.
+// Games take released versions from JitPack by tag (com.github.amadeos-eu:amade-game-engine:v1.0.0).
 version = findProperty('appVersion') ?: '0.0.0-dev.0'
 // Debian sorts 1.1.0~dev.0 before 1.1.0 (with - it would sort after it).
 def debVersion = project.version.toString().replace('-', '~')
@@ -29,7 +29,7 @@ repositories {
 dependencies {
     // Theme, Motif look, start-up, XDG and i18n helpers; games get them through this library.
     // With ../amade-commons checked out, settings.gradle builds that checkout instead (composite build).
-    api 'com.github.datazuul:amade-commons:fac730fed3'
+    api 'com.github.amadeos-eu:amade-commons:fac730fed3'
 
     testImplementation platform('org.junit:junit-bom:5.10.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -68,7 +68,7 @@ publishing {
             pom {
                 name = 'amade-game-engine'
                 description = 'Game library for amadeOS games: high scores, game menu, later loop, rendering and input'
-                url = 'https://github.com/datazuul/amade-game-engine'
+                url = 'https://github.com/amadeos-eu/amade-game-engine'
                 licenses {
                     license {
                         name = 'EUPL-1.2'

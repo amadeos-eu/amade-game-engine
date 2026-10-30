@@ -4,7 +4,7 @@ From Maze on, the games of this book live on maps: a grid of tiles that the rule
 
 ## A grid of tiles: TileMap, Cell and Direction
 
-*Package `tile` · introduced in [25. Maze](25-maze.md#step-1-a-map-of-tiles) · source: [`TileMap`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tile/TileMap.java), [`Cell`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tile/Cell.java), [`Direction`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tile/Direction.java)*
+*Package `tile` · introduced in [25. Maze](25-maze.md#step-1-a-map-of-tiles) · source: [`TileMap`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tile/TileMap.java), [`Cell`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tile/Cell.java), [`Direction`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tile/Direction.java)*
 
 **What it is for.** Columns and rows of squares, each holding one value, usually an enum of the game such as `WALL` or `DOT`. The rules of a maze game, a puzzle or a strategy game live on such a map, in whole cells; only the drawing knows how many pixels a tile has. A `Cell` is a column and a row; a `Direction` is one of `UP`, `LEFT`, `DOWN`, `RIGHT`.
 
@@ -35,7 +35,7 @@ The order of `Direction` is a rule of its own: when two ways are equally good, t
 
 ## Walking corridors: Walker
 
-*Package `tile` · introduced in [25. Maze](25-maze.md#step-2-walking-on-a-grid) · source: [`Walker`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tile/Walker.java)*
+*Package `tile` · introduced in [25. Maze](25-maze.md#step-2-walking-on-a-grid) · source: [`Walker`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tile/Walker.java)*
 
 **What it is for.** Something that walks the corridors of a tile map: the muncher and the ghosts of Maze, the bombers of Blast. It moves from the centre of one tile to the centre of the next, and only at a centre may it turn or stop, so it always stays in the middle of a corridor and never cuts a corner into a wall. Between two centres it can only go on, or turn round at once (`turnAround`).
 
@@ -51,7 +51,7 @@ The order of `Direction` is a rule of its own: when two ways are equally good, t
 
 ## The land a side owns: Territory
 
-*Package `tile` · introduced in [32. Colony](32-colony.md#the-border) · source: [`Territory`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tile/Territory.java)*
+*Package `tile` · introduced in [32. Colony](32-colony.md#the-border) · source: [`Territory`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tile/Territory.java)*
 
 **What it is for.** The land inside a border made of circles: the storehouse claims the land around it, every lookout tower more. A building may stand only inside. Claims overlap, and a tower that burns down gives back only what no other claim still holds.
 
@@ -73,7 +73,7 @@ The order of `Direction` is a rule of its own: when two ways are equally good, t
 
 ## Places that reach a circle: Coverage
 
-*Package `tile` · introduced in [33. Town](33-town.md#step-5-reach-water-and-land-value) · source: [`Coverage`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tile/Coverage.java)*
+*Package `tile` · introduced in [33. Town](33-town.md#step-5-reach-water-and-land-value) · source: [`Coverage`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tile/Coverage.java)*
 
 **What it is for.** How well the tiles of a map are served by places that reach a circle around them: schools, fire stations, water towers, parks. A tile knows how many places reach it, and how close the nearest one is, as a **strength** from 1 on the place itself to almost 0 at the edge of its reach.
 
@@ -94,7 +94,7 @@ The order of `Direction` is a rule of its own: when two ways are equally good, t
 
 ## Networks that carry: SupplyGrid
 
-*Package `tile` · introduced in [33. Town](33-town.md#step-4-power-through-the-town) · source: [`SupplyGrid`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tile/SupplyGrid.java)*
+*Package `tile` · introduced in [33. Town](33-town.md#step-4-power-through-the-town) · source: [`SupplyGrid`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tile/SupplyGrid.java)*
 
 **What it is for.** A network of tiles that carries something from where it is made to where it is used: power from plants through lines and buildings to homes, water through pipes. Tiles that carry are **conductors**; some are **sources** that put an amount in, others **loads** that take an amount out.
 
@@ -122,7 +122,7 @@ The order of `Direction` is a rule of its own: when two ways are equally good, t
 
 ## Maps from an editor: TiledMap
 
-*Package `tiled` · introduced in [27. Jump](27-jump.md#step-1-levels-from-the-tiled-editor) · source: [`TiledMap`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tiled/TiledMap.java), [`TiledObject`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tiled/TiledObject.java), [`TiledProperties`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tiled/TiledProperties.java), [`TmxReader`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tiled/TmxReader.java)*
+*Package `tiled` · introduced in [27. Jump](27-jump.md#step-1-levels-from-the-tiled-editor) · source: [`TiledMap`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tiled/TiledMap.java), [`TiledObject`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tiled/TiledObject.java), [`TiledProperties`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tiled/TiledProperties.java), [`TmxReader`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/tiled/TmxReader.java)*
 
 **What it is for.** Levels drawn in [Tiled](https://www.mapeditor.org), the free map editor, read from its own TMX format. A maze of 28 × 31 is fine as text; a level of 200 × 30 tiles in three layers, with enemies, coins and doors, wants to be painted with the tiles' pictures under the mouse. Jump, Towers and Sands draw their maps in Tiled.
 
@@ -150,7 +150,7 @@ Errors name the file and the line, as in `level1.tmx:12: ...`, because the reade
 
 ## The isometric view: IsoProjection
 
-*Package `iso` · introduced in [33. Town](33-town.md#step-1-the-isometric-view) · source: [`IsoProjection`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/iso/IsoProjection.java)*
+*Package `iso` · introduced in [33. Town](33-town.md#step-1-the-isometric-view) · source: [`IsoProjection`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/iso/IsoProjection.java)*
 
 **What it is for.** A tile map seen from a corner and from above: every square tile becomes a diamond twice as wide as high, and things on it show two walls and a roof. The rules stay flat and square, in the same tile units as every other map of the engine; only the drawing turns.
 
@@ -184,7 +184,7 @@ The projection is affine, so it is also a transform for the graphics. Under `gro
 
 ### What covers what: DepthSort
 
-*Package `iso` · introduced in [33. Town](33-town.md#step-2-what-covers-what) · source: [`DepthSort`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/iso/DepthSort.java)*
+*Package `iso` · introduced in [33. Town](33-town.md#step-2-what-covers-what) · source: [`DepthSort`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/iso/DepthSort.java)*
 
 **What it is for.** The order in which the things of an isometric view are drawn, so what stands in front covers what stands behind: the painter's algorithm for things of any size. For things of one tile, sorting by `x + y` would do; a building of three tiles by two breaks that rule, and a tree behind its end would be drawn over its wall.
 
@@ -204,7 +204,7 @@ Put only what stands into the sort. Flat things (lawns, car parks, roads) are dr
 
 ## A world larger than the screen: Camera
 
-*Package `camera` · introduced in [27. Jump](27-jump.md#step-6-the-camera); the mouse, a view below a bar and a camera the player moves in [30. Towers](30-towers.md#step-5-the-mouse-in-the-world) · source: [`Camera`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/camera/Camera.java)*
+*Package `camera` · introduced in [27. Jump](27-jump.md#step-6-the-camera); the mouse, a view below a bar and a camera the player moves in [30. Towers](30-towers.md#step-5-the-mouse-in-the-world) · source: [`Camera`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/camera/Camera.java)*
 
 **What it is for.** The part of a world larger than the screen that is shown: a view of the screen's logical size whose top left corner lies somewhere in a world of, say, 2400 × 400. The game draws the world shifted by the camera's position. The camera never shows anything outside the world: at its edges it stops, and a world smaller than the view is centred.
 
@@ -233,13 +233,13 @@ Put only what stands into the sort. Flat things (lawns, car parks, roads) are dr
 
 ### Depth: Parallax
 
-*Package `camera` · introduced in [27. Jump](27-jump.md#parallax) · source: [`Parallax`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/camera/Parallax.java)*
+*Package `camera` · introduced in [27. Jump](27-jump.md#parallax) · source: [`Parallax`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/camera/Parallax.java)*
 
 Backgrounds that scroll slower than the world, the further away they are: distant mountains, nearer hills, clouds. Each layer is one sprite, repeated side by side as far as the view needs and drawn seamlessly, and moved by a part of the camera's way, its *factor*: 0 stays still like the sky, 0.2 creeps along like mountains on the horizon, 1 moves with the world. A second, usually smaller factor moves it vertically, so the horizon stays where it is. `draw(g, camera.x(alpha), camera.y(alpha))` before the world draws all layers, the furthest first. Cut a background with much empty sky into bands, and make the solid ones opaque ([chapter 27](27-jump.md#measured-then-halved)).
 
 ## What a side sees: FogOfWar and FogPainter
 
-*Package `fog` · introduced in [31. Sands](31-sands.md#step-3-fog-of-war) · source: [`FogOfWar`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/fog/FogOfWar.java), [`FogPainter`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/fog/FogPainter.java)*
+*Package `fog` · introduced in [31. Sands](31-sands.md#step-3-fog-of-war) · source: [`FogOfWar`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/fog/FogOfWar.java), [`FogPainter`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/fog/FogPainter.java)*
 
 **What it is for.** What one side knows of the map. Every tile is in one of three states: **unseen** (nobody of this side has looked there: black, the *shroud*), **seen** (someone looked once, but nobody looks now: the ground is known and dimmed, enemies there are not shown) and **visible** (a unit or building of this side sees it now). Each side has a fog of its own. In Sands the computer opponent plays by its fog as the player does, with one exception: it knows where the enemy's buildings are.
 
@@ -263,7 +263,7 @@ What the player saw of the enemy, a building as it was when someone last looked,
 
 ## The map in a corner: Minimap
 
-*Package `minimap` · introduced in [31. Sands](31-sands.md#step-4-the-minimap) · source: [`Minimap`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/minimap/Minimap.java)*
+*Package `minimap` · introduced in [31. Sands](31-sands.md#step-4-the-minimap) · source: [`Minimap`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/minimap/Minimap.java)*
 
 **What it is for.** The whole map, small, in a corner of the screen: a pixel per tile, the things on it as dots, and a box that shows what the camera sees. A click on it moves the camera there.
 
@@ -277,7 +277,7 @@ What the player saw of the enemy, a building as it was when someone last looked,
 
 ### An isometric map in a corner: DiamondMinimap
 
-*Package `iso` · introduced in [33. Town](33-town.md#step-12-everything-else) · source: [`DiamondMinimap`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/iso/DiamondMinimap.java)*
+*Package `iso` · introduced in [33. Town](33-town.md#step-12-everything-else) · source: [`DiamondMinimap`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/iso/DiamondMinimap.java)*
 
 The minimap of an isometric map: the whole map as a small diamond, turned like the view. It is the picture of the `IsoProjection`, scaled down, so the camera's view is a plain box on it and a click on it is a point of the picture to move the camera to: `camera.jumpTo(minimap.pictureX(x), minimap.pictureY(y))`. The tiles are an image of one pixel per tile, as in `Minimap`, drawn through a transform that turns each pixel into a little diamond; `paint(col, row, rgb)` when a tile changes, `render(g)` and `view(g, camera, alpha, colour)` in the overlay, `dot` for things that move. Town also uses it, without a camera, for the previews on the choice of a mission.
 
@@ -287,7 +287,7 @@ The minimap of an isometric map: the whole map as a small diamond, turned like t
 
 ## Ground that breaks: Ground and Landscape
 
-*Package `terrain` · introduced in [29. Artillery](29-artillery.md#step-1-ground-that-breaks) · source: [`Ground`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/terrain/Ground.java), [`Landscape`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/terrain/Landscape.java)*
+*Package `terrain` · introduced in [29. Artillery](29-artillery.md#step-1-ground-that-breaks) · source: [`Ground`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/terrain/Ground.java), [`Landscape`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/terrain/Landscape.java)*
 
 **What it is for.** Ground that can be blasted, dug and heaped up anywhere, by any amount, and that falls when its support is gone: an artillery duel, a digging game, worms with bazookas, a mine. A `Ground` is a grid of small cells, each a byte, 0 for air and any other number for a kind of earth the game names. A `Landscape` makes the line of hills to fill it from.
 
@@ -327,7 +327,7 @@ The minimap of an isometric map: the whole map as a small diamond, turned like t
 
 ## Seen from inside: GridMap, Raycaster and LightMap
 
-*Package `raycast` · introduced in [60. Rivet](60-rivet.md#step-1-a-world-of-cells) · source: [`GridMap`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/GridMap.java), [`Door`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Door.java), [`Raycaster`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Raycaster.java), [`Camera`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Camera.java), [`Texture`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Texture.java), [`LightMap`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/LightMap.java), [`Billboard`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Billboard.java), [`Views`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Views.java)*
+*Package `raycast` · introduced in [60. Rivet](60-rivet.md#step-1-a-world-of-cells) · source: [`GridMap`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/GridMap.java), [`Door`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Door.java), [`Raycaster`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Raycaster.java), [`Camera`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Camera.java), [`Texture`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Texture.java), [`LightMap`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/LightMap.java), [`Billboard`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Billboard.java), [`Views`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Views.java)*
 
 **What it is for.** A world seen through the player's eyes: corridors, halls and doors on a grid of square cells, walls of one height, a floor and a ceiling or open sky, things standing in it, all lit by lamps and fading into fog. The `Raycaster` draws it with one ray per column of the picture, fast enough in software for 60 frames a second at 640 × 400.
 

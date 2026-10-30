@@ -21,7 +21,7 @@ Games of this kind grew out of the text adventures of the 1970s, where one typed
     - Texts in five languages that **fit the screen**
     - A **quiz** that starts over without punishing, and an **epilogue** that tells history from invention
 
-The complete game is in [amade-templar-game](https://github.com/datazuul/amade-templar-game). The engine parts it uses are described in [chapter 49](49-adventure.md); this chapter tells how a game is built on them.
+The complete game is in [amade-templar-game](https://github.com/amadeos-eu/amade-templar-game). The engine parts it uses are described in [chapter 49](49-adventure.md); this chapter tells how a game is built on them.
 
 ## The rules
 

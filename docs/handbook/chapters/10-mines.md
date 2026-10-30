@@ -19,7 +19,7 @@ Mines is a perfect first game: no animation, no timing, no physics. The program 
     - **Measuring time** in a testable way
     - **High scores** with the engine
 
-The complete game is in [amade-mines-game](https://github.com/datazuul/amade-mines-game). Open it next to this chapter.
+The complete game is in [amade-mines-game](https://github.com/amadeos-eu/amade-mines-game). Open it next to this chapter.
 
 ## The rules
 

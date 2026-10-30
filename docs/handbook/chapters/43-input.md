@@ -20,7 +20,7 @@ The second point matters more than it looks. A key pressed and released between 
 
 ## The keyboard: KeyState and Keyboard
 
-*Package `input` · introduced in [20. Paddle](20-paddle.md#step-4-the-keyboard) · source: [`KeyState`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/KeyState.java), [`Keyboard`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/Keyboard.java)*
+*Package `input` · introduced in [20. Paddle](20-paddle.md#step-4-the-keyboard) · source: [`KeyState`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/KeyState.java), [`Keyboard`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/Keyboard.java)*
 
 **What it is for.** Which keys are held, and which went down since the last look. `KeyState` is the bookkeeping, without AWT: key codes and nanosecond times come in, so tests can play any sequence. `Keyboard` connects it to a component and makes it safe between the two threads.
 
@@ -45,7 +45,7 @@ The second point matters more than it looks. A key pressed and released between 
 
 ## Actions instead of keys: Controls
 
-*Package `input` · introduced in [20. Paddle](20-paddle.md#keys-and-actions), pad buttons in [26. Blast](26-blast.md#pads-in-the-controls) · source: [`Controls`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/Controls.java)*
+*Package `input` · introduced in [20. Paddle](20-paddle.md#keys-and-actions), pad buttons in [26. Blast](26-blast.md#pads-in-the-controls) · source: [`Controls`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/Controls.java)*
 
 **What it is for.** The rules ask "does the right player move up?", never "is the up arrow down?". `Controls` maps the actions of a game, an enum, to keys and gamepad buttons; several keys and buttons can trigger one action.
 
@@ -67,7 +67,7 @@ Each player gets a `Controls` of their own: two players on one keyboard in Paddl
 
 ## The mouse: Mouse
 
-*Package `input` · introduced in [21. Bricks](21-bricks.md#step-8-the-mouse); held buttons in [23. Rocks](23-rocks.md#step-7-steering-with-the-mouse), release and inside in [30. Towers](30-towers.md#step-5-the-mouse-in-the-world), the wheel in [33. Town](33-town.md#step-10-a-view-that-zooms) · source: [`Mouse`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/Mouse.java)*
+*Package `input` · introduced in [21. Bricks](21-bricks.md#step-8-the-mouse); held buttons in [23. Rocks](23-rocks.md#step-7-steering-with-the-mouse), release and inside in [30. Towers](30-towers.md#step-5-the-mouse-in-the-world), the wheel in [33. Town](33-town.md#step-10-a-view-that-zooms) · source: [`Mouse`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/Mouse.java)*
 
 **What it is for.** The mouse of a game, like the keyboard: Swing reports, the loop polls and asks. Positions are in the game's **logical** coordinates, so a game never sees the size of the window, the black bars or the render mode.
 
@@ -86,7 +86,7 @@ A position outside the picture, on a black bar, lies outside 0 … logical size;
 
 ## Turning with the mouse: MouseLook
 
-*Package `input` · introduced in [60. Rivet](60-rivet.md#the-mouse) · source: [`MouseLook`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/MouseLook.java)*
+*Package `input` · introduced in [60. Rivet](60-rivet.md#the-mouse) · source: [`MouseLook`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/MouseLook.java)*
 
 **What it is for.** Steering with the mouse in a first-person view: the game asks how far the mouse moved since the last step, not where it is, and the mouse never reaches the edge of the screen.
 
@@ -104,7 +104,7 @@ A position outside the picture, on a black bar, lies outside 0 … logical size;
 
 ## Gamepads: Gamepads and Gamepad
 
-*Package `input` · introduced in [26. Blast](26-blast.md#step-2-gamepads) · source: [`Gamepads`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/Gamepads.java), [`Gamepad`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/Gamepad.java), [`LinuxJoysticks`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/LinuxJoysticks.java), [`XInput`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/XInput.java)*
+*Package `input` · introduced in [26. Blast](26-blast.md#step-2-gamepads) · source: [`Gamepads`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/Gamepads.java), [`Gamepad`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/Gamepad.java), [`LinuxJoysticks`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/LinuxJoysticks.java), [`XInput`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/input/XInput.java)*
 
 **What it is for.** Up to four gamepads, in slots filled in the order the pads are plugged in, plugged in and out while the game runs. Each `Gamepad` answers like the keyboard: `isDown(Button.A)`, `wasPressed(Button.START)`, `anyPressed()` (to join a game), and the left stick as `x()` and `y()`, -1 to 1. The buttons are named as on the pads of the Xbox, which most pads copy: `A`, `B`, `X`, `Y`, `LB`, `RB`, `BACK`, `START` and the d-pad `UP`, `DOWN`, `LEFT`, `RIGHT`.
 

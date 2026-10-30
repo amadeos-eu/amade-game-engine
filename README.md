@@ -1,6 +1,6 @@
 # amade-game-engine
 
-**amade-game-engine** is the game library of the [amadeOS](https://github.com/datazuul/amadeos) desktop. The games (`amade-<name>-game`) are built on it, and like the other amadeOS applications they run on other operating systems too.
+**amade-game-engine** is the game library of the [amadeOS](https://github.com/amadeos-eu/amadeos) desktop. The games (`amade-<name>-game`) are built on it, and like the other amadeOS applications they run on other operating systems too.
 
 ![License](https://img.shields.io/badge/license-EUPL--1.2-blue)
 ![Java](https://img.shields.io/badge/Java-25-orange)
@@ -52,7 +52,7 @@ The library grows game by game: each game adds what it needs and leaves it here 
 - **Scenes** (`eu.amadeos.gameengine.scene`): `Scene` and `SceneStack` (only the top scene moves, all are drawn: a pause screen over a frozen match).
 - Texts in English, Deutsch, Français, Español and Italiano.
 
-Theme, Motif look, start-up, XDG directories and i18n come from [amade-commons](https://github.com/datazuul/amade-commons), which this library brings along.
+Theme, Motif look, start-up, XDG directories and i18n come from [amade-commons](https://github.com/amadeos-eu/amade-commons), which this library brings along.
 
 ## Handbook
 
@@ -70,7 +70,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-    implementation 'com.github.datazuul:amade-game-engine:main-SNAPSHOT'
+    implementation 'com.github.amadeos-eu:amade-game-engine:main-SNAPSHOT'
 }
 ```
 

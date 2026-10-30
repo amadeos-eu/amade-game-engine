@@ -6,7 +6,7 @@ None of the classes here needs a screen. They are the rules' tools, and they are
 
 ## Points and directions: Vector and Angles
 
-*Package `math` · introduced in [23. Rocks](23-rocks.md#step-1-vectors) · source: [`Vector`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/math/Vector.java), [`Angles`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/math/Angles.java)*
+*Package `math` · introduced in [23. Rocks](23-rocks.md#step-1-vectors) · source: [`Vector`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/math/Vector.java), [`Angles`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/math/Angles.java)*
 
 **What it is for.** A `Vector` is a point or a direction in the plane: where a ship is, how fast it flies and where to, where its nose points. It is an immutable record; every operation returns a new vector, so a vector can be passed around and kept without anyone changing it behind your back. `Angles` brings angles into one range and finds the short way round between two of them.
 
@@ -32,7 +32,7 @@ None of the classes here needs a screen. They are the rules' tools, and they are
 
 ## A field without edges: Wrap
 
-*Package `math` · introduced in [23. Rocks](23-rocks.md#step-3-a-field-without-edges) · source: [`Wrap`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/math/Wrap.java)*
+*Package `math` · introduced in [23. Rocks](23-rocks.md#step-3-a-field-without-edges) · source: [`Wrap`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/math/Wrap.java)*
 
 **What it is for.** A field on which what leaves on the right comes back on the left: the space of Rocks. Three things change on such a field, and `Wrap` answers each: a position must be brought back into the field (`wrap`), the distance between two things is the **shortest** one, which may lead across an edge (`delta`, `distance`), and a thing that sticks out over an edge must be drawn a second time on the other side (`forEachCopy`).
 
@@ -46,7 +46,7 @@ None of the classes here needs a screen. They are the rules' tools, and they are
 
 ## Curves to fly along: FlightPath
 
-*Package `motion` · introduced in [24. Swarm](24-swarm.md#step-3-flight-paths) · source: [`FlightPath`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/motion/FlightPath.java)*
+*Package `motion` · introduced in [24. Swarm](24-swarm.md#step-3-flight-paths) · source: [`FlightPath`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/motion/FlightPath.java)*
 
 **What it is for.** A curve designed in advance and flown at an even speed: the swoop of an insect into its formation, the loop of a dive, anything on rails. A path is built from cubic Bézier curves and straight lines:
 
@@ -70,7 +70,7 @@ Paths are data: Swarm writes them in its stage file, `path swoop-left from 300 -
 
 ## Grazing: Wander
 
-*Package `motion` · introduced in [32. Colony](32-colony.md#grazing) · source: [`Wander`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/motion/Wander.java)*
+*Package `motion` · introduced in [32. Colony](32-colony.md#grazing) · source: [`Wander`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/motion/Wander.java)*
 
 **What it is for.** Something that idles around a home: sheep in a pasture, hens in a yard, people on a square. It walks to a spot, stands there for one to four seconds, and walks to the next; frightened, it runs to the far side of its circle at twice the speed.
 
@@ -93,7 +93,7 @@ Paths are data: Swarm writes them in its stage file, `path swoop-left from 300 -
 
 ## Falling and standing: Body and TileCollider
 
-*Package `physics` · introduced in [27. Jump](27-jump.md#step-2-falling-and-standing) · source: [`Body`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Body.java), [`Solidity`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Solidity.java), [`TileCollider`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/TileCollider.java)*
+*Package `physics` · introduced in [27. Jump](27-jump.md#step-2-falling-and-standing) · source: [`Body`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Body.java), [`Solidity`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Solidity.java), [`TileCollider`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/TileCollider.java)*
 
 **What it is for.** Things that move through a world of tiles and stand on it: a player, an enemy that walks. A `Body` is a box with a velocity and what it touched in its last move: `onGround`, `hitCeiling`, `hitLeft`, `hitRight`, `onPlatform`. A `TileCollider` moves bodies and stops them where the tiles are solid. Each tile is one of three `Solidity` values: `EMPTY` (air), `SOLID` (ground and walls) or `PLATFORM` (holds a body that comes down onto it from above, lets it pass from below, and can be dropped through on purpose).
 
@@ -123,7 +123,7 @@ The collider asks the game what a tile is, through a function `(col, row) -> Sol
 
 ### Jumping: Jump
 
-*Package `physics` · introduced in [27. Jump](27-jump.md#step-3-running-and-jumping) · source: [`Jump`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Jump.java)*
+*Package `physics` · introduced in [27. Jump](27-jump.md#step-3-running-and-jumping) · source: [`Jump`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Jump.java)*
 
 The jump of a platformer, with the three small kindnesses that make it feel right rather than exact: **coyote time** (a press just after running off a ledge still jumps), a **jump buffer** (a press just before landing is carried out on landing) and a **variable height** (letting go while rising cuts the speed, so a tap is a hop and a held button the full jump). Call `update(body, pressed, held, seconds)` in each step after the last move and before this step's fall; it returns true in the step a jump starts, for the sound.
 
@@ -131,7 +131,7 @@ The speed of a jump follows from the height it should reach: rising at *v* again
 
 ## Flying on jets: Thrusters, drag and Touchdown
 
-*Package `physics` · introduced in [28. Hover Cab](28-hover-cab.md#step-1-jets-against-gravity) · source: [`Thrusters`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Thrusters.java), [`Touchdown`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Touchdown.java), [`Body`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Body.java)*
+*Package `physics` · introduced in [28. Hover Cab](28-hover-cab.md#step-1-jets-against-gravity) · source: [`Thrusters`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Thrusters.java), [`Touchdown`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Touchdown.java), [`Body`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Body.java)*
 
 **What it is for.** A craft that flies against gravity on jets and has to land: a lunar lander, a flying cab, a jetpack, a helicopter. `Thrusters` know how hard the jets push, up (the main jet), to the sides and down, and how much fuel they burn; `Body.drag` is the air that slows the craft; `Touchdown` decides whether a landing was soft, hard or a crash.
 
@@ -166,7 +166,7 @@ A main jet of about twice gravity feels right: the craft rises about as fast as 
 
 ## Shells in flight: Projectile and Ballistics
 
-*Package `physics` · introduced in [29. Artillery](29-artillery.md#step-3-shells-in-the-air) · source: [`Projectile`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Projectile.java), [`Ballistics`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Ballistics.java)*
+*Package `physics` · introduced in [29. Artillery](29-artillery.md#step-3-shells-in-the-air) · source: [`Projectile`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Projectile.java), [`Ballistics`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/physics/Ballistics.java)*
 
 **What it is for.** Things that are fired or thrown and then fly on their own: shells, cannonballs, grenades, arrows, a stone from a catapult. A `Projectile` is a position and a velocity; `Ballistics` is the air it flies through, with gravity, wind and drag, and moves it step by step until it hits something.
 
@@ -196,7 +196,7 @@ A main jet of about twice gravity feels right: the craft rises about as fast as 
 
 ## Walking and shooting on a grid of walls: Mover and Hitscan
 
-*Package `raycast` · introduced in [60. Rivet](60-rivet.md#step-6-walking-and-turning) · source: [`Mover`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Mover.java), [`Hitscan`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Hitscan.java)*
+*Package `raycast` · introduced in [60. Rivet](60-rivet.md#step-6-walking-and-turning) · source: [`Mover`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Mover.java), [`Hitscan`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/raycast/Hitscan.java)*
 
 **What it is for.** Moving a round body through a [`GridMap`](45-maps.md#seen-from-inside-gridmap-raycaster-and-lightmap) of walls and doors, sliding along walls instead of sticking to them; and shots that arrive at once along a line, stopped by the first wall or the first target.
 
@@ -228,7 +228,7 @@ A main jet of about twice gravity feels right: the craft rises about as fast as 
 
 ### Boxes: Box and Sweep
 
-*Package `collision` · introduced in [21. Bricks](21-bricks.md#step-2-collision-of-moving-boxes) · source: [`Box`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/collision/Box.java), [`Sweep`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/collision/Sweep.java)*
+*Package `collision` · introduced in [21. Bricks](21-bricks.md#step-2-collision-of-moving-boxes) · source: [`Box`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/collision/Box.java), [`Sweep`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/collision/Sweep.java)*
 
 A `Box` is an axis-aligned rectangle, its top left corner at `x`, `y`; boxes that only touch do not overlap. `Sweep.sweep(moving, dx, dy, target)` tests a **moving** box against one at rest over the whole way of a step and returns where they first touch: the share of the step, 0 to 1, and the face that was hit as a normal, the direction to bounce. Without it, a ball in front of a brick in one step and behind it in the next would pass through ("tunnelling").
 
@@ -242,13 +242,13 @@ A ball that hits a brick early in a step moves on, bounced, for the rest of it, 
 
 ### Circles: Circle
 
-*Package `collision` · introduced in [23. Rocks](23-rocks.md#step-4-circles) · source: [`Circle`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/collision/Circle.java)*
+*Package `collision` · introduced in [23. Rocks](23-rocks.md#step-4-circles) · source: [`Circle`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/collision/Circle.java)*
 
 Two circles overlap when their centres are closer than both radii together, compared squared, without a root. `overlaps(other, wrap)` measures across the edges of a field without edges; `contains(x, y)` is for a click on a round thing. A turning figure's hit circle is its `Outline.radius()`, or a little less, so that only a real touch counts.
 
 ### Exact to the pixel: PixelMask
 
-*Package `collision` · introduced in [28. Hover Cab](28-hover-cab.md#step-3-collisions-as-exact-as-the-pictures) · source: [`PixelMask`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/collision/PixelMask.java)*
+*Package `collision` · introduced in [28. Hover Cab](28-hover-cab.md#step-3-collisions-as-exact-as-the-pictures) · source: [`PixelMask`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/collision/PixelMask.java)*
 
 **What it is for.** Collisions as exact as the pictures, for shapes a box or a circle fits badly: a cab with thin legs, a slanted strut, a round sign, the jagged wall of a cave. A `PixelMask` says which pixels of a thing are solid, one bit each; two masks collide when they have a solid pixel in the same place.
 
@@ -276,7 +276,7 @@ The easiest masks to get right are drawn: `PixelMask.painted(width, height, g ->
 
 ### Many things: Grid
 
-*Package `collision` · introduced in [24. Swarm](24-swarm.md#step-5-collisions-on-a-grid) · source: [`Grid`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/collision/Grid.java)*
+*Package `collision` · introduced in [24. Swarm](24-swarm.md#step-5-collisions-on-a-grid) · source: [`Grid`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/collision/Grid.java)*
 
 **What it is for.** Finding the things near a place without looking at all things. Testing each of *n* things against each other costs *n*² / 2 tests: 40 insects and 2 shots are 80, nothing; 2,000 shots, sparks and units are two million, in every step. With a grid, each thing meets only the few in its neighbourhood.
 
@@ -290,7 +290,7 @@ Besides collisions, the grid answers "who is near?" in general. Sands uses it to
 
 ## A fixed number of things: Pool
 
-*Package `pool` · introduced in [23. Rocks](23-rocks.md#step-5-four-shots-from-a-pool) · source: [`Pool`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/pool/Pool.java)*
+*Package `pool` · introduced in [23. Rocks](23-rocks.md#step-5-four-shots-from-a-pool) · source: [`Pool`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/pool/Pool.java)*
 
 **What it is for.** A fixed number of reusable objects, such as shots, all made at the start: `obtain()` takes one (or `null` when all are in use), `release(index)` or `releaseIf(done)` gives it back.
 
@@ -304,7 +304,7 @@ Besides collisions, the grid answers "who is near?" in general. Sands uses it to
 
 ## Entities and components
 
-*Package `entity` · introduced in [24. Swarm](24-swarm.md#step-2-entities-and-components) · source: [`Entity`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/entity/Entity.java), [`Entities`](https://github.com/datazuul/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/entity/Entities.java)*
+*Package `entity` · introduced in [24. Swarm](24-swarm.md#step-2-entities-and-components) · source: [`Entity`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/entity/Entity.java), [`Entities`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/entity/Entities.java)*
 
 **What it is for.** Things whose behaviour changes while they live. An `Entity` is little more than a number and a bag of **components**: a body, a flight along a path, a place in a formation, hit points. What it is and what it does follows from the components it has right now. An insect that leaves the formation to dive gets a flight, and loses it again when it is back; its class never changes, its components do. Each rule, a *system*, walks over the entities that have the components it needs: the flight system moves whatever flies, insect, shot or ship, and never asks which it is.
 

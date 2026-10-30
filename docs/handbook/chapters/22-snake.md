@@ -18,7 +18,7 @@ Snake is simpler than Bricks, which is why it is here. With few rules, there is 
     - **Replays**: a whole game as a seed and a few dozen turns, played back on the title screen
     - A **computer player** that counts its room with the flood fill from Mines
 
-The complete game is in [amade-snake-game](https://github.com/datazuul/amade-snake-game).
+The complete game is in [amade-snake-game](https://github.com/amadeos-eu/amade-snake-game).
 
 ## The rules
 

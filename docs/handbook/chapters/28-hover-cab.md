@@ -19,7 +19,7 @@ Games of this kind go back to the arcade lunar landers of 1979: a craft, gravity
     - **An autopilot** made of a distance map and jets switched on and off: it flies the title screen and proves that every shift can be flown
     - Preparing expensive things **in the background** before they are needed
 
-The complete game is in [amade-hover-cab-game](https://github.com/datazuul/amade-hover-cab-game).
+The complete game is in [amade-hover-cab-game](https://github.com/amadeos-eu/amade-hover-cab-game).
 
 ## The rules
 

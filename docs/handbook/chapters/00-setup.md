@@ -52,9 +52,9 @@ The engine, the shared amadeOS library and every game live in their own Git repo
 
 ```bash
 mkdir -p ~/projects/amade && cd ~/projects/amade
-git clone https://github.com/datazuul/amade-commons.git
-git clone https://github.com/datazuul/amade-game-engine.git
-git clone https://github.com/datazuul/amade-mines-game.git
+git clone https://github.com/amadeos-eu/amade-commons.git
+git clone https://github.com/amadeos-eu/amade-game-engine.git
+git clone https://github.com/amadeos-eu/amade-mines-game.git
 ```
 
 ```text
@@ -156,7 +156,7 @@ The game then appears in the desktop's menu under *Games*, and `amade-mines-game
 | Symptom | Cause and fix |
 |---|---|
 | `Cannot find a Java installation ... matching languageVersion=25` | No JDK 25 installed. Install it as above. |
-| `Could not resolve com.github.datazuul:amade-game-engine` | The engine is not checked out next to the game and JitPack cannot be reached. Clone `amade-game-engine` next to the game. |
+| `Could not resolve com.github.amadeos-eu:amade-game-engine` | The engine is not checked out next to the game and JitPack cannot be reached. Clone `amade-game-engine` next to the game. |
 | Window tests fail with odd screen sizes | An old virtual X server is still running on that display. Find it with `pgrep -a Xvfb` and end it. |
 | Everything is tiny on a high-resolution screen | Start with `-Dsun.java2d.uiScale=2`, e.g. `JAVA_TOOL_OPTIONS=-Dsun.java2d.uiScale=2 ./gradlew run`. |
 | The game starts in the wrong language | amadeOS programs follow the desktop's language, else `LANG`. Try `LANG=en_US.UTF-8 ./gradlew run`. |

@@ -20,7 +20,7 @@ Platformers began on the arcade screen in 1981, scrolled sideways from 1984, and
     - **Proving a level can be finished**: a search over every jump the player can make
     - **Saving progress** so that no crash can lose it
 
-The complete game is in [amade-jump-game](https://github.com/datazuul/amade-jump-game).
+The complete game is in [amade-jump-game](https://github.com/amadeos-eu/amade-jump-game).
 
 ## The rules
 
