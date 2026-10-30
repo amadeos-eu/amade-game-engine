@@ -56,7 +56,7 @@ Theme, Motif look, start-up, XDG directories and i18n come from [amade-commons](
 
 ## Handbook
 
-The [amadeOS Game Developer's Handbook](https://datazuul.github.io/amade-game-engine/) teaches game programming with this engine, game by game. Its sources are in [`docs/handbook`](docs/handbook).
+The [amadeOS Game Developer's Handbook](https://docs.amadeos.eu/amade-game-engine/) teaches game programming with this engine, game by game. Its sources are in [`docs/handbook`](docs/handbook).
 
 ## Planned
 
