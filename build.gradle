@@ -26,7 +26,7 @@ java {
 def centralRelease = providers.gradleProperty('mavenCentral').isPresent()
 // The amade-commons this engine builds on, pinned on JitPack: a commit on develop, a release tag (vX.Y.Z) before
 // main (Promote checks this pin). On Maven Central the same release is eu.amadeos:amade-commons:X.Y.Z.
-def commonsDependency = 'com.github.amadeos-eu:amade-commons:fac730fed3'
+def commonsDependency = 'com.github.amadeos-eu:amade-commons:d3a0c87d76'
 if (centralRelease) {
     def commonsPin = commonsDependency.tokenize(':').last()
     def release = commonsPin =~ /^v(\d+\.\d+\.\d+)$/
