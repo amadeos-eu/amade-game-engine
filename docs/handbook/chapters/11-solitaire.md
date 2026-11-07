@@ -3,7 +3,7 @@
 The second game is the patience that came with every desktop of the 1990s: **Klondike**. Fifty-two cards, seven columns, four foundations to fill from ace to king. Mines taught you to model rules, draw a grid and react to clicks. Solitaire adds what makes a game feel alive: cards you pick up and carry, cards that fly to their places, mistakes you can take back, and at the end the famous cascade of bouncing cards.
 
 <figure markdown>
-![Solitaire while playing](images/solitaire/playing.png){ width="534" }
+![Solitaire while playing](images/solitaire/playing.png){ width="542" }
 <figcaption>A game in progress. Cards, backs and suit symbols are drawn in code.</figcaption>
 </figure>
 
@@ -281,7 +281,7 @@ The test plays the view's timer in a simple loop: `while (view.finishing) presen
 ## Step 10: The bouncing cards
 
 <figure markdown>
-![The victory cascade](images/solitaire/won.png){ width="534" }
+![The victory cascade](images/solitaire/won.png){ width="542" }
 <figcaption>The ending: cards bounce off the bottom edge and leave trails, while the game asks for your name.</figcaption>
 </figure>
 
