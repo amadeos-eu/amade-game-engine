@@ -1,6 +1,6 @@
 # 42. Sprites and Effects
 
-What a game shows, apart from plain shapes: pictures from files and pictures drawn in code, many frames in one image, pictures that turn, figures of lines, movements that ease in and out, and splinters by the hundred. One idea runs through all of it: **work out a picture once, then copy it**. Java2D copies an image of the screen's own pixel format very fast and does almost everything else slowly, so the classes of this chapter are built around caches.
+What a game shows, apart from plain shapes: pictures from files and pictures drawn in code, many frames in one image, pictures that turn, figures of lines, movements that ease in and out, splinters by the hundred, tables whose parts stand up with their shadows, a mirror ball, and the lamps and dot-matrix displays of a machine. One idea runs through all of it: **work out a picture once, then copy it**. Java2D copies an image of the screen's own pixel format very fast and does almost everything else slowly, so the classes of this chapter are built around caches.
 
 ## Pictures: Sprite
 
@@ -152,6 +152,60 @@ A figure given by its corners around its own centre, pairs of x and y, angle 0 p
 
 !!! warning "Pitfall: a model is asked from many threads"
     The renderer asks one model from every core at once. Keep nothing in fields of a model while `shape` runs; `Model` keeps its own scratch state in a `ThreadLocal`, so `part` is safe.
+
+## Tables with heights: Relief and RampArt
+
+*Package `pinball` · introduced in [70. Pinball](70-pinball.md#step-8-relief) · source: [`Relief`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/pinball/Relief.java), [`RampArt`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/pinball/RampArt.java)*
+
+**What it is for.** A flat picture of a board or table seen from straight above in which every part stands up from the floor with its height, lit from one side, and throws a soft shadow: posts, bumpers, walls, plastic ramps and wire forms. Tilted into the view by [`Perspective`](45-maps.md#a-flat-world-at-a-slant-perspective), it looks like a model.
+
+**When to choose it.** When the parts of a flat world have heights and you draw them with Java2D shapes. The picture is baked once (it takes most of a second for a whole table), so it holds what does not move; the moving parts are drawn every frame through `Perspective.local`. Things that must look solid from every side are [models](#things-in-3d-sdf-model-and-modelrenderer).
+
+**How it works.** A `Relief` covers a rectangle of the world at some pixels per unit and has three layers: `floor()` for the printed artwork, the shadows, and `parts()`. `extrude(footprint, from, to, side, top)` lifts a shape by drawing it a quarter unit higher each time, darker at the foot and lit from the left, with its top on the last slice. `shadow(footprint, h)` puts the footprint, moved away from the light by its height (`SHADOW_X`, `SHADOW_Y` per unit), on the shadow layer. `bake()` blurs the shadows, lays them over the floor and the parts on top. `above()` gives a second relief for a higher level whose shadows fall on the first: a ball rolls between the two pictures, under the ramps.
+
+```java title="amade-game-engine · pinball/Relief.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/pinball/Relief.java:extrude"
+```
+
+`RampArt.plastic(relief, track, width, colour, wall)` builds a ramp of clear plastic along a [`Track`](44-movement.md#a-ball-on-a-table-playfield-and-its-parts): its far wall, its bed, its near wall lit by how much it faces the light, three lines of light along the edges, and the supports down to the floor. `RampArt.wire(relief, track, width)` draws a wire form, two rails on hoops.
+
+| Method | What it does |
+|---|---|
+| `new Relief(left, top, right, bottom, pixelsPerUnit)`, `above()` | The picture's world rectangle and sharpness; a level above it |
+| `floor()`, `parts()` | The graphics to draw on, in world units |
+| `extrude(footprint, from, to, side, top)`, `shadow(footprint, h)` | A part standing up, and its shadow |
+| `bake()`, `dispose()` | The finished picture; free the graphics |
+| `RampArt.plastic(relief, track, width, colour, wall)`, `RampArt.wire(relief, track, width)` | A ramp and a wire form along a track |
+
+## A mirror ball: ChromeBall
+
+*Package `pinball` · introduced in [70. Pinball](70-pinball.md#the-chrome-ball) · source: [`ChromeBall`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/pinball/ChromeBall.java)*
+
+**What it is for.** A steel ball that reflects the room: bright above, the floor's colour and its lamps below, two highlights, a darker rim. **How it works.** `new ChromeBall(floor, lamps…)` takes the floor's colour and the colours of the lamps it should mirror; `draw(g, cx, cy, r)` draws it at any radius. Each radius in pixels is rendered once, per pixel, by reflecting the view ray about the sphere's normal, and kept.
+
+```java title="amade-game-engine · pinball/ChromeBall.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/pinball/ChromeBall.java:render"
+```
+
+## Lamps and displays: Lamps and DotMatrix
+
+*Package `pinball` · introduced in [70. Pinball](70-pinball.md#step-5-the-game-and-its-rules) and [its backglass](70-pinball.md#step-10-the-backglass-and-its-displays) · source: [`Lamps`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/pinball/Lamps.java), [`DotMatrix`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/pinball/DotMatrix.java)*
+
+**What it is for.** The lights of a machine: named lamps that are off, on, blinking slowly or fast, that chase along a row and all flash together, and that fade up and down like bulbs; and a dot-matrix display of glowing round dots.
+
+**How it works.** The rules set each lamp's `State` by name; `update(seconds)` moves every lamp's brightness towards on or off, quickly up and slower down; `level(name)` is the brightness from 0 to 1 to draw with. `chase(names)` runs a light along a row, `flash(seconds)` blinks them all. A `DotMatrix` is a grid of dots (128 × 32 on a pinball): `line(text, baseline, size, bold)` writes into it with Java2D, `show(big, small)` writes two lines, `graphics()` and `changed()` let you draw anything. `paint(g, x, y, w, h, colour)` draws each dot as a round light with its dark shade, and makes that picture again only when the dots or the size change.
+
+```java title="amade-game-engine · pinball/Lamps.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/pinball/Lamps.java:update"
+```
+
+| Method | What it does |
+|---|---|
+| `set(name, state)`, `set(name, on)`, `state(name)`, `clear()` | What a lamp should do |
+| `chase(names)`, `stopChase()`, `flash(seconds)` | Light shows |
+| `update(seconds)`, `level(name)` | Brightness, faded |
+| `new DotMatrix(columns, rows)`, `clear()`, `line(...)`, `show(big, small)`, `on(x, y)` | The dots and what they say |
+| `paint(g, x, y, w, h, colour)` | The display on the screen |
 
 ## Movement in time: Easing and Tween
 

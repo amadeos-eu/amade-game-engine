@@ -35,6 +35,12 @@ The second point matters more than it looks. A key pressed and released between 
 
 `Keyboard.attach(component)` makes the component focusable, turns off focus traversal (Tab is a key like any other in a game) and forgets all held keys when the window loses the focus, because their releases would never arrive.
 
+**Left and right.** Shift, Control and Alt exist twice, and Java gives both keys the same code; only the event's key location tells them apart. `Keyboard` keeps the side as well: `LEFT_SHIFT`, `RIGHT_SHIFT`, `LEFT_CONTROL` and `RIGHT_CONTROL` are the plain code with a side bit added, and bind like any other key. The plain `VK_SHIFT` is down while either is. A pinball puts its flippers on the two Shift keys ([chapter 70](70-pinball.md#step-12-two-shift-keys)).
+
+```java title="amade-game-engine · input/Keyboard.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/input/Keyboard.java:sides"
+```
+
 !!! warning "Pitfall: two taps of the same key in a test"
     Because a press within 25 ms of a release counts as key repeat, a test that taps the same key twice must let a few steps pass between the taps, or the second tap is taken for the first one still held.
 
