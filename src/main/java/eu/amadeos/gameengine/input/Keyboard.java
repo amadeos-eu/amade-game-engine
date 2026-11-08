@@ -13,6 +13,19 @@ import java.util.function.LongSupplier;
  * makes it safe between the two threads.
  */
 public final class Keyboard {
+    // --8<-- [start:sides]
+    /**
+     * Shift, Control and Alt exist twice; a game that tells them apart (a pinball's flippers on the two Shift
+     * keys) asks for these codes: the key's code with the side added. The plain code is down when either is.
+     */
+    public static final int LEFT_SIDE = 0x1_0000;
+    public static final int RIGHT_SIDE = 0x2_0000;
+    public static final int LEFT_SHIFT = LEFT_SIDE | KeyEvent.VK_SHIFT;
+    public static final int RIGHT_SHIFT = RIGHT_SIDE | KeyEvent.VK_SHIFT;
+    public static final int LEFT_CONTROL = LEFT_SIDE | KeyEvent.VK_CONTROL;
+    public static final int RIGHT_CONTROL = RIGHT_SIDE | KeyEvent.VK_CONTROL;
+    // --8<-- [end:sides]
+
     private final KeyState state = new KeyState();
     private final LongSupplier clock;
 
@@ -32,12 +45,18 @@ public final class Keyboard {
         component.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                pressed(e.getKeyCode(), clock.getAsLong());
+                long now = clock.getAsLong();
+                pressed(e.getKeyCode(), now);
+                int side = side(e);
+                if (side != 0) pressed(side | e.getKeyCode(), now);
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
-                released(e.getKeyCode(), clock.getAsLong());
+                long now = clock.getAsLong();
+                released(e.getKeyCode(), now);
+                int side = side(e);
+                if (side != 0) released(side | e.getKeyCode(), now);
             }
         });
         // Keys held while the window loses the focus never report their release.
@@ -47,6 +66,15 @@ public final class Keyboard {
                 releaseAll();
             }
         });
+    }
+
+    /** {@link #LEFT_SIDE} or {@link #RIGHT_SIDE} for a key that exists on both sides, else 0. */
+    static int side(KeyEvent e) {
+        return switch (e.getKeyLocation()) {
+            case KeyEvent.KEY_LOCATION_LEFT -> LEFT_SIDE;
+            case KeyEvent.KEY_LOCATION_RIGHT -> RIGHT_SIDE;
+            default -> 0;
+        };
     }
 
     public synchronized void pressed(int key, long now) {
