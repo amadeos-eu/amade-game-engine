@@ -89,6 +89,10 @@ public final class RoadRenderer {
         // and then the thin segments near the horizon no longer meet.
         Object stroke = g.getRenderingHint(RenderingHints.KEY_STROKE_CONTROL);
         g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+        // The sprite copies are already smooth and at most a fifth too wide: the nearest pixel is enough, and
+        // four times faster than a bilinear blit, with hundreds of trees in a frame.
+        Object interpolation = g.getRenderingHint(RenderingHints.KEY_INTERPOLATION);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
         for (int i = projections.size() - 1; i >= 0; i--) {
             Proj p = projections.get(i);
             drawSegment(g, p);
@@ -100,6 +104,7 @@ public final class RoadRenderer {
         }
         carsBySegment.clear();
         if (stroke != null) g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, stroke);
+        if (interpolation != null) g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, interpolation);
     }
     // --8<-- [end:render]
 
@@ -160,11 +165,20 @@ public final class RoadRenderer {
         return RoadLook.mix(lit, fog, f);
     }
 
-    /** The colour the distance fades into for a look, in the light and the mist of now. */
+    // --8<-- [start:fog-colour]
+    /**
+     * The colour the distance fades into for a look, in the light and the mist of now. Light and mist are
+     * taken in a few steps, the same steps the sprites' copies are tinted in: a colour that changed a little
+     * in every frame of a sunset would need new copies of every sprite in every frame.
+     */
     public Color fogColour(RoadLook look) {
-        Color fog = mistAmount > 0 ? RoadLook.mix(look.fog(), mist, mistAmount) : look.fog();
-        return light >= 1 ? fog : RoadLook.mix(shade, fog, Math.max(light, 0.15));
+        double steps = RoadSprite.LIGHT_STEPS - 1;
+        double mistStep = Math.round(Math.max(0, Math.min(1, mistAmount)) * steps) / steps;
+        double lightStep = Math.round(Math.max(0, Math.min(1, light)) * steps) / steps;
+        Color fog = mistStep > 0 ? RoadLook.mix(look.fog(), mist, mistStep) : look.fog();
+        return lightStep >= 1 ? fog : RoadLook.mix(shade, fog, Math.max(lightStep, 0.15));
     }
+    // --8<-- [end:fog-colour]
 
     // --8<-- [start:segment]
     private void drawSegment(Graphics2D g, Proj p) {

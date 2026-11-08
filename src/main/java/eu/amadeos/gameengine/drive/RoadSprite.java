@@ -5,8 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 /**
  * A picture that stands on the road or beside it: a tree, a house, a car. It is drawn at every size, from a
@@ -14,7 +13,9 @@ import java.util.Map;
  * night. Scaling and tinting a large picture for every tree in every frame would be far too slow, so the
  * sprite keeps finished copies: scaled down to a few fixed widths (each about a fifth wider than the one
  * before) and tinted to a few steps of fog and light. A frame takes the copy just wider than it needs and
- * draws it with a small, cheap scale.
+ * draws it with a small, cheap scale. A tree seen at thirty distances needs about thirty copies. All sprites
+ * share one budget of pixels for their copies; when it is spent, the copy used longest ago goes, whichever
+ * sprite it belongs to.
  *
  * <p>The picture's bottom centre stands on the ground; {@link #worldWidth()} is its width in world units (a
  * pine about 900, a car about 560, with the road 2200 wide). A <i>glowing</i> sprite (a lamp, a lit window,
@@ -27,15 +28,19 @@ public final class RoadSprite {
     static final int LIGHT_STEPS = 8;
     /** Each width is this much wider than the one before. */
     static final double WIDTH_STEP = 1.19;
-    /** More copies than this and the sprite forgets them all; they are made again as needed. */
-    static final int MAX_COPIES = 96;
+    /** The pixels all copies of all sprites may hold together, about 64 MB. */
+    static final long BUDGET = 16_000_000;
 
     private final BufferedImage art;
     private final double worldWidth;
     private final double glow;
-    private final Map<Key, BufferedImage> copies = new HashMap<>();
 
-    private record Key(int width, int fog, int light, int fogColour, int shade) {
+    /** The copies of all sprites, the one used longest ago first. */
+    private static final LinkedHashMap<Key, BufferedImage> COPIES = new LinkedHashMap<>(256, 0.75f, true);
+    private static long pixels;
+
+    /** A sprite is its own identity: the key holds the very sprite, not one that looks alike. */
+    private record Key(RoadSprite sprite, int width, int fog, int light, int fogColour, int shade) {
     }
     // --8<-- [end:sprite]
 
@@ -81,16 +86,37 @@ public final class RoadSprite {
         double keep = 1 - glow;
         int f = (int) Math.round(Math.max(0, Math.min(1, fog)) * keep * (FOG_STEPS - 1));
         int l = (int) Math.round((1 - (1 - Math.max(0, Math.min(1, light))) * keep) * (LIGHT_STEPS - 1));
-        Key key = new Key(width, f, l, fogColour.getRGB(), shade.getRGB());
-        BufferedImage copy = copies.get(key);
+        Key key = new Key(this, width, f, l, fogColour.getRGB(), shade.getRGB());
+        BufferedImage copy;
+        synchronized (COPIES) {
+            copy = COPIES.get(key);
+        }
         if (copy == null) {
-            if (copies.size() >= MAX_COPIES) copies.clear();
             copy = make(width, f / (double) (FOG_STEPS - 1), fogColour, l / (double) (LIGHT_STEPS - 1), shade);
-            copies.put(key, copy);
+            remember(key, copy);
         }
         return copy;
     }
     // --8<-- [end:copy]
+
+    private static void remember(Key key, BufferedImage copy) {
+        synchronized (COPIES) {
+            BufferedImage before = COPIES.put(key, copy);
+            if (before != null) pixels -= size(before);
+            pixels += size(copy);
+            var oldest = COPIES.values().iterator();
+            while (pixels > BUDGET && oldest.hasNext()) {
+                BufferedImage gone = oldest.next();
+                if (gone == copy) break;
+                pixels -= size(gone);
+                oldest.remove();
+            }
+        }
+    }
+
+    private static long size(BufferedImage im) {
+        return (long) im.getWidth() * im.getHeight();
+    }
 
     /** The smallest of the fixed widths that is at least {@code pixels}; never wider than the picture. */
     static int bucket(double pixels, int full) {
