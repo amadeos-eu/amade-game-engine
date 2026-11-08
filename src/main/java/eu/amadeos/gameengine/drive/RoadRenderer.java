@@ -45,6 +45,11 @@ public final class RoadRenderer {
     public Color shade = new Color(8, 10, 28);
     /** Headlights of this car light the road ahead of it; {@code null} for none. */
     public Car headlights;
+    /** How far one sees, as a part of each look's fog distance: below 1 in fog and rain. */
+    public double sight = 1;
+    /** The colour of mist or rain that the fog takes on, by {@link #mistAmount} (0 to 1). */
+    public Color mist = new Color(190, 194, 200);
+    public double mistAmount;
     // --8<-- [end:renderer]
 
     private final Path2D.Float path = new Path2D.Float();
@@ -146,7 +151,7 @@ public final class RoadRenderer {
     }
 
     private double fog(RoadLook look, double z) {
-        return 1 - Math.exp(-z / look.fogDistance());
+        return 1 - Math.exp(-z / (look.fogDistance() * Math.max(0.05, sight)));
     }
 
     /** A colour lit by the time of day and faded by fog. */
@@ -155,8 +160,10 @@ public final class RoadRenderer {
         return RoadLook.mix(lit, fog, f);
     }
 
-    private Color fogColour(RoadLook look) {
-        return light >= 1 ? look.fog() : RoadLook.mix(shade, look.fog(), Math.max(light, 0.15));
+    /** The colour the distance fades into for a look, in the light and the mist of now. */
+    public Color fogColour(RoadLook look) {
+        Color fog = mistAmount > 0 ? RoadLook.mix(look.fog(), mist, mistAmount) : look.fog();
+        return light >= 1 ? fog : RoadLook.mix(shade, fog, Math.max(light, 0.15));
     }
 
     // --8<-- [start:segment]
