@@ -21,6 +21,8 @@ public final class Ball {
     public State state = State.FREE;
     /** A captive ball stays in its own little lane: it never drains and is never held or launched. */
     public final boolean captive;
+    /** For a captive ball: the box it may move in, {left, top, right, bottom}; null for a free ball. */
+    public double[] fence;
 
     // riding a track
     Track track;

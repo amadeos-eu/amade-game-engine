@@ -244,6 +244,8 @@ public final class Playfield {
         for (Segment seg : segments) if (!seg.down && seg.layer == b.layer) bounce(b, seg);
         for (Disc d : discs) if (!d.down && d.layer == b.layer) bounce(b, d);
         for (Flipper f : flippers) if (f.layer == b.layer) bounce(b, f);
+        if (b.fence != null) fence(b);
+        if (b.captive) return;
         zones(b);
         if (b.y - b.radius > drainY && !b.captive) {
             b.state = Ball.State.LOST;
@@ -301,6 +303,15 @@ public final class Playfield {
         double[] sv = f.surfaceVelocity(p[0], p[1]);
         double hit = contact(b, p[0], p[1], p[2], Material.FLIPPER, sv[0], sv[1]);
         if (hit > 0) events.hit(f.id, b, hit);
+    }
+
+    /** Keeps a captive ball in its box: it bounces off the box's sides like off a wall. */
+    private void fence(Ball b) {
+        double[] f = b.fence;
+        if (b.x < f[0] + b.radius) { b.x = f[0] + b.radius; b.vx = Math.abs(b.vx) * 0.5; }
+        if (b.x > f[2] - b.radius) { b.x = f[2] - b.radius; b.vx = -Math.abs(b.vx) * 0.5; }
+        if (b.y < f[1] + b.radius) { b.y = f[1] + b.radius; b.vy = Math.abs(b.vy) * 0.5; }
+        if (b.y > f[3] - b.radius) { b.y = f[3] - b.radius; b.vy = -Math.abs(b.vy) * 0.2; }
     }
 
     private void pullByMagnets(Ball b, double dt) {
@@ -401,7 +412,7 @@ public final class Playfield {
             if (a.state != Ball.State.FREE) continue;
             for (int j = i + 1; j < balls.size(); j++) {
                 Ball c = balls.get(j);
-                if (c.state != Ball.State.FREE || c.layer != a.layer) continue;
+                if (c.state != Ball.State.FREE || c.layer != a.layer && !c.captive && !a.captive) continue;
                 double dx = c.x - a.x, dy = c.y - a.y;
                 double min = a.radius + c.radius;
                 double d2 = dx * dx + dy * dy;
