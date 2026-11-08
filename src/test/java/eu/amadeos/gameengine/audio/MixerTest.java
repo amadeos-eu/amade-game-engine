@@ -112,4 +112,27 @@ class MixerTest {
         assertTrue(!mixer.playingMusic());
     }
     // --8<-- [end:test-music]
+
+    // --8<-- [start:test-drone]
+    @Test
+    void theDroneGlidesToItsVolumeAndPlaysFasterAtAHigherRate() {
+        Mixer mixer = new Mixer();
+        short[] ramp = new short[1000];
+        for (int i = 0; i < ramp.length; i++) ramp[i] = (short) (i * 10);
+        mixer.setDrone(Sound.of(ramp));
+        short[] block = new short[Mixer.BLOCK];
+        mixer.mix(block);
+        assertEquals(0, block[100], "silent until a volume is set");
+        mixer.setDroneVolume(1);
+        for (int n = 0; n < 20; n++) mixer.mix(block);   // the volume has glided up
+        mixer.setDroneRate(2);
+        mixer.mix(block);
+        int steps = 0;
+        for (int i = 1; i < 200; i++) if (block[i] > block[i - 1]) steps += block[i] - block[i - 1];
+        assertTrue(steps / 199.0 > 15, "two samples of the ramp per sample: about 20 a step, was " + steps / 199.0);
+        mixer.setMuted(true);
+        for (int n = 0; n < 20; n++) mixer.mix(block);
+        assertTrue(Math.abs(block[Mixer.BLOCK - 1]) < 50, "muted, the drone fades out");
+    }
+    // --8<-- [end:test-drone]
 }

@@ -26,6 +26,9 @@ import java.util.concurrent.atomic.AtomicReference;
  * its own that no effect can push out. Muting turns the music down, it does not stop it: switched on again,
  * it goes on where it would be.
  *
+ * <p>Under both runs a <i>drone</i>, one more loop whose speed and loudness the game changes while it plays:
+ * the motor of a car, which climbs in pitch as the car gets faster, or the wind.
+ *
  * <p>Without a sound card (a server, a test machine) the mixer stays silent and the game plays on.
  */
 public final class Mixer implements AutoCloseable {
@@ -58,6 +61,12 @@ public final class Mixer implements AutoCloseable {
     /** The music playing, on the mixer thread only; {@code null} for none. */
     private Voice music;
     private boolean musicLoops;
+    private volatile Sound drone;
+    private volatile double droneRate = 1;
+    private volatile double droneVolume;
+    /** Where in the drone, in samples with fractions, and how loud it is now; mixer thread only. */
+    private double dronePosition;
+    private double droneLevel;
     private volatile boolean running;
     private volatile boolean muted;
     private SourceDataLine line;
@@ -111,6 +120,23 @@ public final class Mixer implements AutoCloseable {
     }
     // --8<-- [end:music]
 
+    // --8<-- [start:drone]
+    /** Loops {@code sound} under everything else, silent until {@link #setDroneVolume}; {@code null} stops it. */
+    public void setDrone(Sound sound) {
+        drone = sound;
+    }
+
+    /** Plays the drone this many times as fast: 2 is an octave higher. Safe from any thread. */
+    public void setDroneRate(double rate) {
+        droneRate = Math.max(0.05, Math.min(8, rate));
+    }
+
+    /** How loud the drone is, 0 to 1; it glides there within a few milliseconds, without a click. */
+    public void setDroneVolume(double volume) {
+        droneVolume = Math.max(0, Math.min(1, volume));
+    }
+    // --8<-- [end:drone]
+
     public boolean muted() {
         return muted;
     }
@@ -155,6 +181,7 @@ public final class Mixer implements AutoCloseable {
                 if (v.position < v.sound.length()) sum += v.sound.sample(v.position++);
             }
             sum += music();
+            sum += drone();
             // Two loud sounds together exceed what 16 bits can hold: clip instead of wrapping around.
             block[i] = (short) Math.clamp(sum, Short.MIN_VALUE, Short.MAX_VALUE);
         }
@@ -171,6 +198,20 @@ public final class Mixer implements AutoCloseable {
             else music = null;
         }
         return muted ? 0 : sample;
+    }
+
+    /** The drone's next sample: read between two samples at its rate, at its gliding loudness. */
+    private int drone() {
+        Sound s = drone;
+        if (s == null || s.length() < 2) return 0;
+        int n = s.length();
+        if (dronePosition >= n) dronePosition %= n;
+        int i = (int) dronePosition;
+        double f = dronePosition - i;
+        double sample = s.sample(i) + (s.sample((i + 1) % n) - s.sample(i)) * f;
+        dronePosition += droneRate;
+        droneLevel += ((muted ? 0 : droneVolume) - droneLevel) * 0.002;
+        return (int) (sample * droneLevel);
     }
 
     // --8<-- [start:hiss]
