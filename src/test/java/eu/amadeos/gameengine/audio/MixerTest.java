@@ -135,4 +135,40 @@ class MixerTest {
         assertTrue(Math.abs(block[Mixer.BLOCK - 1]) < 50, "muted, the drone fades out");
     }
     // --8<-- [end:test-drone]
+
+    // --8<-- [start:test-stream]
+    @Test
+    void aStreamPlaysWhatItsWriterSentAndThenEnds() throws InterruptedException {
+        Mixer mixer = new Mixer();
+        SampleStream stream = new SampleStream(0.1);
+        short[] samples = new short[300];
+        java.util.Arrays.fill(samples, (short) 200);
+        assertTrue(stream.write(samples, samples.length));
+        stream.end();
+        mixer.setMusicVolume(0.5);
+        mixer.playMusic(stream);
+        short[] block = new short[Mixer.BLOCK];
+        mixer.mix(block);
+        assertEquals(100, block[0], "at half the music volume");
+        assertEquals(0, block[300], "nothing more was written");
+        assertTrue(!mixer.playingMusic());
+        stream.close();
+        assertTrue(!stream.write(samples, 1), "a closed stream tells its writer to stop");
+    }
+
+    @Test
+    void bedsPlayTogether() {
+        Mixer mixer = new Mixer();
+        Mixer.Bed wind = mixer.bed(constant(1000, 50));
+        Mixer.Bed birds = mixer.bed(constant(500, 70));
+        wind.setVolume(1);
+        birds.setVolume(1);
+        short[] block = new short[Mixer.BLOCK];
+        for (int n = 0; n < 20; n++) mixer.mix(block);
+        assertEquals(1500, block[100], 2);
+        birds.setSound(null);
+        for (int n = 0; n < 2; n++) mixer.mix(block);
+        assertEquals(1000, block[100], 2);
+    }
+    // --8<-- [end:test-stream]
 }

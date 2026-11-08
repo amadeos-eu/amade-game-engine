@@ -26,8 +26,12 @@ import java.util.concurrent.atomic.AtomicReference;
  * its own that no effect can push out. Muting turns the music down, it does not stop it: switched on again,
  * it goes on where it would be.
  *
- * <p>Under both runs a <i>drone</i>, one more loop whose speed and loudness the game changes while it plays:
- * the motor of a car, which climbs in pitch as the car gets faster, or the wind.
+ * <p>Under both run <i>beds</i>: loops whose speed and loudness the game changes while they play. The
+ * {@linkplain #setDrone drone} is one, the motor of a car, which climbs in pitch as the car gets faster; more
+ * come from {@link #bed}: wind, birds in a forest, the sea, rain.
+ *
+ * <p>Music too long to hold in memory, a song from the player's own files, comes as a {@link SampleStream}
+ * that another thread fills while the mixer empties it.
  *
  * <p>Without a sound card (a server, a test machine) the mixer stays silent and the game plays on.
  */
@@ -52,8 +56,67 @@ public final class Mixer implements AutoCloseable {
     }
 
     /** A change of the music, from the game's thread to the mixer's; {@code sound} null stops it. */
-    private record MusicRequest(Sound sound, boolean loop) {
+    private record MusicRequest(Sound sound, boolean loop, SampleStream stream) {
     }
+
+    // --8<-- [start:bed]
+    /**
+     * A loop under the music and the effects whose sound, speed and loudness can change while it plays; all
+     * methods are safe from any thread. Changes of loudness glide within a few milliseconds, without a click.
+     */
+    public static final class Bed {
+        private volatile Sound sound;
+        private volatile double rate = 1;
+        private volatile double volume;
+        /** Where in the sound, in samples with fractions, and how loud it is now; mixer thread only. */
+        private double position;
+        private double level;
+
+        private Bed(Sound sound) {
+            this.sound = sound;
+        }
+
+        /** Plays another loop from here on; {@code null} for silence. */
+        public void setSound(Sound sound) {
+            this.sound = sound;
+        }
+
+        /** Plays the loop this many times as fast: 2 is an octave higher. */
+        public void setRate(double rate) {
+            this.rate = Math.max(0.05, Math.min(8, rate));
+        }
+
+        /** How loud, 0 to 1. */
+        public void setVolume(double volume) {
+            this.volume = Math.max(0, Math.min(1, volume));
+        }
+
+        public double volume() {
+            return volume;
+        }
+
+        /** The next sample: read between two samples at its rate, at its gliding loudness. */
+        private int next(boolean muted) {
+            Sound s = sound;
+            level += ((muted ? 0 : volume) - level) * 0.002;
+            if (s == null || s.length() < 2) return 0;
+            int n = s.length();
+            if (position >= n) position %= n;
+            int i = (int) position;
+            double f = position - i;
+            double sample = s.sample(i) + (s.sample((i + 1) % n) - s.sample(i)) * f;
+            position += rate;
+            return (int) (sample * level);
+        }
+    }
+
+    /** A new bed, silent until its volume is set; it plays as long as the mixer does. */
+    public Bed bed(Sound sound) {
+        Bed bed = new Bed(sound);
+        beds.add(bed);
+        return bed;
+    }
+    // --8<-- [end:bed]
 
     private final Queue<Sound> requests = new ConcurrentLinkedQueue<>();
     private final List<Voice> voices = new ArrayList<>();
@@ -61,12 +124,11 @@ public final class Mixer implements AutoCloseable {
     /** The music playing, on the mixer thread only; {@code null} for none. */
     private Voice music;
     private boolean musicLoops;
-    private volatile Sound drone;
-    private volatile double droneRate = 1;
-    private volatile double droneVolume;
-    /** Where in the drone, in samples with fractions, and how loud it is now; mixer thread only. */
-    private double dronePosition;
-    private double droneLevel;
+    private final Bed drone = new Bed(null);
+    private final List<Bed> beds = new java.util.concurrent.CopyOnWriteArrayList<>(List.of(drone));
+    /** Music fed from another thread, instead of {@link #music}; mixer thread only. */
+    private SampleStream stream;
+    private volatile double musicVolume = 1;
     private volatile boolean running;
     private volatile boolean muted;
     private SourceDataLine line;
@@ -111,29 +173,42 @@ public final class Mixer implements AutoCloseable {
      * again until {@link #stopMusic()}. Safe to call from any thread, never waits.
      */
     public void playMusic(Sound music, boolean loop) {
-        musicRequest.set(new MusicRequest(music, loop));
+        musicRequest.set(new MusicRequest(music, loop, null));
+    }
+
+    /**
+     * Plays music from a stream that another thread fills, instead of the music playing now; it ends when
+     * the stream {@linkplain SampleStream#finished() is finished}.
+     */
+    public void playMusic(SampleStream stream) {
+        musicRequest.set(new MusicRequest(null, false, stream));
     }
 
     /** Stops the music at once. */
     public void stopMusic() {
-        musicRequest.set(new MusicRequest(null, false));
+        musicRequest.set(new MusicRequest(null, false, null));
+    }
+
+    /** How loud the music is against the effects, 0 to 1. */
+    public void setMusicVolume(double volume) {
+        musicVolume = Math.max(0, Math.min(1, volume));
     }
     // --8<-- [end:music]
 
     // --8<-- [start:drone]
     /** Loops {@code sound} under everything else, silent until {@link #setDroneVolume}; {@code null} stops it. */
     public void setDrone(Sound sound) {
-        drone = sound;
+        drone.setSound(sound);
     }
 
     /** Plays the drone this many times as fast: 2 is an octave higher. Safe from any thread. */
     public void setDroneRate(double rate) {
-        droneRate = Math.max(0.05, Math.min(8, rate));
+        drone.setRate(rate);
     }
 
     /** How loud the drone is, 0 to 1; it glides there within a few milliseconds, without a click. */
     public void setDroneVolume(double volume) {
-        droneVolume = Math.max(0, Math.min(1, volume));
+        drone.setVolume(volume);
     }
     // --8<-- [end:drone]
 
@@ -174,6 +249,7 @@ public final class Mixer implements AutoCloseable {
         if (change != null) {
             music = change.sound() == null ? null : new Voice(change.sound());
             musicLoops = change.loop();
+            stream = change.stream();
         }
         for (int i = 0; i < block.length; i++) {
             int sum = 0;
@@ -181,7 +257,7 @@ public final class Mixer implements AutoCloseable {
                 if (v.position < v.sound.length()) sum += v.sound.sample(v.position++);
             }
             sum += music();
-            sum += drone();
+            for (Bed bed : beds) sum += bed.next(muted);
             // Two loud sounds together exceed what 16 bits can hold: clip instead of wrapping around.
             block[i] = (short) Math.clamp(sum, Short.MIN_VALUE, Short.MAX_VALUE);
         }
@@ -191,27 +267,18 @@ public final class Mixer implements AutoCloseable {
 
     /** The music's next sample, silent while muted; at its end it starts again or stops. */
     private int music() {
+        if (stream != null) {
+            int sample = stream.next();
+            if (stream.finished()) stream = null;
+            return muted ? 0 : (int) (sample * musicVolume);
+        }
         if (music == null) return 0;
         int sample = music.sound.length() == 0 ? 0 : music.sound.sample(music.position);
         if (++music.position >= music.sound.length()) {
             if (musicLoops) music.position = 0;
             else music = null;
         }
-        return muted ? 0 : sample;
-    }
-
-    /** The drone's next sample: read between two samples at its rate, at its gliding loudness. */
-    private int drone() {
-        Sound s = drone;
-        if (s == null || s.length() < 2) return 0;
-        int n = s.length();
-        if (dronePosition >= n) dronePosition %= n;
-        int i = (int) dronePosition;
-        double f = dronePosition - i;
-        double sample = s.sample(i) + (s.sample((i + 1) % n) - s.sample(i)) * f;
-        dronePosition += droneRate;
-        droneLevel += ((muted ? 0 : droneVolume) - droneLevel) * 0.002;
-        return (int) (sample * droneLevel);
+        return muted ? 0 : (int) (sample * musicVolume);
     }
 
     // --8<-- [start:hiss]
@@ -232,7 +299,7 @@ public final class Mixer implements AutoCloseable {
 
     /** For tests: true while music plays, on the mixer thread. */
     boolean playingMusic() {
-        return music != null;
+        return music != null || stream != null;
     }
 
     /** For tests: sounds playing or waiting. */
