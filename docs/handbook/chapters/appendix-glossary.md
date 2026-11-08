@@ -18,6 +18,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 **ARPAbet.** A way of writing the sounds of speech in plain letters, one name per phoneme: `k ae1 b` is "cab". American speech research has used it since the 1970s; the engine's speech is written in it. [Hover Cab](28-hover-cab.md#how-a-voice-is-made), [manual](48-scenes-menus-sound.md#speech-speech-and-phoneme).
 
+**Attract mode.** What a machine shows while nobody plays: the computer plays a demo, the displays show the high score and how to start. In Pinball a robot plays the chosen table on the title. [Pinball](70-pinball.md#step-6-the-robot).
+
 ## B
 
 **Back buffer.** The hidden picture a frame is drawn into before it is shown on the screen, so the player never sees a half-drawn frame. [Paddle](20-paddle.md#step-2-drawing-actively), [appendix](appendix-java2d.md#buffers).
@@ -82,6 +84,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 **Domain.** The rules of a game as plain Java, without Swing, so they can be tested without a screen. [Structure](02-structure.md#domain-the-rules).
 
+**Dot-matrix display.** A screen of round dots in a grid, each on or off, as on the score displays of pinball machines since the 1990s. Text is written into it with a font and then shown dot by dot. [Pinball](70-pinball.md#step-10-the-backglass-and-its-displays), [manual](42-sprites.md#lamps-and-displays-lamps-and-dotmatrix).
+
 **Drag.** The slowing of a thing by the air it moves through: each second it loses a part of its speed. It makes a craft on jets steerable. [Hover Cab](28-hover-cab.md#why-a-cab-needs-air), [manual](44-movement.md#flying-on-jets-thrusters-drag-and-touchdown).
 
 ## E
@@ -103,6 +107,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 **Flag.** A point on the map where roads meet and wares wait to be carried on. A new flag on a road splits it in two. [Colony](32-colony.md#step-1-roads-from-flag-to-flag), [manual](46-paths-and-decisions.md#roads-between-flags-roadnetwork).
 
 **Flag (story).** A named number the story remembers, such as whether a page was found or how often a question was asked. Never set means 0. [Templars](50-templar.md#step-1-the-story-as-data), [manual](49-adventure.md#what-she-carries-what-the-story-remembers-inventory-and-flags).
+
+**Flipper.** A bat that turns about a pivot when its button is held. It hits the ball with the speed of its surface where they meet, which grows towards the tip, so where the ball is hit decides how hard and where it goes. [Pinball](70-pinball.md#step-3-flippers-and-the-plunger), [manual](44-movement.md#a-ball-on-a-table-playfield-and-its-parts).
 
 **Flood fill.** Opening or colouring all connected cells from one start, as Mines opens an empty area. [Mines](10-mines.md#flood-fill-without-recursion).
 
@@ -136,6 +142,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 **Hitscan.** A shot that arrives at once along a line, instead of flying: the first wall or target on the line is hit. [Rivet](60-rivet.md#step-10-shooting), [manual](44-movement.md#walking-and-shooting-on-a-grid-of-walls-mover-and-hitscan).
 
+**Homography.** The perspective mapping of a flat plane onto the screen: a three-by-three matrix applied to a point written with a third coordinate of 1, then divided by the result's third coordinate. Straight lines stay straight, equal steps further away get shorter. [Pinball](70-pinball.md#step-7-the-table-in-perspective), [manual](45-maps.md#a-flat-world-at-a-slant-perspective).
+
 **Hotspot.** A part of a room picture the player can point at: it has a name, an outline, and a place where the hero stands to use it. [Templars](50-templar.md#step-1-the-story-as-data), [manual](49-adventure.md#rooms-room-hotspot-and-layers).
 
 ## I
@@ -164,6 +172,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 **Managed image.** An image that Java2D keeps a copy of in video memory, so it is copied fast. Touching its pixel array directly ends that for good. [Appendix](appendix-java2d.md#drawing).
 
+**Material (physics).** How a surface answers a ball: how much of the speed towards it comes back (bounce), how much of the speed along it is lost (grip), and a kick for bumpers and slingshots. [Pinball](70-pinball.md#materials), [manual](44-movement.md#a-ball-on-a-table-playfield-and-its-parts).
+
 **Midpoint displacement.** A way to make natural-looking hills: put a point between two heights at their average, moved up or down at random, and do the same for each half with smaller moves. [Artillery](29-artillery.md#step-2-a-landscape), [manual](45-maps.md#ground-that-breaks-ground-and-landscape).
 
 **Minimap.** The whole map, small, in a corner of the screen, with a box for what the camera shows. A click on it moves the camera. [Sands](31-sands.md#step-4-the-minimap), [manual](45-maps.md#the-map-in-a-corner-minimap).
@@ -173,6 +183,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 **Model-View-Presenter (MVP).** The rules (model) and the window (view) never talk to each other directly; a presenter without Swing sits between them. [Structure](02-structure.md#model-view-presenter).
 
 **Mouse look.** Turning the view by moving the mouse: the game uses how far the mouse moved, and keeps the hidden pointer in the middle of the window so it never stops at the screen's edge. [Rivet](60-rivet.md#the-mouse), [manual](43-input.md#turning-with-the-mouse-mouselook).
+
+**Multiball.** Several balls in play at once, the reward for locking balls on a pinball table. While it lasts, jackpots are lit. [Pinball](70-pinball.md#the-rules).
 
 ## O
 
@@ -208,11 +220,15 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 ## R
 
+**Ramp (pinball).** A track that lifts the ball off the table and brings it back elsewhere, of plastic going up and often of wire coming down. Climbing costs the ball speed; too slow, it rolls back. [Pinball](70-pinball.md#step-4-ramps-and-wire-forms), [manual](44-movement.md#a-ball-on-a-table-playfield-and-its-parts).
+
 **Ray marching (sphere tracing).** Finding where a ray meets a model described by distances: step forward by the distance the model reports, which can never pass the surface, until it is almost zero. [Rivet](60-rivet.md#marching-rays), [manual](42-sprites.md#things-in-3d-sdf-model-and-modelrenderer).
 
 **Raycasting.** Drawing a world of square cells and walls of one height from inside, with one ray per column of the picture: the distance to the wall a ray hits sets the height of that column's slice. [Rivet](60-rivet.md#step-2-one-ray-per-column), [manual](45-maps.md#seen-from-inside-gridmap-raycaster-and-lightmap).
 
 **Recipe.** What a workshop makes of what: its inputs, the good made and the time it takes. [Colony](32-colony.md#step-4-goods-and-recipes), [manual](47-data-and-saving.md#goods-and-recipes-stock-and-recipe).
+
+**Relief (drawing).** A flat picture seen from straight above in which every part stands up with its height, lit from one side, and throws a soft shadow; drawn once, then tilted into the view. [Pinball](70-pinball.md#step-8-relief), [manual](42-sprites.md#tables-with-heights-relief-and-rampart).
 
 **Render mode.** How the world reaches the screen: `DIRECT`, scaled to any size and sharp, or `PIXEL`. [Bricks](21-bricks.md#pixel-mode), [manual](41-loop-and-drawing.md#the-canvas-gamecanvas-and-rendermode).
 
@@ -248,6 +264,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 **State machine.** Something that is always in exactly one of a few states and changes between them only along ways allowed in advance, such as a ghost that waits, hunts, flees or flies home. [Maze](25-maze.md#step-3-ghosts-as-state-machines), [manual](46-paths-and-decisions.md#one-state-at-a-time-statemachine).
 
+**Substeps.** Cutting one step of the rules into several smaller ones for the physics, so a fast ball cannot pass through a thin part between two looks. [Pinball](70-pinball.md#step-2-physics-in-small-steps), [manual](44-movement.md#a-ball-on-a-table-playfield-and-its-parts).
+
 **Supply network.** Tiles that carry something from where it is made to where it is used, such as power from plants through lines to homes. [Town](33-town.md#step-4-power-through-the-town), [manual](45-maps.md#networks-that-carry-supplygrid).
 
 **Swept collision.** A collision test for a thing that moves: not "do they overlap now?" but "when during this step did they first touch?", so a fast ball never passes through a paddle. [Paddle](20-paddle.md#swept-collision), [Bricks](21-bricks.md#step-2-collision-of-moving-boxes), [manual](44-movement.md#boxes-box-and-sweep).
@@ -263,6 +281,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 **Tile map.** Columns and rows of squares, each holding one value such as `WALL` or `ROAD`. The rules of maze, puzzle and strategy games live on it in whole cells. [Maze](25-maze.md#step-1-a-map-of-tiles), [manual](45-maps.md#a-grid-of-tiles-tilemap-cell-and-direction).
 
 **Tiled.** A free map editor whose TMX files the engine reads. [Jump](27-jump.md#step-1-levels-from-the-tiled-editor), [manual](45-maps.md#maps-from-an-editor-tiledmap).
+
+**Tilt.** What a pinball machine does when it is shaken too hard: the flippers go dead and the ball is lost. Each nudge sets a bob swinging; nudges while it swings are warnings. [Pinball](70-pinball.md#nudging-and-the-tilt), [manual](44-movement.md#the-plunger-and-the-tilt-plunger-and-tilt).
 
 **Tint.** A colour multiplied into a picture, so people drawn in daylight colours take on the light of a candlelit or moonlit room. [Templars](50-templar.md#drawn-once-kept).
 
@@ -287,6 +307,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 ## W
 
 **Walk area.** The floor of a painted room as a polygon with holes, where people can walk; older adventures called its parts walkboxes. [Templars](50-templar.md#step-1-the-story-as-data), [manual](49-adventure.md#where-people-walk-walkarea).
+
+**Wizard mode.** The last mode of a pinball table, lit when all the others have been played: a big multiball in which every main shot counts. [Pinball](70-pinball.md#the-rules).
 
 **Wrap-around.** A field without edges: what leaves on one side comes back on the other, and distances take the short way across an edge. [Rocks](23-rocks.md#step-3-a-field-without-edges), [manual](44-movement.md#a-field-without-edges-wrap).
 

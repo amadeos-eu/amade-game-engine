@@ -1,6 +1,6 @@
 # 45. Maps, Camera and Fog
 
-From Maze on, the games of this book live on maps: a grid of tiles that the rules think in, and a picture of it that the drawing scales. This chapter covers the maps themselves, written as text or drawn in an editor, what spreads over them (land owned, services that reach, power that flows), the isometric view of a map, the camera that shows a part of a world larger than the screen, what one side of a strategy game knows of the map (the fog of war and the minimap), and ground that is not made of tiles at all but of cells that can be blasted away.
+From Maze on, the games of this book live on maps: a grid of tiles that the rules think in, and a picture of it that the drawing scales. This chapter covers the maps themselves, written as text or drawn in an editor, what spreads over them (land owned, services that reach, power that flows), the isometric view of a map, the camera that shows a part of a world larger than the screen, what one side of a strategy game knows of the map (the fog of war and the minimap), and ground that is not made of tiles at all but of cells that can be blasted away. The last two sections look at a world from other places: from inside it, and from the near end of a flat table at a slant.
 
 ## A grid of tiles: TileMap, Cell and Direction
 
@@ -360,4 +360,34 @@ A `Texture` is square, a power of two in size, with a **glow** per texel: glowin
 ??? example "Test: a wall twice as far is half as high"
     ```java title="amade-game-engine · test/raycast/RaycasterTest.java"
     --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/raycast/RaycasterTest.java:test-raycaster"
+    ```
+
+## A flat world at a slant: Perspective
+
+*Package `pinball` · introduced in [70. Pinball](70-pinball.md#step-7-the-table-in-perspective) · source: [`Perspective`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/pinball/Perspective.java)*
+
+**What it is for.** A flat rectangular world, a pinball table or a board, seen from its near edge at a slant: the far end narrower, equal steps up the world shorter towards the far end, as the eye sees them. The isometric view of [`IsoProjection`](#the-isometric-view-isoprojection) keeps sizes the same everywhere; this one does not.
+
+**When to choose it.** When the world is flat (heights are allowed, but small) and the player looks at it from one fixed place. A world the player walks through is [`Raycaster`](#seen-from-inside-gridmap-raycaster-and-lightmap)'s.
+
+**How it works.** `new Perspective(width, height, quad)` takes the world's size and the four corners of the screen's trapezoid (`trapezoid(cx, top, bottom, topWidth, bottomWidth)` makes a symmetric one) and works out the **homography**, a three-by-three matrix in homogeneous coordinates, and its inverse. `view(x, y)` maps a world point to the screen, `table(sx, sy)` a screen point back. A height `h` at `(x, y)` is drawn where `(x, y − h)` is, the rule the flat pictures of [`Relief`](42-sprites.md#tables-with-heights-relief-and-rampart) use. Java2D cannot draw through a homography, so `warp` tilts a whole flat picture into an image, pixel by pixel, backwards; do it once per window size. `local(x, y)` gives an affine transform that agrees with the perspective near one point: small moving parts are drawn through it every frame.
+
+```java title="amade-game-engine · pinball/Perspective.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/pinball/Perspective.java:view"
+```
+
+| Method | What it does |
+|---|---|
+| `new Perspective(width, height, quad)`, `Perspective.trapezoid(...)` | The world and where it is seen |
+| `view(x, y)`, `view(x, y, h)`, `table(sx, sy)` | World to screen, with a height, and back |
+| `scale(x, y)` | How big one unit looks there: balls further up are smaller |
+| `local(x, y)` | An affine transform for drawing near that point |
+| `warp(flat, left, top, right, bottom, dst, toPixels)` | A flat picture tilted into the view |
+
+!!! warning "Pitfall: warping every frame"
+    `warp` looks up four samples for every pixel of the trapezoid. At 1920 × 1200 that is far too slow for 60 frames a second. Warp what does not move once, keep the image until the window's size changes, and draw only the moving parts per frame.
+
+??? example "Test: the far end looks smaller"
+    ```java title="amade-game-engine · test/pinball/PerspectiveTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/pinball/PerspectiveTest.java:test-perspective"
     ```

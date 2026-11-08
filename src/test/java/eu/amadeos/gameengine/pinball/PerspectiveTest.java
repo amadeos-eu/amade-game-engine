@@ -27,6 +27,7 @@ class PerspectiveTest {
         assertEquals(211, t.y, 1e-6);
     }
 
+    // --8<-- [start:test-perspective]
     @Test
     void theFarEndLooksSmallerAndItsStepsShorter() {
         assertTrue(view.scale(116, 20) < view.scale(116, 370));
@@ -34,6 +35,7 @@ class PerspectiveTest {
         double nearStep = view.view(116, 380).y - view.view(116, 360).y;
         assertTrue(farStep < nearStep);
     }
+    // --8<-- [end:test-perspective]
 
     @Test
     void theLocalTransformAgreesNearItsPoint() {

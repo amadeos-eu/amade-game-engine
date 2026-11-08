@@ -94,6 +94,7 @@ class PlayfieldTest {
         assertTrue(heard.contains("hit pop"));
     }
 
+    // --8<-- [start:test-flipper]
     @Test
     void theTipOfARaisedFlipperThrowsHarderThanItsBase() {
         assertTrue(throwSpeed(26) > throwSpeed(8) * 1.5);
@@ -111,6 +112,7 @@ class PlayfieldTest {
         run(f, 0.08);
         return -b.vy;
     }
+    // --8<-- [end:test-flipper]
 
     @Test
     void aFlippedBallReachesTheTopOfTheTable() {
@@ -149,6 +151,7 @@ class PlayfieldTest {
         assertEquals(Ball.State.FREE, fast.state);
     }
 
+    // --8<-- [start:test-ramp]
     @Test
     void aStrongShotRidesTheRampAndAWeakOneRollsBack() {
         assertEquals("rode ramp", rideRamp(1100));
@@ -165,6 +168,7 @@ class PlayfieldTest {
         run(f, 3);
         return heard.stream().filter(s -> s.startsWith("rode") || s.startsWith("back")).findFirst().orElse("none");
     }
+    // --8<-- [end:test-ramp]
 
     @Test
     void aGateLetsTheBallThroughOneWayOnly() {

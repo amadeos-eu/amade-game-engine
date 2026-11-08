@@ -1,6 +1,6 @@
 # 44. Movement, Physics and Collision
 
-Things move in a game in a few typical ways: in a straight line at an angle, along a curve someone designed, falling and jumping on tiles, flying on jets, from tile centre to tile centre. Then the game must find out what hit what, often for hundreds of things in every step, and keep track of many things whose behaviour changes while they live. This chapter covers the arithmetic for all of it. Walking on a grid is in [chapter 45](45-maps.md#walking-corridors-walker), finding a way in [chapter 46](46-paths-and-decisions.md).
+Things move in a game in a few typical ways: in a straight line at an angle, along a curve someone designed, falling and jumping on tiles, flying on jets, from tile centre to tile centre, rolling and bouncing on a table. Then the game must find out what hit what, often for hundreds of things in every step, and keep track of many things whose behaviour changes while they live. This chapter covers the arithmetic for all of it. Walking on a grid is in [chapter 45](45-maps.md#walking-corridors-walker), finding a way in [chapter 46](46-paths-and-decisions.md).
 
 None of the classes here needs a screen. They are the rules' tools, and they are tested without one. Only `PixelMask` uses AWT, to draw its shapes into an image in memory, which works headless on a build server too.
 
@@ -215,6 +215,63 @@ A main jet of about twice gravity feels right: the craft rises about as fast as 
 | `Hitscan.shoot(map, x, y, angle, range, targets)` | The `Hit`: distance, point, target, or `wall()` |
 | `Hitscan.enter(x, y, dx, dy, cx, cy, r)` | Where a ray enters a circle, or -1 |
 
+## A ball on a table: Playfield and its parts
+
+*Package `pinball` · introduced in [70. Pinball](70-pinball.md#step-2-physics-in-small-steps) · source: [`Playfield`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/pinball/Playfield.java), [`Ball`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/pinball/Ball.java), [`Segment`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/pinball/Segment.java), [`Disc`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/pinball/Disc.java), [`Flipper`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/pinball/Flipper.java), [`Zone`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/pinball/Zone.java), [`Track`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/pinball/Track.java), [`Material`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/pinball/Material.java)*
+
+**What it is for.** Balls that roll down a sloped table and bounce off what they meet by the laws of motion: walls, rubber, posts, pop bumpers that kick, flippers that hit with the speed of their surface. Ramps and wire forms that the ball climbs in three dimensions, raised floors, holes that catch the ball, switches, spinners, magnets and captive balls.
+
+**When to choose it.** For a pinball table, and for any game in which round things roll and bounce off walls and posts: mini golf, a marble run, a billiard-like game. Things that fall and jump on tiles use [`Body`](#falling-and-standing-body-and-tilecollider); shells under gravity and wind are [`Projectile`](#shells-in-flight-projectile-and-ballistics)s.
+
+**How it works.** A `Playfield` is made with its width, the line below which a ball is lost, its gravity (`STANDARD_GRAVITY` is 900 units per second squared, down the table along +y), the number of substeps and a top speed. `step(seconds)` cuts each step into the substeps (8 at 120 steps a second: a thousandth of a second each), so a fast ball cannot pass through a post. In each substep the flippers turn, every free ball moves and is tested against every part on its **layer**, and balls bounce off each other.
+
+Every test finds the part's point closest to the ball's centre. Segments have a thickness (a capsule), discs a radius. A ball that overlaps a part is pushed out, the part of its speed towards the surface is reflected and multiplied by the `Material`'s **bounce**, the part along it loses the **grip**, and a hit harder than **kickAbove** adds the **kick**. The speeds are measured against the surface's own velocity, which only a flipper has: that is all it takes for a flipper to shoot.
+
+```java title="amade-game-engine · pinball/Playfield.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/pinball/Playfield.java:bounce"
+```
+
+A `Track` is a path of points with heights: a ramp, a wire form, a lift. A ball that moves into an **entry** `Zone` fast enough goes up its track and only knows how far along it is; gravity pulls along the table and, `CLIMB` (6) times harder, against the track's own slope. At the end it leaves the track on the track's `exitLayer`; too slow, it rolls back out of the mouth. The other zones are **switches**, **spinners**, **holes** (which catch a ball slower than their limit until `eject`) and **magnets**. A **captive** ball is kept inside its `fence`.
+
+The playfield reports what happened to its `Events`: `hit`, `entered`, `caught`, `climbed`, `rode`, `rolledBack`, `drained`. The game's rules listen.
+
+| Method | What it does |
+|---|---|
+| `new Playfield(width, drainY, gravity, substeps, maxSpeed)`, `listen(events)` | The table and who hears what happens |
+| `add(segment)`, `add(disc)`, `add(flipper)`, `add(zone)`, `add(track)`, `add(ball)` | Parts and balls; each returns what it added |
+| `layer(n, height)`, `layerHeight(n)` | A raised floor and its height |
+| `step(seconds)` | Moves everything on |
+| `eject(ball, vx, vy)`, `ride(ball, track, speed)`, `nudge(vx, vy)`, `remove(ball)`, `inPlay()` | Out of a hole, onto a track directly, a push for every free ball, balls still in play |
+| `new Segment(id, ax, ay, bx, by, thickness, material, layer[, gate])`, `closest(x, y)`, `down` | A wall, band or target; a gate lets the ball through one way; `down` takes it away (a drop target) |
+| `new Disc(id, x, y, radius, material, layer)` | A post or a pop bumper |
+| `Flipper.of(id, left, px, py, length, drop, swing, layer)`, `hold(held)`, `angle()`, `surfaceVelocity(x, y)` | A flipper at its pivot, held or let go |
+| `new Zone(id, kind, x, y, radius, layer, param[, dx, dy, track])` | A switch, spinner, hole, magnet or ramp entry |
+| `new Track(id, exitLayer, x, y, h, …)`, `xAt`, `yAt`, `heightAt`, `direction` | A path in three dimensions, by distance along it |
+| `Material.WALL`, `RUBBER`, `TARGET`, `FLIPPER`, `BUMPER`, `SLING` | Bounce, grip and kick of the usual parts |
+
+!!! warning "Pitfall: balls that rest where no flipper reaches"
+    A flat ledge, the top of a gate, a corner between a box and the rim: a ball that stops there stays for ever. Make every top a shallow roof or slant it, and let a robot play many whole games in the tests to find the places you missed ([chapter 70](70-pinball.md#step-6-the-robot)).
+
+??? example "Test: the tip of a flipper throws harder than its base"
+    ```java title="amade-game-engine · test/pinball/PlayfieldTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/pinball/PlayfieldTest.java:test-flipper"
+    ```
+
+??? example "Test: a strong shot rides the ramp, a weak one rolls back"
+    ```java title="amade-game-engine · test/pinball/PlayfieldTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/pinball/PlayfieldTest.java:test-ramp"
+    ```
+
+### The plunger and the tilt: Plunger and Tilt
+
+*Package `pinball` · introduced in [70. Pinball](70-pinball.md#step-3-flippers-and-the-plunger) · source: [`Plunger`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/pinball/Plunger.java), [`Tilt`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/pinball/Tilt.java)*
+
+`Plunger.update(down, seconds)` pulls the rod while the button is held, all the way in `fullPull` seconds, and on release returns the launch speed: from `minSpeed` to `maxSpeed` with the square of the pull, as a spring gives it. `pull()` is how far the rod is drawn, for the picture. `Tilt` is the bob: `nudge()` returns `NUDGE`, `WARNING` (a nudge while the bob still swings) or `TILT` after more warnings than allowed; `settle(seconds)` calms it, `reset()` starts the next ball.
+
+```java title="amade-game-engine · pinball/Tilt.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/pinball/Tilt.java:nudge"
+```
+
 ## Which collision test?
 
 | The things | Use | Because |
@@ -225,6 +282,7 @@ A main jet of about twice gravity feels right: the craft rises about as fast as 
 | A body against tiles | `TileCollider` | Above |
 | Shapes that are neither boxes nor circles: a cab and a neon sign, a rock face | `PixelMask` | Exact to the pixel, 64 pixels per comparison |
 | Many things against many | `Grid`, then one of the above | Each thing meets only its neighbours |
+| Balls that roll and bounce off walls, posts and flippers | [`Playfield`](#a-ball-on-a-table-playfield-and-its-parts) | Small substeps, the closest point of each part, materials that bounce and kick |
 
 ### Boxes: Box and Sweep
 
