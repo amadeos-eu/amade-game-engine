@@ -121,7 +121,7 @@ Besides `start` and `update` there are `running(key)`, `left(key)`, `cancel(key)
 
 ## The canvas: GameCanvas and RenderMode
 
-*Package `swing` · introduced in [20. Paddle](20-paddle.md#step-2-drawing-actively), render modes and the overlay in [21. Bricks](21-bricks.md#pixel-mode) · source: [`GameCanvas`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/swing/GameCanvas.java), [`RenderMode`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/swing/RenderMode.java)*
+*Package `swing` · introduced in [20. Paddle](20-paddle.md#step-2-drawing-actively), render modes and the overlay in [21. Bricks](21-bricks.md#pixel-mode), the automatic mode in [61. Cruise](61-cruise.md#full-screen-three-times-the-pixels) · source: [`GameCanvas`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/swing/GameCanvas.java), [`RenderMode`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/swing/RenderMode.java)*
 
 **What it is for.** The drawing surface of every real-time game. The game draws in fixed **logical coordinates**, 640 × 400 in most games, as if the screen always had that size; the canvas scales the picture to its real size, keeps the proportions and fills the rest with black bars. Drawing is **active**: the game loop calls `render(alpha)` whenever it wants a frame, and the canvas draws into a hidden buffer of a `BufferStrategy` and shows it at once by copying it onto the screen, never by flipping, which can leave the screen black in full screen on X11 ([appendix](appendix-java2d.md#buffers)). Swing's `repaint()` is not involved, so nothing waits for the event thread.
 
@@ -135,6 +135,12 @@ Besides `start` and `update` there are `running(key)`, `left(key)`, `cancel(key)
 
 In `DIRECT` mode, world and overlay are drawn through one scaling transform, with antialiasing on. In `PIXEL` mode, the world is drawn into a `VolatileImage` of the logical size, with antialiasing off and hard interpolation, and that image is enlarged by the largest **whole** factor that fits (`wholeScale`), so every logical pixel becomes a square block. The overlay is then drawn straight onto the screen at the same place and scale, so the score stays sharp over a world of big pixels ([chapter 21](21-bricks.md#two-layers-the-world-and-the-overlay)).
 
+In `AUTO` mode, the world is drawn into a `BufferedImage` in main memory, in the screen's pixel format, with antialiasing on, and copied onto the screen in one piece; the overlay follows as in pixel mode. The picture is as large as the screen's scale divided by a whole **divisor**: 1 while the frames are in time, which looks exactly like `DIRECT`, then 2 or 3, enlarged again with hard edges. `AutoResolution` chooses the divisor from the frame times: half a second of frames decides by their median; above 20 ms it goes one step coarser, and it goes one step sharper again when the sharper picture is expected to take no more than 15 ms, where the expectation comes from what the last step between the two was worth. A sharper step that had to be taken back at once makes the next attempt wait twice as long.
+
+```java title="amade-game-engine · swing/GameCanvas.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/swing/GameCanvas.java:memory"
+```
+
 Both the screen's buffers and the pixel-mode buffer live in video memory where there is one and can be lost; the canvas draws again until they are not, and calls `Toolkit.sync()` after every frame so X11 does not deliver frames in bursts ([appendix](appendix-java2d.md#buffers)).
 
 ```java title="amade-game-engine · swing/GameCanvas.java"
@@ -146,7 +152,8 @@ Both the screen's buffers and the pixel-mode buffer live in video memory where t
 | `new GameCanvas(width, height, painter)` | A canvas whose painter draws everything |
 | `new GameCanvas(width, height, painter, overlay)` | World and overlay painted separately |
 | `render(alpha)` | Draws one frame; the loop's render function |
-| `setRenderMode(mode)`, `renderMode()` | `DIRECT` or `PIXEL`, from the next frame on; from any thread |
+| `setRenderMode(mode)`, `renderMode()` | `DIRECT`, `PIXEL` or `AUTO`, from the next frame on; from any thread |
+| `resolutionDivisor()` | By how much `AUTO` draws the world smaller than the screen at the moment; 1 in the other modes |
 | `toLogical(x, y)` | A point of the component, such as a mouse event's, in logical coordinates, placed as the current mode places the picture |
 | `setMaxLogicalWidth(max)` | Lets the picture widen up to `max` units to fill a wide screen; from the next frame on |
 | `logicalWidth()`, `minLogicalWidth()` | The width of the current frame, and the width the canvas was made with |
@@ -163,7 +170,7 @@ Both the screen's buffers and the pixel-mode buffer live in video memory where t
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/swing/GameCanvas.java:width-for"
 ```
 
-**Which mode?** `DIRECT` is the default and sharp at every size. `PIXEL` costs 640 × 400 pixels on any screen, which makes it the fast choice for very large screens and slow drivers, and gives the look of old games. Every game offers both in its *Graphics* menu ([chapter 48](48-scenes-menus-sound.md#the-standard-menus-gamemenus-and-gametexts)) and keeps the choice in its settings.
+**Which mode?** `DIRECT` is the default and sharp at every size; it draws on the screen's own surface, which is the fast way for a game with a few dozen sprites. `PIXEL` costs 640 × 400 pixels on any screen and gives the look of old games. `AUTO` is for a game that paints every pixel of the screen several times in a frame, such as a road with hundreds of trees: drawing in main memory is then several times faster than drawing on the screen's surface, and the game stays fluid on a slow computer at the price of a coarser picture ([chapter 61](61-cruise.md#full-screen-three-times-the-pixels) has the numbers). Every game offers the modes in its *Graphics* menu ([chapter 48](48-scenes-menus-sound.md#the-standard-menus-gamemenus-and-gametexts)) and keeps the choice in its settings.
 
 ??? example "Test: the mouse where pixel mode puts the picture"
     ```java title="amade-game-engine · test/swing/GameCanvasTest.java"

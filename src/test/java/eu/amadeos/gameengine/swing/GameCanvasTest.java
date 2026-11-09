@@ -32,6 +32,15 @@ class GameCanvasTest {
 
     // --8<-- [start:test-to-logical]
     @Test
+    void theAutomaticModeNeverDrawsMuchBelowTheLogicalSize() {
+        assertEquals(1, GameCanvas.mostDivisor(1));
+        assertEquals(2, GameCanvas.mostDivisor(2));
+        assertEquals(3, GameCanvas.mostDivisor(2.7), "1920 x 1080: down to 0.9 times the logical size");
+        assertEquals(3, GameCanvas.mostDivisor(3));
+        assertEquals(1, GameCanvas.mostDivisor(0.6));
+    }
+
+    @Test
     void mousePositionsAreMappedLikeThePicture() {
         // 1920 × 1080 drawn directly: scaled 2.7 times to 1728 × 1080, with black bars of 96 pixels left and right.
         Point2D.Double p = GameCanvas.toLogical(96, 0, 1920, 1080, 640, 400, RenderMode.DIRECT);
