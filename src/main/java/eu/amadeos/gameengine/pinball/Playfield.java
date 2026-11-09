@@ -64,6 +64,8 @@ public final class Playfield {
 
     private final double width;
     private final double drainY;
+    /** Below this speed into a part, in units per second, the ball leans on it and rolls instead of hitting it. */
+    static final double ROLLING = 12;
     private final double gravity;
     private final int substeps;
     private final double maxSpeed;
@@ -274,8 +276,11 @@ public final class Playfield {
         double vn = rvx * nx + rvy * ny;
         if (vn >= 0) return 0; // already moving away
         double tx = rvx - vn * nx, ty = rvy - vn * ny;
-        rvx = -vn * m.bounce() * nx + tx * (1 - m.grip());
-        rvy = -vn * m.bounce() * ny + ty * (1 - m.grip());
+        // a hit takes some of the sliding speed; a ball that only leans on a part (rolling along a guide or
+        // down a flipper) keeps it, or it would creep along every wall at a crawl
+        double keep = -vn > ROLLING ? 1 - m.grip() : 1;
+        rvx = -vn * m.bounce() * nx + tx * keep;
+        rvy = -vn * m.bounce() * ny + ty * keep;
         if (m.kick() > 0 && -vn > m.kickAbove()) {
             rvx += nx * m.kick();
             rvy += ny * m.kick();

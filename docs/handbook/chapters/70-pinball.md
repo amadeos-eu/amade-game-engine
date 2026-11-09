@@ -104,7 +104,7 @@ What happens next depends on what the part is made of. A `Material` has four num
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/pinball/Material.java:material"
 ```
 
-A pop bumper has a kick of 520 and kicks at a touch of 25; a slingshot has 430 but only kicks when the ball arrives with more than 60, so a ball that only rolls past it is not thrown. `contact` does the bounce: it pushes the ball out of the part, splits its speed into the part towards the surface and the part along it, reflects the first, takes some of the second, and adds the kick:
+A pop bumper has a kick of 520 and kicks at a touch of 25; a slingshot has 430 but only kicks when the ball arrives with more than 60, so a ball that only rolls past it is not thrown. `contact` does the bounce: it pushes the ball out of the part, splits its speed into the part towards the surface and the part along it, reflects the first, takes some of the second, and adds the kick. Only a real hit takes speed along the surface: a ball that just leans on a part, pressed against it by the slope (slower than `ROLLING` towards it), rolls along it. Without that rule a ball crept down every guide and flipper at a crawl, losing a little of its speed at each of the thousand small steps a second:
 
 ```java title="amade-game-engine · pinball/Playfield.java"
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/pinball/Playfield.java:bounce"
@@ -196,7 +196,7 @@ The engine's `Lamps` turns those states into brightness. A lamp does not switch;
 
 ### The skill shot
 
-The skill shot rewards the plunge: when the ball is plunged with just the right strength, its first touch is the skill target. That is the rule, quite literally: the first part or zone the ball touches after the launch decides. On Lantern Fair the target is the lit top lane, which the flipper buttons move before the plunge; on Coral Deep the blue jellyfish bumper (`pop2`); on Orbit Yard the satellite's spin disc:
+The skill shot rewards the plunge: when the ball is plunged with just the right strength, its first touch is the skill target. That is the rule, quite literally: the first part or zone the ball touches after the launch decides. On Lantern Fair the target is the lit top lane, which the flipper buttons move before the plunge; on Coral Deep the pink jellyfish bumper (`pop1`); on Orbit Yard the satellite's spin disc:
 
 ```java title="amade-pinball-game · domain/Rules.java"
 --8<-- "amade-pinball-game/src/main/java/eu/amadeos/games/pinball/domain/Rules.java:skill"
@@ -362,7 +362,7 @@ Lamps add light, and light adds up: the picture with two lamps lit is the pictur
 
 ### The frame
 
-`RenderedView.paint` puts a frame together: the base picture, every lit lamp added by how bright it is, the standing drop targets, the flippers at the nearest of their angles, the plunger at its pull, the balls' shadows and the balls. All pictures are scaled once to the window's size:
+`RenderedView.paint` puts a frame together: the base picture, every lit lamp added by how bright it is, the standing drop targets, the flippers at the nearest of their angles, the balls' shadows, the balls, and last the plunger at its pull, which is nearer the eye than any ball in the shooter lane. All pictures are scaled once to the window's size:
 
 ```java title="amade-pinball-game · ui/game/RenderedView.java"
 --8<-- "amade-pinball-game/src/main/java/eu/amadeos/games/pinball/ui/game/RenderedView.java:paint"
