@@ -391,3 +391,45 @@ A `Texture` is square, a power of two in size, with a **glow** per texel: glowin
     ```java title="amade-game-engine · test/pinball/PerspectiveTest.java"
     --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/pinball/PerspectiveTest.java:test-perspective"
     ```
+
+## A road into the distance: Road, RoadBuilder and RoadRenderer
+
+*Package `drive` · introduced in [61. Cruise](61-cruise.md#step-1-a-road-of-segments) · source: [`Road`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/drive/Road.java), [`Segment`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/drive/Segment.java), [`RoadBuilder`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/drive/RoadBuilder.java), [`RoadCamera`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/drive/RoadCamera.java), [`RoadRenderer`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/drive/RoadRenderer.java), [`RoadLook`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/drive/RoadLook.java), [`Wall`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/drive/Wall.java), [`Scenery`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/drive/Scenery.java)*
+
+**What it is for.** A road seen from behind a car, running towards the horizon, bending and climbing: the pseudo-3D of the arcade road games. Ground, road, kerbs and lines, cliffs, rows of houses and tunnels beside it, water, trees and signs, cars, fog in the distance, night with headlights.
+
+**When to choose it.** When the world is a road, or anything else the player follows forwards: a track, a river, a corridor in the sky. A world the player walks through freely is [`Raycaster`](#seen-from-inside-gridmap-raycaster-and-lightmap)'s; a flat world seen from one fixed place is [`Perspective`](#a-flat-world-at-a-slant-perspective)'s.
+
+**How it works.** A `Road` is a row of `Segment`s of `Road.SEGMENT` units, each with its `curve`, the height `y` of its far end, its `RoadLook`, and what stands beside it: `scenery`, a `left` and `right` `Wall`, `tunnel`, `waterLeft` and `waterRight`. It grows at its far end (`add`) and is forgotten at its near end (`dropBefore`); segments keep their numbers. A `RoadBuilder` adds sections that ease in and out. `RoadRenderer.render` projects every segment within the `RoadCamera`'s `drawDistance` (`dx · depth / dz`), pushes each one sideways by the sum of the curves before it, and paints them from far to near with what stands on them, so near things cover far ones without any test. `light`, `shade`, `sight`, `mist` and `mistAmount` set the hour and the weather, `headlights` the car whose lights shine at night. The background is the game's: draw it first, up to `horizonY()`.
+
+```java title="amade-game-engine · drive/RoadRenderer.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/drive/RoadRenderer.java:project"
+```
+
+| Method or field | What it does |
+|---|---|
+| `road.add(look, curve, y)`, `segment(n)`, `at(z)`, `has(n)`, `first()`, `end()`, `heightAt(z)`, `dropBefore(n)` | The segments: added, found, forgotten |
+| `new RoadBuilder(road, look)`, `section(count, curve, rise, each)`, `straight(count)`, `look(look)` | Sections that ease in and out, each segment dressed by `each` |
+| `segment.add(new Scenery(sprite, offset, along, flipped))`, `left`, `right` (`Wall.cliff`, `Wall.houses`, `Wall.tunnel`), `tunnel`, `portal`, `waterLeft`, `waterRight` | What stands beside a segment |
+| `camera.follow(car, behind)`, `height`, `depth`, `horizon`, `drawDistance` | Where the eye is and how far it sees |
+| `renderer.render(g, road, camera, width, height, cars)` | The road with its walls, scenery and cars |
+| `light`, `shade`, `sight`, `mist`, `mistAmount`, `headlights`, `fogColour(look)` | Hour, weather and lights |
+| `RoadLook.mix(a, b, t)` | One landscape melting into the next |
+
+!!! warning "Pitfall: a colour that changes in every frame"
+    The fog colour, the light and the shade are part of the key under which [`RoadSprite`](42-sprites.md#sprites-at-every-size-roadsprite) keeps its tinted copies. If the game moves them smoothly, every frame needs new copies of every tree, and the frame takes three times as long. `fogColour` rounds to the steps of the copies; a game that sets `shade` or `mist` itself should change them in steps too.
+
+??? example "Test: the road where it belongs"
+    ```java title="amade-game-engine · test/drive/RoadRendererTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/drive/RoadRendererTest.java:test-view"
+    ```
+
+### Mountains and clouds made in code: Panorama
+
+*Package `drive` · introduced in [61. Cruise](61-cruise.md#step-6-the-sky-and-the-landscape-behind) · source: [`Panorama`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/drive/Panorama.java), [`Noise`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/drive/Noise.java)*
+
+`Panorama` makes pictures for the background: `sky(width, height, top, middle, horizon)` a gradient, `sun(...)` a disc with its glow, `clouds(sky, seed, count, reach, lit, dark)` soft clouds, `range(width, height, seed, roughness, rock, haze, ...)` a range of mountains from a ridge of `Noise` (lit by its slopes, with snow above a line and haze towards the foot; flat tops for mesas), and `treeLine(width, height, seed, colour)`. All of them wrap around, so a [`Parallax`](#depth-parallax) layer, or the game's own code, can repeat them as the road turns.
+
+```java title="amade-game-engine · drive/Panorama.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/drive/Panorama.java:range"
+```

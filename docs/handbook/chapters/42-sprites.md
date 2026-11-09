@@ -207,6 +207,34 @@ A figure given by its corners around its own centre, pairs of x and y, angle 0 p
 | `new DotMatrix(columns, rows)`, `clear()`, `line(...)`, `show(big, small)`, `on(x, y)` | The dots and what they say |
 | `paint(g, x, y, w, h, colour)` | The display on the screen |
 
+## Sprites at every size: RoadSprite
+
+*Package `drive` · introduced in [61. Cruise](61-cruise.md#step-3-walls-tunnels-and-things-beside-the-road) · source: [`RoadSprite`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/drive/RoadSprite.java)*
+
+**What it is for.** A picture drawn at any size, from a few pixels far away to half the screen close by, faded into fog and darkened at night: the trees, houses and cars of a road, hundreds in a frame.
+
+**When to choose it.** When one picture is drawn at many sizes and tints in every frame. A picture at one size is a [`Sprite`](#pictures-sprite); a thing seen from several sides is a [model](#things-in-3d-sdf-model-and-modelrenderer).
+
+**How it works.** `new RoadSprite(art, worldWidth, glow)` takes a large picture (transparent around the thing), its width in world units, and how much it glows (0 not at all, 1 keeps its colours in fog and dark). `copy(pixels, fog, fogColour, light, shade)` returns a copy at least `pixels` wide: scaled to one of a few fixed widths (each about 1.19 times the one before), halving step by step and then one smooth step so small trees do not shimmer, and tinted to one of 16 steps of fog and 8 of light. The caller draws it a little smaller. All sprites share one budget of pixels (`BUDGET`, about 64 MB); beyond it, the copy used longest ago goes.
+
+```java title="amade-game-engine · drive/RoadSprite.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/drive/RoadSprite.java:copy"
+```
+
+| Method | What it does |
+|---|---|
+| `new RoadSprite(art, worldWidth)`, `new RoadSprite(art, worldWidth, glow)` | A picture standing on the ground at its bottom centre |
+| `copy(pixels, fog, fogColour, light, shade)` | The finished copy for this size, fog and light |
+| `art()`, `worldWidth()`, `worldHeight()`, `glow()` | The picture and its size in the world |
+
+!!! tip "Draw copies with the nearest pixel"
+    A copy is already smooth and at most a fifth too wide, so the last little scale does not need bilinear interpolation, which costs four times as much in Java2D's software loops. `RoadRenderer` sets `VALUE_INTERPOLATION_NEAREST_NEIGHBOR` for its sprites; do the same when drawing copies yourself ([appendix](appendix-java2d.md)).
+
+??? example "Test: copies come in fixed widths and are reused"
+    ```java title="amade-game-engine · test/drive/RoadSpriteTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/drive/RoadSpriteTest.java:test-copies"
+    ```
+
 ## Movement in time: Easing and Tween
 
 *Package `anim` · introduced in [11. Solitaire](11-solitaire.md#easing-how-a-movement-feels) · source: [`Easing`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/anim/Easing.java), [`Tween`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/anim/Tween.java)*

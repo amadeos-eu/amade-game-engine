@@ -112,4 +112,63 @@ class MixerTest {
         assertTrue(!mixer.playingMusic());
     }
     // --8<-- [end:test-music]
+
+    // --8<-- [start:test-drone]
+    @Test
+    void theDroneGlidesToItsVolumeAndPlaysFasterAtAHigherRate() {
+        Mixer mixer = new Mixer();
+        short[] ramp = new short[1000];
+        for (int i = 0; i < ramp.length; i++) ramp[i] = (short) (i * 10);
+        mixer.setDrone(Sound.of(ramp));
+        short[] block = new short[Mixer.BLOCK];
+        mixer.mix(block);
+        assertEquals(0, block[100], "silent until a volume is set");
+        mixer.setDroneVolume(1);
+        for (int n = 0; n < 20; n++) mixer.mix(block);   // the volume has glided up
+        mixer.setDroneRate(2);
+        mixer.mix(block);
+        int steps = 0;
+        for (int i = 1; i < 200; i++) if (block[i] > block[i - 1]) steps += block[i] - block[i - 1];
+        assertTrue(steps / 199.0 > 15, "two samples of the ramp per sample: about 20 a step, was " + steps / 199.0);
+        mixer.setMuted(true);
+        for (int n = 0; n < 20; n++) mixer.mix(block);
+        assertTrue(Math.abs(block[Mixer.BLOCK - 1]) < 50, "muted, the drone fades out");
+    }
+    // --8<-- [end:test-drone]
+
+    // --8<-- [start:test-stream]
+    @Test
+    void aStreamPlaysWhatItsWriterSentAndThenEnds() throws InterruptedException {
+        Mixer mixer = new Mixer();
+        SampleStream stream = new SampleStream(0.1);
+        short[] samples = new short[300];
+        java.util.Arrays.fill(samples, (short) 200);
+        assertTrue(stream.write(samples, samples.length));
+        stream.end();
+        mixer.setMusicVolume(0.5);
+        mixer.playMusic(stream);
+        short[] block = new short[Mixer.BLOCK];
+        mixer.mix(block);
+        assertEquals(100, block[0], "at half the music volume");
+        assertEquals(0, block[300], "nothing more was written");
+        assertTrue(!mixer.playingMusic());
+        stream.close();
+        assertTrue(!stream.write(samples, 1), "a closed stream tells its writer to stop");
+    }
+
+    @Test
+    void bedsPlayTogether() {
+        Mixer mixer = new Mixer();
+        Mixer.Bed wind = mixer.bed(constant(1000, 50));
+        Mixer.Bed birds = mixer.bed(constant(500, 70));
+        wind.setVolume(1);
+        birds.setVolume(1);
+        short[] block = new short[Mixer.BLOCK];
+        for (int n = 0; n < 20; n++) mixer.mix(block);
+        assertEquals(1500, block[100], 2);
+        birds.setSound(null);
+        for (int n = 0; n < 2; n++) mixer.mix(block);
+        assertEquals(1000, block[100], 2);
+    }
+    // --8<-- [end:test-stream]
 }

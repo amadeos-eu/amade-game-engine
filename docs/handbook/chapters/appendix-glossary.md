@@ -30,6 +30,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 **Baseline (layer).** The height where a part of a painted room touches the floor. People whose feet are above it are drawn before it and disappear behind it; the others walk in front. [Manual](49-adventure.md#rooms-room-hotspot-and-layers).
 
+**Bed (sound).** A loop under the music and the effects whose sound, speed and loudness change while it plays, gliding without a click: an engine climbing with the speed, wind, rain, the sound of a landscape. [Cruise](61-cruise.md#step-11-sounds-made-in-code), [manual](48-scenes-menus-sound.md#loops-that-change-while-they-play-beds).
+
 **Billboard.** A flat picture standing in a 3D view that always turns its face to the eye. Pictures of the thing from several sides, chosen by the angle it is seen from, make it look solid. [Rivet](60-rivet.md#step-7-things-in-the-world), [manual](45-maps.md#seen-from-inside-gridmap-raycaster-and-lightmap).
 
 **Box selection.** A drag with the mouse opens a rectangle, and every unit of the player's side inside it is chosen. [Sands](31-sands.md#step-1-choosing-and-commanding), [manual](46-paths-and-decisions.md#choosing-units-selection-and-boxselect).
@@ -196,6 +198,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 ## P
 
+**Painter's algorithm.** Drawing from far to near, so what is near is painted last and covers what lies behind it, with no test of what can be seen. The road of Cruise is drawn this way; a hilltop hides the road beyond by itself. [Cruise](61-cruise.md#step-2-the-projection).
+
 **Parallax.** Background layers that scroll slower the further away they are, which gives a flat game depth. [Jump](27-jump.md#parallax), [manual](45-maps.md#depth-parallax).
 
 **Particle.** A small, short-lived square that flies, falls and fades: a splinter, a spark, dust. [Bricks](21-bricks.md#step-5-particles), [manual](42-sprites.md#splinters-and-sparks-particles).
@@ -218,6 +222,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 **Production queue.** Orders worked off one after the other, each paid while it is made. [Sands](31-sands.md#paying-while-it-is-made), [manual](47-data-and-saving.md#money-and-production-credits-and-production).
 
+**Pseudo-3D.** A picture that looks three-dimensional but is made with a two-dimensional trick: the road of the arcade road games, projected segment by segment, with curves as sideways pushes. [Cruise](61-cruise.md#step-2-the-projection).
+
 ## R
 
 **Ramp (pinball).** A track that lifts the ball off the table and brings it back elsewhere, of plastic going up and often of wire coming down. Climbing costs the ball speed; too slow, it rolls back. [Pinball](70-pinball.md#step-4-ramps-and-wire-forms), [manual](44-movement.md#a-ball-on-a-table-playfield-and-its-parts).
@@ -235,6 +241,10 @@ The words this book uses for the ideas of game programming, each with a short ex
 **Replay.** A whole game kept as a seed and the player's actions with the tick of each. Fed to the rules again, they play the same game. [Snake](22-snake.md#step-5-replays), [manual](47-data-and-saving.md#a-game-as-its-input-replay).
 
 **Resonator.** A filter that rings at one frequency: a tone at that frequency builds up in it, others die away. Five of them in a row are the mouth of the speech synthesizer. [Hover Cab](28-hover-cab.md#the-resonator).
+
+**Ring buffer.** A fixed array that one side writes into and another reads from, both going round and round; what lies between the two positions is waiting. A decoder fills it with music while the mixer empties it. [Cruise](61-cruise.md#step-12-the-radio), [manual](48-scenes-menus-sound.md#music-as-it-is-decoded-samplestream).
+
+**Road segment.** One short piece of a pseudo-3D road, the unit it is built and drawn in: it knows how much the road bends and climbs there, how it looks and what stands beside it. [Cruise](61-cruise.md#step-1-a-road-of-segments), [manual](45-maps.md#a-road-into-the-distance-road-roadbuilder-and-roadrenderer).
 
 ## S
 
@@ -287,6 +297,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 **Tint.** A colour multiplied into a picture, so people drawn in daylight colours take on the light of a candlelit or moonlit room. [Templars](50-templar.md#drawn-once-kept).
 
 **Touchdown.** The moment a craft comes down on a landing place, graded by its speed as soft, hard or a crash. [Hover Cab](28-hover-cab.md#step-2-touching-down), [manual](44-movement.md#flying-on-jets-thrusters-drag-and-touchdown).
+
+**Tracker module.** Music stored as notes, patterns and short instrument samples instead of a recording, as the trackers of the demo scene wrote it: MOD, XM, S3M, IT. Cruise plays them through libopenmpt. [Cruise](61-cruise.md#step-12-the-radio).
 
 **Turn order.** Who plays now and who next, in a game played in turns, skipping the players who are out; the round is decided when one is left. [Artillery](29-artillery.md#whose-turn), [manual](46-paths-and-decisions.md#whose-turn-turnorder).
 

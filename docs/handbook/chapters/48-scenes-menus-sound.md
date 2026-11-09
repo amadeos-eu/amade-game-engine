@@ -119,9 +119,32 @@ A melody written as text in the *Music Macro Language* of the home computers of 
 | `play(sound)` | An effect, as soon as possible |
 | `playMusic(sound, loop)`, `stopMusic()` | The music, from its start; once or in a loop |
 | `setMuted(muted)` | New effects are dropped and the music turns silent but goes on, so it is where it would be when sound comes back |
+| `bed(sound)` → `Bed` (`setSound`, `setRate`, `setVolume`) | A loop whose sound, speed and loudness change while it plays ([below](#loops-that-change-while-they-play-beds)) |
+| `playMusic(stream)`, `setMusicVolume(volume)` | Music decoded while it plays ([below](#music-as-it-is-decoded-samplestream)); the music's own loudness |
 
 !!! info "Behind the scenes: a hiss nobody hears"
     The mixer adds a hiss of one or two steps out of 32,768 to every block, far below hearing, so the line never carries pure silence. Some wireless headsets switch off after a few seconds of zeros and take longer to wake up again than a game can wait: the first sounds of a round would be lost ([appendix](appendix-java2d.md#sound)).
+
+#### Loops that change while they play: beds
+
+*introduced in [61. Cruise](61-cruise.md#step-11-sounds-made-in-code) · source: [`Mixer`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/audio/Mixer.java)*
+
+An engine that climbs with the speed, wind that grows, rain that sets in: loops under everything whose sound, speed and loudness change while they play. `mixer.bed(sound)` adds one and returns its `Mixer.Bed`; `setSound(sound)` changes the loop (`null` for silence), `setRate(rate)` plays it faster or slower (2 is an octave up), `setVolume(volume)` sets its loudness, which glides there within a few milliseconds without a click. All are safe from any thread. `setMuted` silences the beds too. `setDrone`, `setDroneRate` and `setDroneVolume` are one bed ready made, for a game that needs only one.
+
+```java title="amade-game-engine · audio/Mixer.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/audio/Mixer.java:bed"
+```
+
+#### Music as it is decoded: SampleStream
+
+*introduced in [61. Cruise](61-cruise.md#step-12-the-radio) · source: [`SampleStream`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/audio/SampleStream.java)*
+
+A song of four minutes is 21 million samples; decoding it whole before it plays would take seconds and memory. `new SampleStream(seconds)` is a ring buffer between a decoder thread, which `write`s samples into it (waiting while it is full, and told `false` once the stream is closed), and the mixer, which reads it as the music (`playMusic(stream)`) and never waits: when the decoder falls behind, it hears silence. `end()` marks the end of the song, `finished()` tells when the mixer has played it all. `setMusicVolume(volume)` sets how loud the music is against the effects and beds; 0 silences only the music.
+
+??? example "Test: a stream plays what was written, then ends"
+    ```java title="amade-game-engine · test/audio/MixerTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/audio/MixerTest.java:test-stream"
+    ```
 
 ## Speech: Speech and Phoneme
 

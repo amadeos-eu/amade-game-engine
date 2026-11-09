@@ -7,13 +7,13 @@ Each chapter of this part covers one area. Each section in it describes one feat
 | Chapter | Packages | For |
 |---|---|---|
 | [41. Loop, Time and Drawing](41-loop-and-drawing.md) | `loop`, `time`, `swing` | The game loop, rules with a pace of their own, countdowns, the canvas, full screen, frame times |
-| [42. Sprites and Effects](42-sprites.md) | `sprite`, `shape`, `raycast.model`, `anim`, `fx`, `pinball` | Pictures that copy fast, a ground painted only where it changed, sheets and animation, turned pictures, figures of lines, things rendered in 3D, tweens, particles, tables with heights and shadows, a mirror ball, lamps and dot-matrix displays |
+| [42. Sprites and Effects](42-sprites.md) | `sprite`, `shape`, `raycast.model`, `drive`, `anim`, `fx`, `pinball` | Pictures that copy fast, a ground painted only where it changed, sheets and animation, turned pictures, figures of lines, things rendered in 3D, pictures at every size on a road, tweens, particles, tables with heights and shadows, a mirror ball, lamps and dot-matrix displays |
 | [43. Input](43-input.md) | `input` | Keyboard (left and right Shift apart), actions instead of keys, mouse, turning with the mouse, gamepads |
-| [44. Movement, Physics and Collision](44-movement.md) | `math`, `motion`, `physics`, `raycast`, `pinball`, `collision`, `pool`, `entity` | Vectors and angles, flight paths, falling and jumping, flying on jets and landing, shells under gravity and wind, walking and shooting among walls, balls on a table with flippers and ramps, what hits what (down to the pixel), many things at once |
-| [45. Maps, Camera and Fog](45-maps.md) | `tile`, `tiled`, `iso`, `camera`, `fog`, `minimap`, `terrain`, `raycast`, `pinball` | Tile maps, reach and networks on them, maps from an editor, the isometric view, worlds larger than the screen, what a side sees, ground that breaks, a world seen from inside, a flat world seen at a slant |
+| [44. Movement, Physics and Collision](44-movement.md) | `math`, `motion`, `physics`, `raycast`, `drive`, `pinball`, `collision`, `pool`, `entity` | Vectors and angles, flight paths, falling and jumping, flying on jets and landing, shells under gravity and wind, walking and shooting among walls, cars and traffic on a road, balls on a table with flippers and ramps, what hits what (down to the pixel), many things at once |
+| [45. Maps, Camera and Fog](45-maps.md) | `tile`, `tiled`, `iso`, `camera`, `fog`, `minimap`, `terrain`, `raycast`, `drive`, `pinball` | Tile maps, reach and networks on them, maps from an editor, the isometric view, worlds larger than the screen, what a side sees, ground that breaks, a world seen from inside, a road into the distance, a flat world seen at a slant |
 | [46. Paths, Groups and Decisions](46-paths-and-decisions.md) | `path`, `road`, `select`, `ai`, `event`, `turn` | Finding the way for one or for many, roads between flags, choosing units, states, the computer's view of the map, aiming by trying, chain reactions, turns |
 | [47. Chance, Data and Saving](47-data-and-saving.md) | `random`, `replay`, `undo`, `data`, `economy`, `save`, `score` | Repeatable chance, replays, undo, data files, money and production, saving, high scores |
-| [48. Scenes, Menus and Sound](48-scenes-menus-sound.md) | `scene`, `swing`, `menu`, `audio` | Screens of a game, the standard menus and dialogs, menus over the game, sound and music, speech |
+| [48. Scenes, Menus and Sound](48-scenes-menus-sound.md) | `scene`, `swing`, `menu`, `audio` | Screens of a game, the standard menus and dialogs, menus over the game, sound and music, loops that change while they play, music decoded while it plays, speech |
 | [49. Rooms, Scripts and Dialogs](49-adventure.md) | `adventure` | Painted rooms and where people walk in them, hotspots, inventory, the story as scripts, conversations |
 
 ## What the engine is, and is not
@@ -79,6 +79,7 @@ A few rules hold for nearly every class. Knowing them makes the rest of the manu
 | A craft on jets against gravity, fuel, air, a soft or hard landing | `Thrusters`, `Body.drag`, `Touchdown` | [44](44-movement.md#flying-on-jets-thrusters-drag-and-touchdown) |
 | Shells, grenades, arrows: fired, then flying under gravity and wind until they hit | `Projectile`, `Ballistics` | [44](44-movement.md#shells-in-flight-projectile-and-ballistics) |
 | Walking among walls and doors without sticking; shots that arrive at once | `Mover`, `Hitscan` | [44](44-movement.md#walking-and-shooting-on-a-grid-of-walls-mover-and-hitscan) |
+| A car on a road: gas, brakes, the pull of curves; traffic that follows, overtakes and comes the other way | `Driving`, `Car`, `Traffic` | [44](44-movement.md#cars-on-a-road-driving-car-and-traffic) |
 | A ball that rolls and bounces off walls, rubber, bumpers and flippers; ramps, holes, magnets | `Playfield`, `Flipper`, `Track`, `Zone`, `Material` | [44](44-movement.md#a-ball-on-a-table-playfield-and-its-parts) |
 | A plunger with a spring, nudging with a tilt | `Plunger`, `Tilt` | [44](44-movement.md#the-plunger-and-the-tilt-plunger-and-tilt) |
 | Collision of fast boxes, of circles, of many things | `Sweep`, `Circle`, `Grid` | [44](44-movement.md#which-collision-test) |
@@ -98,6 +99,9 @@ A few rules hold for nearly every class. Knowing them makes the rest of the manu
 | The whole map in a corner | `Minimap`, `DiamondMinimap` | [45](45-maps.md#the-map-in-a-corner-minimap), [45](45-maps.md#an-isometric-map-in-a-corner-diamondminimap) |
 | Ground that can be blasted, heaped and falls; hills from random numbers | `Ground`, `Landscape` | [45](45-maps.md#ground-that-breaks-ground-and-landscape) |
 | A world seen through the player's eyes: walls, doors, floor, sky, light and fog | `GridMap`, `Raycaster`, `LightMap`, `Billboard` | [45](45-maps.md#seen-from-inside-gridmap-raycaster-and-lightmap) |
+| A road into the distance: curves, hills, cliffs, tunnels, water, scenery, fog, night | `Road`, `RoadBuilder`, `RoadRenderer`, `RoadLook` | [45](45-maps.md#a-road-into-the-distance-road-roadbuilder-and-roadrenderer) |
+| Mountains, clouds and tree lines made in code | `Panorama` | [45](45-maps.md#mountains-and-clouds-made-in-code-panorama) |
+| Many pictures at every size, faded and darkened | `RoadSprite` | [42](42-sprites.md#sprites-at-every-size-roadsprite) |
 | A flat table or board seen from its near end, in perspective | `Perspective` | [45](45-maps.md#a-flat-world-at-a-slant-perspective) |
 | The way for one, or for many to one goal | `AStar`, `DistanceMap`, `FlowField` | [46](46-paths-and-decisions.md#which-search) |
 | Roads from flag to flag, the next road for a ware | `RoadNetwork` | [46](46-paths-and-decisions.md#roads-between-flags-roadnetwork) |
@@ -119,6 +123,7 @@ A few rules hold for nearly every class. Knowing them makes the rest of the manu
 | New Game, Full Screen, Exit with the usual keys | `GameMenus` | [48](48-scenes-menus-sound.md#the-standard-menus-gamemenus-and-gametexts) |
 | A menu on the map, beside what it is about | `OverlayMenu` | [48](48-scenes-menus-sound.md#menus-over-the-game-overlaymenu) |
 | Sound effects and music | `Sound`, `Tune`, `Mixer` | [48](48-scenes-menus-sound.md#sound-effects-sound) |
+| An engine, wind or rain that change while they play; the player's own music, decoded while it plays | `Mixer.Bed`, `SampleStream` | [48](48-scenes-menus-sound.md#loops-that-change-while-they-play-beds), [48](48-scenes-menus-sound.md#music-as-it-is-decoded-samplestream) |
 | Characters who talk, without recordings | `Speech`, `Phoneme` | [48](48-scenes-menus-sound.md#speech-speech-and-phoneme) |
 | A painted floor, and the shortest way round the table | `WalkArea` | [49](49-adventure.md#where-people-walk-walkarea) |
 | People smaller and slower at the back of a room | `DepthScale`, `Actor` | [49](49-adventure.md#smaller-at-the-back-depthscale) |
@@ -152,6 +157,7 @@ The order in which the engine grew, and where each part is explained step by ste
 | [33](33-town.md#what-moved-into-the-engine) | Town | `iso` (`IsoProjection`, `DepthSort`, `DiamondMinimap`), `tile` (`Coverage`, `SupplyGrid`), `sprite.ScrollingLayer`, the wheel of `input.Mouse` |
 | [50](50-templar.md#what-moved-into-the-engine) | The Seal of the Templars | `adventure` (`WalkArea`, `DepthScale`, `Actor`, `Room`, `Hotspot`, `Interaction`, `Inventory`, `Flags`, `Script`, `ScriptRunner`, `SpokenText`, `ReadingTime`) |
 | [60](60-rivet.md#what-moved-into-the-engine) | Rivet | `raycast` (`GridMap`, `Door`, `Texture`, `LightMap`, `Camera`, `Billboard`, `Views`, `Raycaster`, `Mover`, `Hitscan`), `raycast.model` (`Sdf`, `Model`, `Material`, `ModelRenderer`), `input.MouseLook` |
+| [61](61-cruise.md#what-moved-into-the-engine) | Cruise | `drive` (`Road`, `Segment`, `RoadBuilder`, `RoadCamera`, `RoadRenderer`, `RoadLook`, `RoadSprite`, `Wall`, `Scenery`, `Car`, `Driving`, `Traffic`, `Panorama`, `Noise`), `audio` (`Mixer.Bed`, `SampleStream`, the music's own volume) |
 | [70](70-pinball.md#what-moved-into-the-engine) | Pinball | `pinball` (`Playfield`, `Ball`, `Segment`, `Disc`, `Flipper`, `Zone`, `Track`, `Material`, `Plunger`, `Tilt`, `Perspective`, `Relief`, `RampArt`, `ChromeBall`, `Lamps`, `DotMatrix`), the sides of `input.Keyboard` |
 
 Many classes grew later, when another game needed a little more: `Camera` learned the mouse in Towers, `Mouse` the wheel in Town, `Keyboard` the two sides of Shift in Pinball, `Sprite` its opaque caches in Jump and Towers, `SeededRandom` to be saved in Sands. The sections of this part describe each class as it is now.

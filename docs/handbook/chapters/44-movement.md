@@ -272,6 +272,31 @@ The playfield reports what happened to its `Events`: `hit`, `entered`, `caught`,
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/pinball/Tilt.java:nudge"
 ```
 
+## Cars on a road: Driving, Car and Traffic
+
+*Package `drive` · introduced in [61. Cruise](61-cruise.md#step-4-driving-and-traffic) · source: [`Driving`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/drive/Driving.java), [`Car`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/drive/Car.java), [`Traffic`](https://github.com/amadeos-eu/amade-game-engine/blob/main/src/main/java/eu/amadeos/gameengine/drive/Traffic.java)*
+
+**What it is for.** A car the player drives on a [`Road`](45-maps.md#a-road-into-the-distance-road-roadbuilder-and-roadrenderer), and the traffic around it: cars that keep their lane and their distance, overtake when the other lane is clear, and come the other way.
+
+**How it works.** A `Car` has `z` (where its back is along the road), `x` (its middle, in road half-widths: the right lane is +0.5), `speed`, `direction` (-1 coming the other way), its `sprite` and `glowSprite`, `width`, `length`, `lift` (above the road, for things that fly), `steered` for a player's car, and a `tag` for the game. `Driving.update(car, road, seconds, steer, gas, brake)` moves a player's car: gas towards `topSpeed`, braking and coasting, steering faster at speed, a pull outwards in curves with the square of the speed, slower on the grass beyond `offRoad`, and a stop against a `Wall`. `Traffic.update(seconds)` moves the other cars: each follows the car ahead in its lane at a safe gap, and one that `overtakes` pulls out when `clear(...)` finds the other lane free far enough ahead. Collisions are the game's: `touching(car)` finds the car a player's car runs into.
+
+```java title="amade-game-engine · drive/Traffic.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/drive/Traffic.java:update"
+```
+
+| Method or field | What it does |
+|---|---|
+| `new Car(sprite, z, x, speed)`, `oncoming()`, `overtaking()`, `touches(other)` | A car; one that comes the other way; one that overtakes |
+| `driving.update(car, road, seconds, steer, gas, brake)` → `Result(offRoad, hitWall)` | The player's car, with `topSpeed`, `acceleration`, `braking`, `coasting`, `steering`, `centrifugal`, `offRoad`, `limit` |
+| `traffic.add(car)`, `remove(car)`, `removeOutside(z, behind, ahead)`, `update(seconds)` | The cars that drive themselves |
+| `ahead(car, laneX)`, `clear(laneX, from, to, except)`, `touching(car)` | What is ahead, whether a lane is free, what a car runs into |
+
+??? example "Test: following and overtaking"
+    ```java title="amade-game-engine · test/drive/TrafficTest.java"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/drive/TrafficTest.java:test-follow"
+    --8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/drive/TrafficTest.java:test-overtake"
+    ```
+
 ## Which collision test?
 
 | The things | Use | Because |
