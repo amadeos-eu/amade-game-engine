@@ -5,12 +5,12 @@
 <figure markdown>
 ![Lantern Fair: the Coaster and Dipper ramps, the Ferris wheel and the backglass](images/pinball/lantern-fair.jpg){ width="400" }
 ![Coral Deep: the Kraken, the Sub Tube and the Wreck Hold upper playfield](images/pinball/coral-deep.jpg){ width="400" }
-<figcaption>Lantern Fair, the easy table (left), and Coral Deep, the medium one (right). The table is a flat picture tilted into the view; the chrome ball reflects the room.</figcaption>
+<figcaption>Lantern Fair, the easy table (left), and Coral Deep, the medium one (right). The tables are rendered in Blender; the chrome ball mirrors the table around it.</figcaption>
 </figure>
 
 The tables are original: a fairground at night, a wreck on a reef, a dockyard in orbit. Their rules are the ones every modern machine shares: shots light lamps, lamps tell what is worth shooting next, and a game is three balls long.
 
-Two things are new in this book. The first is **real physics**. The ball of Paddle (chapter 20) bounced off flat walls at fixed angles; this ball has a mass that rolls down a sloped table, it bounces harder off rubber than off wood, it is kicked by bumpers, it climbs ramps and loses speed doing it, and a flipper hits it with the speed of the flipper's surface at the point where they meet. The second is **a flat world seen in perspective**: the table is drawn once from straight above, every part standing up with its height and its shadow, and that picture is tilted into a trapezoid by a real perspective projection. Both live in the engine's new `pinball` package. They open **Part VII**, *Tables and Real Physics*.
+Two things are new in this book. The first is **real physics**. The ball of Paddle (chapter 20) bounced off flat walls at fixed angles; this ball has a mass that rolls down a sloped table, it bounces harder off rubber than off wood, it is kicked by bumpers, it climbs ramps and loses speed doing it, and a flipper hits it with the speed of the flipper's surface at the point where they meet. The second is **a flat world seen in perspective**: the table is drawn once from straight above, every part standing up with its height and its shadow, and that picture is tilted into a trapezoid by a real perspective projection. Both live in the engine's new `pinball` package. They open **Part VII**, *Tables and Real Physics*. What the player finally sees is a third thing: each table rendered ahead of time in Blender, from the same table file, in layers that the game puts together frame by frame (Step 10).
 
 !!! abstract "What you will learn"
     - **A table as a text file**: parts in lines, a shared cabinet file, layers for raised floors
@@ -21,6 +21,7 @@ Two things are new in this book. The first is **real physics**. The ball of Padd
     - **A perspective projection** (a homography) from the flat table to the screen and back
     - **Relief drawing**: parts lifted slice by slice, with soft shadows, baked once into a picture
     - **A chrome ball** that reflects the room, rendered once
+    - **Pre-rendered tables**: a Blender scene built from the table file, a camera fitted to the game's view, lamps rendered one by one, and a ball that mirrors the rendered table
     - **Lamps** that blink, chase and fade, and **dot-matrix displays**
     - **Rules**: modes, a ball lock and multiball, combos, the skill shot, a wizard mode
     - **A robot player** that plays whole games, in the title and in the tests
@@ -195,7 +196,7 @@ The engine's `Lamps` turns those states into brightness. A lamp does not switch;
 
 ### The skill shot
 
-The skill shot rewards the plunge: when the ball is plunged with just the right strength, its first touch is the skill target. That is the rule, quite literally: the first part or zone the ball touches after the launch decides. On Lantern Fair the target is the lit top lane, which the flipper buttons move before the plunge; on Coral Deep any of the treasure standups (`treasure*`); on Orbit Yard the satellite's spin disc:
+The skill shot rewards the plunge: when the ball is plunged with just the right strength, its first touch is the skill target. That is the rule, quite literally: the first part or zone the ball touches after the launch decides. On Lantern Fair the target is the lit top lane, which the flipper buttons move before the plunge; on Coral Deep the blue jellyfish bumper (`pop2`); on Orbit Yard the satellite's spin disc:
 
 ```java title="amade-pinball-game · domain/Rules.java"
 --8<-- "amade-pinball-game/src/main/java/eu/amadeos/games/pinball/domain/Rules.java:skill"
@@ -333,7 +334,53 @@ The ball is drawn smaller the further up the table it is (`view.scale`), with a 
 
 `./gradlew benchmark` bakes each table and draws its frames with the robot playing: a frame takes about 6 to 7 ms at 1280 × 800 and about 10 ms at 1920 × 1200 on a four-core computer without a graphics card.
 
-## Step 10: The backglass and its displays
+## Step 10: Rendered in Blender
+
+Relief drawing gives every part a height and a shadow, but the light is painted: no lamp lights the floor around it, no flipper mirrors in the clear coat, no ramp lets the light through. A path tracer does all that by itself, if it is given a scene. So the game also has its tables rendered in **Blender**, ahead of time, and draws those pictures instead. The table file stays the truth: the physics reads it, and the tools in `tools/render` build a 3D scene from it.
+
+`./gradlew renderExport` writes what Blender needs: the printed playfield, seen from straight above with nothing standing on it, and every part with its place, height and colour. A Python script, `build.py`, run in Blender as a Python module (`pip install bpy`), builds the scene: the print under a clear coat, the walls with their rubbers, the posts, the pop bumpers, the slingshots, the ramps of clear plastic with their wire forms, the plastics, the toys, the cabinet, the apron, the plunger and the lockdown bar, and a small light under every insert. `passes.py` renders it.
+
+### A camera that fits the view
+
+The picture must lie exactly where the physics has the table: a ball at (120, 200) has to be drawn on the spot of the rendered floor that is (120, 200). Step 7 put the table on the screen with a homography, a trapezoid. A real camera looking at a flat floor is a homography too: so there is a camera whose picture of the floor is that very trapezoid. Its place, its tilt and its focal length follow from the four corners of the table, which must land on the four corners of the trapezoid; a few steps of Newton's method find them. There is a whole line of such cameras, each with its own lens shift; the one without a shift sees the posts and walls as the eye expects. It stands about 0.86 m in front of the cabinet and 1.08 m above it, looks down at 42°, and has an 82 mm lens. Its matrix, written beside the pictures, takes any point of the table, at any height, to its pixel.
+
+### Layers
+
+A picture cannot move, so the table is rendered in layers, and the game composes them every frame:
+
+| Layer | What it is |
+|---|---|
+| `base.png` | The whole machine with every lamp off, the flippers, drop targets and plunger left out |
+| `lamp-<name>.png` | What one lamp adds to the picture when it is lit, cut to where it adds anything |
+| `flip-<id>-<k>.png` | Each flipper at twelve angles between rest and up |
+| `drop-<id>.png`, `plunger-<k>.png` | Each drop target standing, the plunger at eight pulls |
+| `over.png` | The ramps, wire forms, plastics and toys alone, with their transparency |
+| `depth.png`, `overdepth.png` | How far each pixel is from the camera, in millimetres, for everything a ball can roll behind, and for the ramps and plastics alone |
+| `probes.png` | What a ball sees around it, as small panoramas on a grid over the table |
+
+Lamps add light, and light adds up: the picture with two lamps lit is the picture with none, plus what the first adds, plus what the second adds. Blender's *light groups* render, in a single run, how much of the light comes from each group; every insert is its own group. Each group's share is noisy, so the denoised difference between the picture with all lamps lit and the one with none is shared out among the lamps by their (blurred) shares. A flipper, a drop target and the plunger are rendered with the whole scene in their box, and what differs from the base picture becomes the sprite: the part, its shadow, its mirror image in the coat.
+
+### The frame
+
+`RenderedView.paint` puts a frame together: the base picture, every lit lamp added by how bright it is, the standing drop targets, the flippers at the nearest of their angles, the plunger at its pull, the balls' shadows and the balls. All pictures are scaled once to the window's size:
+
+```java title="amade-pinball-game · ui/game/RenderedView.java"
+--8<-- "amade-pinball-game/src/main/java/eu/amadeos/games/pinball/ui/game/RenderedView.java:paint"
+```
+
+### The ball, mirroring the rendered table
+
+The ball moves, so it is the one thing drawn in the game, pixel by pixel, much as `ChromeBall` does it. The difference is what the reflected ray sees: not a made-up room, but the table itself. Blender rendered panoramas, 64 × 32 pixels each, from 60 points on a grid over the table, at the height of a ball's centre, with the fluorescent tubes of the room and the lit backbox above. A ray reflected off the ball looks up the four panoramas around the ball, weighted by distance. Then the depth pictures decide what covers it: a pixel of the ball behind a post is left out, and a ramp in front of it is laid over it:
+
+```java title="amade-pinball-game · ui/game/RenderedView.java"
+--8<-- "amade-pinball-game/src/main/java/eu/amadeos/games/pinball/ui/game/RenderedView.java:chrome"
+```
+
+![Lantern Fair as rendered: the lamps lit, the flippers, the chrome ball](images/pinball/rendered.jpg){ width="560" }
+
+A frame takes about 5 ms at 1280 × 800 and 9 ms at 1920 × 1200, a little less than the drawn view, because most of the work is a copy. The pictures of the three tables take about a quarter of an hour each to render on four cores (`tools/render/render.sh <table>`), and they have to be rendered again when a table file moves a part. The drawn view of Steps 7 to 9 is still there: `-Damade.pinball.drawn=true` shows it, and a table without pictures falls back to it.
+
+## Step 11: The backglass and its displays
 
 Right of the table stands the backglass: the table's picture and name, the score, two dot-matrix displays and the list of modes.
 
@@ -360,7 +407,7 @@ The backglass itself is drawn with Java2D, like every picture in the game:
 --8<-- "amade-pinball-game/src/main/java/eu/amadeos/games/pinball/ui/game/Backglass.java:paint"
 ```
 
-## Step 11: Sound
+## Step 12: Sound
 
 Every event of the rules has its sound (`Sfx`), and every sound is made from tones when the game starts, with the engine's `Sound`: a knock of noise and a falling triangle for a bumper, a rising sweep for a ramp, short bell notes for the chimes. The big moments get a voice too, with the speech synthesizer of chapter 28: "Jackpot!", "Multiball!", "Shoot again!":
 
@@ -370,7 +417,7 @@ Every event of the rules has its sound (`Sfx`), and every sound is made from ton
 
 Each table has a quiet tune that loops while a ball is in play, written in MML as in chapter 24: a fairground waltz, a slow tune under water, a driving one in orbit.
 
-## Step 12: Two Shift keys
+## Step 13: Two Shift keys
 
 The flippers of a real machine are two buttons on the sides of the cabinet. On a keyboard, the two Shift keys are where the hands are anyway. But Java gives both the same key code, `VK_SHIFT`; only the event's **key location** tells them apart. The engine's `Keyboard` now keeps the side too: the codes `LEFT_SHIFT` and `RIGHT_SHIFT` (and the same for Control) are the plain code with the side added, and a game binds them like any other key. The plain `VK_SHIFT` is still down when either is:
 
@@ -390,7 +437,7 @@ The settings file names keys by their Java names; the four sided keys get names 
 --8<-- "amade-pinball-game/src/main/java/eu/amadeos/games/pinball/repository/PinballSettings.java:sides"
 ```
 
-## Step 13: Scenes
+## Step 14: Scenes
 
 The scenes are the familiar ones. The **title** shows the chosen table while the robot plays it, with a card that says how to start:
 
@@ -438,7 +485,7 @@ The window's presenter then asks each player whose score is good enough for the 
 | Lamps that blink, chase, flash and fade; dot-matrix displays | `pinball` (`Lamps`, `DotMatrix`) | Machines and their displays: pinball, slot machines, arcade cabinets |
 | Left and right Shift and Control told apart | `input.Keyboard` (`LEFT_SHIFT`, `RIGHT_SHIFT`, `LEFT_CONTROL`, `RIGHT_CONTROL`) | Every game with two hands on two sides of the keyboard |
 
-What stays in the game: the table files and their reader, the rules, the robot, the pictures of the parts and the three playfields, the backglass and what the displays say, the sounds and tunes, the scenes, the high score lists per table.
+What stays in the game: the table files and their reader, the Blender scene and the pictures rendered from it, the rules, the robot, the pictures of the parts and the three playfields, the backglass and what the displays say, the sounds and tunes, the scenes, the high score lists per table.
 
 ## Exercises
 
@@ -448,6 +495,7 @@ What stays in the game: the table files and their reader, the rules, the robot, 
 4. **A moving toy.** Coral Deep's Kraken swallows balls. Make it move: a part whose position changes over time, like a flipper, but driven by the rules. Which parts of `Playfield` need to know its velocity?
 5. **Match.** Real machines end a game with a match: if the last two digits of the score match a random number, the player gets a free game. Add it to the end card.
 6. **A table seen higher up.** Change the trapezoid of `Perspective`: wider at the top, as if the player stood further back. Which pictures still look right, and why do the heights start to look wrong?
+7. **Spinning spinners.** The spinners are in the base picture and stand still. Render each at a few angles, like the flippers, and draw the one nearest its angle. How many angles does a fast spinner need before it looks like a blur?
 
 ---
 
