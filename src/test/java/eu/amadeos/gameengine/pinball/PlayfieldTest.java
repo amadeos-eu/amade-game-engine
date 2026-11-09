@@ -73,6 +73,20 @@ class PlayfieldTest {
     }
 
     @Test
+    void aBallLeaningOnASlopingGuideRollsDownItFasterAndFaster() {
+        Playfield f = field();
+        // a guide falling 1 in 2, like an inlane guide; the ball is set down on it
+        f.add(new Segment("guide", 20, 100, 220, 200, 2, Material.WALL, 0));
+        Ball b = f.add(new Ball(40, 110 - 6.6 * Math.sqrt(1.25), 5.5));
+        run(f, 0.3);
+        double early = Math.hypot(b.vx, b.vy);
+        run(f, 0.3);
+        double later = Math.hypot(b.vx, b.vy);
+        assertTrue(early > 60, "rolling, not creeping: " + early);
+        assertTrue(later > early * 1.5, "faster and faster: " + early + " then " + later);
+    }
+
+    @Test
     void aFastBallDoesNotPassThroughAThinWall() {
         Playfield f = field();
         f.add(new Segment("wall", 150, 0, 150, 392, 1, Material.WALL, 0));
