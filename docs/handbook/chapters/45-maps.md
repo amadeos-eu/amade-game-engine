@@ -402,6 +402,8 @@ A `Texture` is square, a power of two in size, with a **glow** per texel: glowin
 
 **How it works.** A `Road` is a row of `Segment`s of `Road.SEGMENT` units, each with its `curve`, the height `y` of its far end, its `RoadLook`, and what stands beside it: `scenery`, a `left` and `right` `Wall`, `tunnel`, `waterLeft` and `waterRight`. It grows at its far end (`add`) and is forgotten at its near end (`dropBefore`); segments keep their numbers. A `RoadBuilder` adds sections that ease in and out. `RoadRenderer.render` projects every segment within the `RoadCamera`'s `drawDistance` (`dx · depth / dz`), pushes each one sideways by the sum of the curves before it, and paints them from far to near with what stands on them, so near things cover far ones without any test. `light`, `shade`, `sight`, `mist` and `mistAmount` set the hour and the weather, `headlights` the car whose lights shine at night. The background is the game's: draw it first, up to `horizonY()`.
 
+The renderer spends its smoothing where it shows. The ground of a segment is a rectangle of whole pixels; the strips of the road (shoulder, kerb, asphalt) lie side by side and are smoothed once; the many small bands of a wall are filled plainly, since they meet edge to edge; a kerb or a line thinner than a quarter of a pixel is left out; and a glow is a picture made once per size and colour ([chapter 61](61-cruise.md#full-screen-three-times-the-pixels)).
+
 ```java title="amade-game-engine · drive/RoadRenderer.java"
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/drive/RoadRenderer.java:project"
 ```

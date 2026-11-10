@@ -14,10 +14,12 @@ import java.awt.GraphicsConfiguration;
 import java.awt.ImageCapabilities;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.awt.Transparency;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
 import java.util.Locale;
 
@@ -84,6 +86,9 @@ public final class GameCanvas extends Canvas {
     private volatile boolean showFrameTimes;
     /** The world of {@link RenderMode#PIXEL}; used by the loop thread only. */
     private VolatileImage backBuffer;
+    /** The world of {@link RenderMode#AUTO}, in main memory; used by the loop thread only. */
+    private BufferedImage memory;
+    private final AutoResolution resolution = new AutoResolution();
 
     /** A canvas whose painter draws everything, world and texts alike. */
     public GameCanvas(int logicalWidth, int logicalHeight, Painter painter) {
@@ -261,7 +266,9 @@ public final class GameCanvas extends Canvas {
             } while (buffers.contentsLost());
             // Without this, X11 may collect frames and show them in bursts.
             Toolkit.getDefaultToolkit().sync();
-            frameTimes.record(start, System.nanoTime());
+            long end = System.nanoTime();
+            frameTimes.record(start, end);
+            if (mode == RenderMode.AUTO) resolution.frame((end - start) / 1e6);
         }
     }
     // --8<-- [end:render]
@@ -299,6 +306,7 @@ public final class GameCanvas extends Canvas {
             switch (mode) {
                 case DIRECT -> paintScaled(game, alpha);
                 case PIXEL -> paintPixels(game, alpha);
+                case AUTO -> paintFromMemory(game, alpha);
             }
         } finally {
             game.dispose();
@@ -374,6 +382,77 @@ public final class GameCanvas extends Canvas {
     }
     // --8<-- [end:world]
 
+    // --8<-- [start:memory]
+    /**
+     * The world drawn into a picture in main memory, at the screen's scale divided by a whole number, then
+     * copied onto the screen in one piece. A divisor of 1 is as sharp as {@link RenderMode#DIRECT}; 2 and 3
+     * enlarge each pixel to a square of 2 × 2 or 3 × 3.
+     */
+    private void paintFromMemory(Graphics2D g, double alpha) {
+        Dimension screen = toScreenPixels(g);
+        double scale = scale(screen.width, screen.height, logicalWidth, logicalHeight);
+        resolution.limit(mostDivisor(scale));
+        int n = resolution.divisor();
+        double s = scale / n;
+        int w = (int) Math.ceil(logicalWidth * s - 1e-6);
+        int h = (int) Math.ceil(logicalHeight * s - 1e-6);
+        if (memory == null || memory.getWidth() != w || memory.getHeight() != h) {
+            if (memory != null) memory.flush();
+            // In the screen's own pixel format: copying it needs no conversion.
+            memory = getGraphicsConfiguration().createCompatibleImage(w, h, Transparency.OPAQUE);
+        }
+        Graphics2D m = memory.createGraphics();
+        try {
+            m.setColor(Color.BLACK);
+            m.fillRect(0, 0, w, h);
+            m.scale(s, s);
+            m.clipRect(0, 0, logicalWidth, logicalHeight);
+            m.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            m.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            painter.paint(m, alpha);
+        } finally {
+            m.dispose();
+        }
+        int pw = (int) Math.ceil(logicalWidth * scale - 1e-6);
+        int ph = (int) Math.ceil(logicalHeight * scale - 1e-6);
+        int x = (screen.width - pw) / 2;
+        int y = (screen.height - ph) / 2;
+        // Only the bars: the picture covers the rest.
+        g.setColor(Color.BLACK);
+        if (x > 0) {
+            g.fillRect(0, 0, x, screen.height);
+            g.fillRect(x + pw, 0, screen.width - x - pw, screen.height);
+        }
+        if (y > 0) {
+            g.fillRect(x, 0, pw, y);
+            g.fillRect(x, y + ph, pw, screen.height - y - ph);
+        }
+        Graphics2D c = (Graphics2D) g.create(x, y, pw, ph);
+        try {
+            if (n == 1) {
+                c.drawImage(memory, 0, 0, null);
+            } else {
+                c.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                        RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                c.drawImage(memory, 0, 0, w * n, h * n, null);
+            }
+        } finally {
+            c.dispose();
+        }
+        paintOverlay(g, x, y, scale, alpha);
+    }
+
+    /** The coarsest step of {@link RenderMode#AUTO} at this scale: the world is not drawn below about its logical size. */
+    static int mostDivisor(double scale) {
+        return Math.max(1, (int) Math.floor(scale + 0.5));
+    }
+    // --8<-- [end:memory]
+
+    /** The world is drawn at the screen's size divided by this: 1 except in {@link RenderMode#AUTO}. */
+    public int resolutionDivisor() {
+        return mode == RenderMode.AUTO ? resolution.divisor() : 1;
+    }
+
     /** The overlay in logical coordinates, placed and scaled like the world, drawn straight onto the screen. */
     private void paintOverlay(Graphics2D g, double x, double y, double scale, double alpha) {
         Graphics2D o = (Graphics2D) g.create();
@@ -406,9 +485,12 @@ public final class GameCanvas extends Canvas {
         Dimension screen = toScreenPixels(g);
         int w = screen.width;
         int h = screen.height;
-        String label = mode == RenderMode.DIRECT
-                ? String.format(Locale.ROOT, "direct %.2f", scale(w, h, logicalWidth, logicalHeight))
-                : "pixel " + wholeScale(w, h, logicalWidth, logicalHeight);
+        String label = switch (mode) {
+            case DIRECT -> String.format(Locale.ROOT, "direct %.2f", scale(w, h, logicalWidth, logicalHeight));
+            case PIXEL -> "pixel " + wholeScale(w, h, logicalWidth, logicalHeight);
+            case AUTO -> String.format(Locale.ROOT, "auto %.2f / %d", scale(w, h, logicalWidth, logicalHeight),
+                    resolution.divisor());
+        };
         String text = String.format(Locale.ROOT, "%d x %d  %s  %5.1f ms  max %5.1f ms  %3d fps",
                 w, h, label, frameTimes.averageMillis(), frameTimes.maxMillis(),
                 frameTimes.framesPerSecond());

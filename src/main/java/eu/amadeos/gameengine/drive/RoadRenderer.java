@@ -9,8 +9,8 @@ import java.awt.RadialGradientPaint;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.Area;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -38,6 +38,9 @@ import java.util.Map;
 public final class RoadRenderer {
     /** The colour of the air inside a tunnel: everything far in it fades into this. */
     public static final Color TUNNEL_DARK = new Color(22, 20, 18);
+    /** A kerb or a line thinner than this many pixels is not drawn. */
+    private static final double THINNEST = 0.25;
+    private static final AffineTransform IDENTITY = new AffineTransform();
     private static final Color LAMP = new Color(255, 228, 160);
 
     /** 1 by day, down to 0 in the dark: everything but lights and glowing things fades to {@link #shade}. */
@@ -62,6 +65,12 @@ public final class RoadRenderer {
     private double viewHeight;
     private double camX;
     private double camY;
+    /** The same surface in its own pixels, without smoothing: for the ground's rectangles. */
+    private Graphics2D flat;
+    /** The same surface without smoothing: for the faces of walls, whose many small shapes meet edge to edge. */
+    private Graphics2D rough;
+    public static final long[] T = new long[4];
+    private double deviceX, deviceY, deviceScaleX, deviceScaleY;
 
     /** One segment, projected: its near (N) and far (F) end. */
     static final class Proj {
@@ -93,14 +102,33 @@ public final class RoadRenderer {
         // four times faster than a bilinear blit, with hundreds of trees in a frame.
         Object interpolation = g.getRenderingHint(RenderingHints.KEY_INTERPOLATION);
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-        for (int i = projections.size() - 1; i >= 0; i--) {
-            Proj p = projections.get(i);
-            drawSegment(g, p);
-            if (p.seg.left != null) wall(g, p, p.seg.left, -1);
-            if (p.seg.right != null) wall(g, p, p.seg.right, 1);
-            if (p.seg.tunnel && p.seg.left != null && p.seg.right != null) ceiling(g, p);
-            scenery(g, p, cam);
-            if (p.seg.portal != null) portal(g, p);
+        AffineTransform t = g.getTransform();
+        if (t.getShearX() == 0 && t.getShearY() == 0 && t.getScaleX() > 0 && t.getScaleY() > 0) {
+            flat = (Graphics2D) g.create();
+            flat.setTransform(IDENTITY);
+            flat.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+            deviceX = t.getTranslateX();
+            deviceY = t.getTranslateY();
+            deviceScaleX = t.getScaleX();
+            deviceScaleY = t.getScaleY();
+        }
+        rough = (Graphics2D) g.create();
+        rough.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        try {
+            for (int i = projections.size() - 1; i >= 0; i--) {
+                Proj p = projections.get(i);
+                drawSegment(g, p);
+                if (p.seg.left != null) wall(g, p, p.seg.left, -1);
+                if (p.seg.right != null) wall(g, p, p.seg.right, 1);
+                if (p.seg.tunnel && p.seg.left != null && p.seg.right != null) ceiling(g, p);
+                scenery(g, p, cam);
+                if (p.seg.portal != null) portal(g, p);
+            }
+        } finally {
+            if (flat != null) flat.dispose();
+            flat = null;
+            rough.dispose();
+            rough = null;
         }
         carsBySegment.clear();
         if (stroke != null) g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, stroke);
@@ -193,16 +221,21 @@ public final class RoadRenderer {
         double f = fog(look, (p.zN + p.zF) / 2);
         Color fogC = s.tunnel ? TUNNEL_DARK : fogColour(look);
         boolean stripe = (s.index / 3) % 2 == 0;
-        g.setColor(tint(stripe ? look.grass() : look.grassDark(), fogC, f));
-        quad(g, 0, yN + 0.6, viewWidth, yN + 0.6, viewWidth, yF, 0, yF, g.getColor());
+        ground(g, yN + 0.6, yF, tint(stripe ? look.grass() : look.grassDark(), fogC, f));
         if (s.waterLeft > 0) water(g, p, yN, yF, -1, s.waterLeft, stripe, fogC, f);
         if (s.waterRight > 0) water(g, p, yN, yF, 1, s.waterRight, stripe, fogC, f);
-        band(g, p, yN, yF, -1.28, 1.28, tint(look.shoulder(), fogC, f));
-        if (look.kerb() != null) band(g, p, yN, yF, -1.12, 1.12, tint(stripe ? look.kerb() : look.kerbDark(), fogC, f));
+        // Side by side, not on top of each other: every pixel of the road is smoothed once, not three times.
+        // Each strip reaches a little under its inner neighbour, so no grass shows through between them.
+        // Far away, where a kerb or a line is thinner than a quarter of a pixel, it is left out.
+        double pixels = p.sN * Road.HALF_WIDTH * scale * (flat == null ? 1 : deviceScaleX);
+        boolean kerbs = look.kerb() != null && pixels * 0.08 >= THINNEST;
+        boolean lines = pixels * 0.07 >= THINNEST;
+        bands(g, p, yN, yF, kerbs ? 1.12 : 1.04, 1.28, 1, tint(look.shoulder(), fogC, f));
+        if (kerbs) bands(g, p, yN, yF, 1.04, 1.12, 1, tint(stripe ? look.kerb() : look.kerbDark(), fogC, f));
         band(g, p, yN, yF, -1.04, 1.04, tint(stripe ? look.asphalt() : look.asphaltDark(), fogC, f));
+        if (!lines && !look.glowingLines()) return;
         Color edge = look.glowingLines() ? look.edgeLine() : tint(look.edgeLine(), fogC, f);
-        band(g, p, yN, yF, -1.005, -0.935, edge);
-        band(g, p, yN, yF, 0.935, 1.005, edge);
+        bands(g, p, yN, yF, 0.935, 1.005, 0, edge);
         if (s.index % 4 < 2) band(g, p, yN, yF, -0.028, 0.028, look.glowingLines() ? look.centreLine() : tint(look.centreLine(), fogC, f));
         if (look.glowingLines() && s.index % 4 == 0 && !near) {
             double r = Math.max(1.5, p.sN * 360 * scale);
@@ -212,6 +245,49 @@ public final class RoadRenderer {
         }
     }
     // --8<-- [end:segment]
+
+    // --8<-- [start:ground]
+    /**
+     * The ground across the whole view between two heights: a plain rectangle of whole pixels, without
+     * smoothing, which costs a fraction of a smoothed shape. It begins at the first row of pixels that lies
+     * wholly below the far edge: the row the edge runs through keeps what the segment beyond painted there.
+     */
+    private void ground(Graphics2D g, double yN, double yF, Color c) {
+        if (flat == null) {
+            quad(g, 0, yN, viewWidth, yN, viewWidth, yF, 0, yF, c);
+            return;
+        }
+        int top = (int) Math.ceil(deviceY + deviceScaleY * yF);
+        int bottom = (int) Math.ceil(deviceY + deviceScaleY * yN);
+        if (bottom <= top) return;
+        int left = (int) Math.floor(deviceX);
+        int right = (int) Math.ceil(deviceX + deviceScaleX * viewWidth);
+        flat.setColor(c);
+        flat.fillRect(left, top, right - left, bottom - top);
+    }
+    // --8<-- [end:ground]
+
+    /**
+     * Two bands, left and right of the centre, from {@code a} to {@code b} half-widths, in one shape. Each
+     * reaches {@code under} logical units towards the centre, under the band that is drawn after it.
+     */
+    private void bands(Graphics2D g, Proj p, double yN, double yF, double a, double b, double under, Color c) {
+        double hw = Road.HALF_WIDTH;
+        path.reset();
+        // Both run the same way round: where the road is a pixel wide they overlap, and must not cancel out.
+        trapezoid(sx(p.sN, p.cxN - b * hw), sx(p.sN, p.cxN - a * hw) + under, sx(p.sF, p.cxF - b * hw), sx(p.sF, p.cxF - a * hw) + under, yN, yF);
+        trapezoid(sx(p.sN, p.cxN + a * hw) - under, sx(p.sN, p.cxN + b * hw), sx(p.sF, p.cxF + a * hw) - under, sx(p.sF, p.cxF + b * hw), yN, yF);
+        g.setColor(c);
+        g.fill(path);
+    }
+
+    private void trapezoid(double leftN, double rightN, double leftF, double rightF, double yN, double yF) {
+        path.moveTo(leftN, yN + 0.6);
+        path.lineTo(rightN, yN + 0.6);
+        path.lineTo(rightF, yF);
+        path.lineTo(leftF, yF);
+        path.closePath();
+    }
 
     /** A band of the road between {@code a} and {@code b} half-widths from the centre. */
     private void band(Graphics2D g, Proj p, double yN, double yF, double a, double b, Color c) {
@@ -251,7 +327,11 @@ public final class RoadRenderer {
     }
 
     // --8<-- [start:wall]
-    /** A wall's face towards the road, in bands of its colours from the bottom up. */
+    /**
+     * A wall's face towards the road, in bands of its colours from the bottom up. The bands are filled
+     * without smoothing: a canyon has seven thousand of them in a frame, they meet edge to edge, and a
+     * smoothed shape costs several times as much as a plain one. Only the lines on top of them are smooth.
+     */
     private void wall(Graphics2D g, Proj p, Wall w, int side) {
         double hw = Road.HALF_WIDTH;
         double latN = p.cxN + side * w.offset() * hw, latF = p.cxF + side * w.offset() * hw;
@@ -274,7 +354,7 @@ public final class RoadRenderer {
                     Color c = strata[(b + (int) (Noise.hash(b, w.seed()) * 2)) % strata.length];
                     double streak = 0.9 + 0.2 * Noise.fbm(p.seg.index * 0.18 + b * 3.7, w.seed() + 5, 3);
                     double up = 0.78 + 0.3 * b / bands;
-                    quad(g, xN, near ? viewHeight + 400 : sy(p.sN, p.yN + n0), xF, sy(p.sF, p.yF + f0),
+                    quad(rough, xN, near ? viewHeight + 400 : sy(p.sN, p.yN + n0), xF, sy(p.sF, p.yF + f0),
                             xF, sy(p.sF, p.yF + f1), xN, near ? -400 : sy(p.sN, p.yN + n1),
                             tint(scale(c, sun * streak * up), fogC, f));
                 }
@@ -295,11 +375,11 @@ public final class RoadRenderer {
                 double gN = near ? viewHeight + 400 : sy(p.sN, p.yN), gF = sy(p.sF, p.yF);
                 double mN = near ? viewHeight / 2 : sy(p.sN, p.yN + split), mF = sy(p.sF, p.yF + split);
                 double tN = near ? -400 : sy(p.sN, p.yN + hN), tF = sy(p.sF, p.yF + hF);
-                quad(g, xN, gN, xF, gF, xF, mF, xN, mN, tint(scale(w.colours()[0], sun), fogC, f));
-                quad(g, xN, mN, xF, mF, xF, tF, xN, tN, tint(scale(w.colours()[1], sun), fogC, f));
+                quad(rough, xN, gN, xF, gF, xF, mF, xN, mN, tint(scale(w.colours()[0], sun), fogC, f));
+                quad(rough, xN, mN, xF, mF, xF, tF, xN, tN, tint(scale(w.colours()[1], sun), fogC, f));
                 if (!near) {
                     double s1 = sy(p.sN, p.yN + 160), s2 = sy(p.sF, p.yF + 160);
-                    quad(g, xN, s1, xF, s2, xF, s2 - Math.max(0.5, p.sF * 60 * scale), xN, s1 - Math.max(0.5, p.sN * 60 * scale),
+                    quad(rough, xN, s1, xF, s2, xF, s2 - Math.max(0.5, p.sF * 60 * scale), xN, s1 - Math.max(0.5, p.sN * 60 * scale),
                             RoadLook.mix(new Color(230, 170, 40), fogC, f * 0.7));
                     if (p.seg.index % 3 == 0) {
                         g.setColor(tint(new Color(20, 20, 18), fogC, f));
@@ -319,7 +399,7 @@ public final class RoadRenderer {
         Color c = facades[(int) (Noise.hash(p.seg.index / 4, w.seed()) * facades.length)];
         double gN = near ? viewHeight + 400 : sy(p.sN, p.yN), gF = sy(p.sF, p.yF);
         double tN = near ? -400 : sy(p.sN, p.yN + hN), tF = sy(p.sF, p.yF + hF);
-        quad(g, xN, gN, xF, gF, xF, tF, xN, tN, tint(scale(c, sun), fogC, f * 0.9));
+        quad(rough, xN, gN, xF, gF, xF, tF, xN, tN, tint(scale(c, sun), fogC, f * 0.9));
         if (near) return;
         int floors = (int) (Math.min(hN, hF) / 320);
         double off = side * w.offset() * Road.HALF_WIDTH;
@@ -332,7 +412,7 @@ public final class RoadRenderer {
                 double ya = p.yN + (p.yF - p.yN) * t0, yb = p.yN + (p.yF - p.yN) * t1;
                 double ax = sx(sa, p.cxN + (p.cxF - p.cxN) * t0 + off), bx = sx(sb, p.cxN + (p.cxF - p.cxN) * t1 + off);
                 Color wc = on ? RoadLook.mix(new Color(255, 205, 120), fogC, f * 0.4) : tint(new Color(60, 70, 90), fogC, f);
-                quad(g, ax, sy(sa, ya + y0), bx, sy(sb, yb + y0), bx, sy(sb, yb + y1), ax, sy(sa, ya + y1), wc);
+                quad(rough, ax, sy(sa, ya + y0), bx, sy(sb, yb + y0), bx, sy(sb, yb + y1), ax, sy(sa, ya + y1), wc);
             }
         }
         if (p.seg.index % 4 == 0) {
@@ -349,12 +429,12 @@ public final class RoadRenderer {
         double lF = sx(p.sF, p.cxF - s.left.offset() * hw), rF = sx(p.sF, p.cxF + s.right.offset() * hw);
         double tN = p.zN < 1 ? -400 : sy(p.sN, p.yN + h), tF = sy(p.sF, p.yF + h);
         double f = fog(s.look, (p.zN + p.zF) / 2);
-        quad(g, lN, tN, rN, tN, rF, tF, lF, tF, tint(new Color(70, 68, 62), TUNNEL_DARK, f));
+        quad(rough, lN, tN, rN, tN, rF, tF, lF, tF, tint(new Color(70, 68, 62), TUNNEL_DARK, f));
         if (s.index % 2 == 0 && p.zN > 1) {
             double aN = sx(p.sN, p.cxN - 0.12 * hw), bN = sx(p.sN, p.cxN + 0.12 * hw);
             double aF = sx(p.sF, p.cxF - 0.12 * hw), bF = sx(p.sF, p.cxF + 0.12 * hw);
             double mid = (tN + tF) / 2;
-            quad(g, aN, tN, bN, tN, bF, mid, aF, mid, LAMP);
+            quad(rough, aN, tN, bN, tN, bF, mid, aF, mid, LAMP);
             glow(g, (aN + bF) / 2, (tN + mid) / 2, Math.max(3, (bN - aN) * 1.6), new Color(255, 210, 120, 90));
         }
     }
@@ -451,18 +531,11 @@ public final class RoadRenderer {
         double pw = s * sprite.worldWidth() * scale;
         double ph = pw * sprite.art().getHeight() / sprite.art().getWidth();
         if (pw < 0.4 || x + pw < 0 || x - pw > viewWidth || y - ph > viewHeight) return;
-        double device = pw * Math.abs(g.getTransform().getScaleX());
         double f = fog(p.seg.look, z);
-        paint(g, sprite.copy(device, f, fogC, light, shade), x, y, pw, ph, flip);
-        if (glowing != null) paint(g, glowing.copy(device, 0, fogC, 1, shade), x, y, pw, ph, flip);
+        sprite.paint(g, x - pw / 2, y - ph, pw, ph, f, fogC, light, shade, flip);
+        if (glowing != null) glowing.paint(g, x - pw / 2, y - ph, pw, ph, 0, fogC, 1, shade, flip);
     }
     // --8<-- [end:scenery]
-
-    private static void paint(Graphics2D g, BufferedImage im, double x, double y, double pw, double ph, boolean flip) {
-        double left = x - pw / 2, top = y - ph;
-        if (flip) g.drawImage(im, (int) Math.round(left + pw), (int) Math.round(top), (int) -Math.round(pw), (int) Math.round(ph), null);
-        else g.drawImage(im, (int) Math.round(left), (int) Math.round(top), (int) Math.round(pw), (int) Math.round(ph), null);
-    }
 
     /** Coordinates in logical units are rounded only where an image is placed; a shape keeps its fractions. */
     private void quad(Graphics2D g, double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, Color c) {
@@ -506,10 +579,52 @@ public final class RoadRenderer {
         return (int) Math.max(0, Math.min(255, Math.round(v)));
     }
 
+    /** Pictures of glows by colour and size, the one used longest ago forgotten first. */
+    private static final Map<Long, BufferedImage> GLOWS = new java.util.LinkedHashMap<>(64, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<Long, BufferedImage> eldest) {
+            return size() > 200;
+        }
+    };
+    /** The largest picture of a glow; a larger glow is this picture enlarged. */
+    private static final int LARGEST_GLOW = 384;
+
+    // --8<-- [start:glow]
+    /**
+     * A soft light of radius {@code r}. A radial gradient is among the slowest things Java 2D can fill, and
+     * a road with glowing lines has more than a hundred lights in a frame: so each is painted once as a
+     * picture, in fixed sizes a tenth apart, and then only copied, in the size of the picture: a light may
+     * be a tenth too large, which nobody sees on something without an edge.
+     */
     static void glow(Graphics2D g, double x, double y, double r, Color c) {
         if (r < 0.5) return;
-        g.setPaint(new RadialGradientPaint(new Point2D.Double(x, y), (float) r, new float[]{0f, 0.35f, 1f},
-                new Color[]{c, new Color(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha() / 3), new Color(c.getRed(), c.getGreen(), c.getBlue(), 0)}));
-        g.fill(new Ellipse2D.Double(x - r, y - r, 2 * r, 2 * r));
+        AffineTransform t = g.getTransform();
+        double device = 2 * r * Math.abs(t.getScaleX());
+        int size = 3;
+        while (size < device && size < LARGEST_GLOW) size = (int) Math.ceil(size * 1.1);
+        long key = ((long) c.getRGB() << 32) | size;
+        BufferedImage im;
+        synchronized (GLOWS) {
+            im = GLOWS.get(key);
+            if (im == null) {
+                im = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D p = im.createGraphics();
+                float half = size / 2f;
+                p.setPaint(new RadialGradientPaint(new Point2D.Float(half, half), half, new float[]{0f, 0.35f, 1f},
+                        new Color[]{c, new Color(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha() / 3), new Color(c.getRed(), c.getGreen(), c.getBlue(), 0)}));
+                p.fillRect(0, 0, size, size);
+                p.dispose();
+                GLOWS.put(key, im);
+            }
+        }
+        if (t.getShearX() != 0 || t.getShearY() != 0 || device > size) {
+            g.drawImage(im, (int) Math.round(x - r), (int) Math.round(y - r), (int) Math.round(2 * r), (int) Math.round(2 * r), null);
+            return;
+        }
+        g.setTransform(IDENTITY);
+        g.drawImage(im, (int) Math.round(t.getTranslateX() + t.getScaleX() * x - size / 2.0),
+                (int) Math.round(t.getTranslateY() + t.getScaleY() * y - size / 2.0), null);
+        g.setTransform(t);
     }
+    // --8<-- [end:glow]
 }

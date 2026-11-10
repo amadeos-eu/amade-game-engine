@@ -236,7 +236,7 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 **Relief (drawing).** A flat picture seen from straight above in which every part stands up with its height, lit from one side, and throws a soft shadow; drawn once, then tilted into the view. [Pinball](70-pinball.md#step-8-relief), [manual](42-sprites.md#tables-with-heights-relief-and-rampart).
 
-**Render mode.** How the world reaches the screen: `DIRECT`, scaled to any size and sharp, or `PIXEL`. [Bricks](21-bricks.md#pixel-mode), [manual](41-loop-and-drawing.md#the-canvas-gamecanvas-and-rendermode).
+**Render mode.** How the world reaches the screen: `DIRECT`, scaled to any size and sharp, `PIXEL`, or `AUTO`, drawn in main memory and as sharp as the computer manages ([Cruise](61-cruise.md#full-screen-three-times-the-pixels)). [Bricks](21-bricks.md#pixel-mode), [manual](41-loop-and-drawing.md#the-canvas-gamecanvas-and-rendermode).
 
 **Replay.** A whole game kept as a seed and the player's actions with the tick of each. Fed to the rules again, they play the same game. [Snake](22-snake.md#step-5-replays), [manual](47-data-and-saving.md#a-game-as-its-input-replay).
 

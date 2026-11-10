@@ -16,7 +16,14 @@ public enum RenderMode {
      * The world is drawn at the logical size itself, then enlarged by a whole factor with hard pixel edges:
      * the look of old games. Drawing costs 640 × 400 pixels on any screen; black bars fill what is left.
      */
-    PIXEL;
+    PIXEL,
+    /**
+     * The world is drawn into a picture in main memory and copied onto the screen in one piece: at the full
+     * size of the screen while the frames are in time, at half or a third of it, enlarged, when they are
+     * not ({@link AutoResolution}). For a game that paints every pixel many times over, such as a road with
+     * hundreds of trees, drawing in memory is much faster than drawing on the screen's own surface.
+     */
+    AUTO;
     // --8<-- [end:modes]
 
     /** The name in settings files, e.g. {@code pixel}. */

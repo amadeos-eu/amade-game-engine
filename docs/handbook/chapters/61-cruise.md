@@ -231,7 +231,7 @@ The road is drawn over a background the game paints itself. Behind it is the sky
 --8<-- "amade-cruise-game/src/main/java/eu/amadeos/games/cruise/ui/game/Sky.java:tint"
 ```
 
-The pictures are 2400 pixels wide and made once per region. At night and in the golden hour they are tinted, in steps again, and the tinted copies are kept under a budget of pixels, the way `RoadSprite` keeps its copies.
+The pictures are 2400 pixels wide and made once per region. At night and in the golden hour they are tinted, in steps again, and the game keeps copies of them in the size they have on the screen, under a budget of pixels, the way `RoadSprite` keeps its copies. A new copy is made on a thread of its own; until it is finished, the layer is drawn with the copy it had before, a step of light off for a few frames ([Step 13](#full-screen-three-times-the-pixels) tells why).
 
 ## Step 7: The time of day and the weather
 
@@ -407,7 +407,61 @@ A frame of Cruise draws about 260 segments, five or six bands each, and over 500
 3. **The nearest pixel.** A copy is already smooth and at most a fifth too wide; drawing it with bilinear interpolation cost four times as much as with the nearest pixel, and looked no better. The renderer sets the hint for its sprites. A small program of a few lines measured the blits of Java2D before deciding: a plain copy costs about 1.4 ns a pixel, a scaled one with the nearest pixel 2.9 ns, a bilinear one 11 ns.
 4. **Pictures instead of paints.** A `LinearGradientPaint` over the sky and a `RadialGradientPaint` for the sun's glow are computed pixel by pixel in every frame. A gradient one pixel wide, drawn stretched, and the glow drawn once into a picture cost a fraction of that; the mountains, whose pictures are as big as they are drawn, are copied without any scaling.
 
-Measured and changed one at a time, each step could be checked against the last. *Game → Graphics → Pixels* draws the game at 640 × 400 and enlarges it, about 12 milliseconds a frame: for slow computers.
+Measured and changed one at a time, each step could be checked against the last.
+
+### Full screen: three times the pixels
+
+Then the game was played in full screen, at 1920 × 1200, and it crawled: a home computer of the 1980s drew such a road at 160 × 200 points, and here were seventy times as many, each with smooth edges. The benchmark, told to draw at three times the logical size (`./gradlew benchmark -Pscale=3`), measured 68 milliseconds a frame, and a second measurement in a real window nearly twice that. Leaving out one part at a time showed where the time went: 29 ms for the sky, 19 ms for the road, 25 ms for everything standing on it and beside it. The road ahead was never the problem; it is built long before the camera gets there and projected in under a millisecond. The time goes into painting pixels. Seven more changes:
+
+5. **The sky in the size of the screen.** The sky's pictures were exactly as large as they are drawn at twice the logical size, and were copied; at three times they were enlarged in every frame, smoothly, at 11 ns a pixel over the whole upper half of the screen. Now each layer has a copy in just the size it has on the screen, and a frame only copies. The gradient behind them is no longer a stretched picture but rows of plain rectangles, one for each of its colours: 5 ms instead of 29.
+
+    ```java title="amade-cruise-game · ui/game/Sky.java"
+    --8<-- "amade-cruise-game/src/main/java/eu/amadeos/games/cruise/ui/game/Sky.java:wrap"
+    ```
+
+    ```java title="amade-cruise-game · ui/game/Sky.java"
+    --8<-- "amade-cruise-game/src/main/java/eu/amadeos/games/cruise/ui/game/Sky.java:gradient"
+    ```
+
+6. **The ground once, the road once.** Each segment painted the grass across the whole view as a smoothed shape, and on it the shoulder, on that the kerb, on that the asphalt: every pixel of the road four times. The grass is now a rectangle of whole pixels, which needs no smoothing and costs a fraction, and the strips of the road lie side by side, each reaching one unit under its inner neighbour so that nothing shows through between them.
+
+    ```java title="amade-game-engine · drive/RoadRenderer.java"
+    --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/drive/RoadRenderer.java:ground"
+    ```
+
+7. **Walls without smoothing.** A canyon has fourteen bands of rock on each wall of each segment: seven thousand small shapes in a frame, and a smoothed shape costs several microseconds before its first pixel. They meet edge to edge, so nobody sees whether their edges are smooth; filled plainly, the walls take 7 ms instead of 22.
+8. **One bit of transparency.** Java2D copies a picture to a new size about three times as fast when each of its pixels is either there or not than when each must be blended with what lies behind it, and five times as fast when the picture is small. So `RoadSprite` takes its picture apart: the tree gets copies with one bit of transparency, and its shadow on the ground, which must stay soft, a copy of its own that is only as large as the shadow. Drawing a copy mirrored turned out to be slow as well, so a sprite that stands mirrored gets mirrored copies.
+
+    ```java title="amade-game-engine · drive/RoadSprite.java"
+    --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/drive/RoadSprite.java:parts"
+    ```
+
+    ```java title="amade-game-engine · drive/RoadSprite.java"
+    --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/drive/RoadSprite.java:paint"
+    ```
+
+9. **Glows as pictures.** The glowing lines of the dream roads have a hundred and thirty lights in a frame, each a `RadialGradientPaint`. Painted once per size and colour and then copied, they cost about half.
+
+    ```java title="amade-game-engine · drive/RoadRenderer.java"
+    --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/drive/RoadRenderer.java:glow"
+    ```
+
+10. **A picture in main memory.** The canvas draws straight onto the screen's surface, which belongs to the window system. For a game with a few dozen sprites that is the fast way. A frame of Cruise paints every pixel several times over, and its copies change all the time, so nothing can stay in video memory; drawing the frame into a `BufferedImage` and copying that to the screen in one piece was nearly twice as fast in the first measurement, and after the other changes about four times.
+11. **As sharp as the computer can.** Even so, a full screen of smooth pixels in software takes 17 to 32 ms on the test computer, and it may be slower on another. The new render mode `AUTO` measures its own frames: while they take longer than 20 ms it draws the world at half or a third of the screen's size and enlarges it, each pixel a square of 2 × 2 or 3 × 3, and when the road gets emptier it goes back. The overlay with the speedometer stays sharp.
+
+    ```java title="amade-game-engine · swing/AutoResolution.java"
+    --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/swing/AutoResolution.java:auto-resolution"
+    ```
+
+| 1920 × 1200, four cores, no graphics card | A frame |
+|---|---|
+| Before, drawn in memory | 68 ms |
+| After changes 5 to 9, drawn in memory | 23 ms |
+| At half the size, enlarged | 10 ms |
+| The game in its window, *Direct* | 71 to 114 ms |
+| The game in its window, *Automatic* (it settles at half the size) | 11 to 15 ms |
+
+The pictures of the eight regions before and after, laid over each other, differ in the outlines of the trees and nowhere else. *Automatic* is the game's default; *Game → Graphics* still has *Direct* and *Pixels*.
 
 Memory needed the same care. All pictures of the props and cars take about 180 megabytes; the game draws them once, for all its windows and tests, and keeps the soft glow of the lights at half the size.
 
@@ -440,6 +494,7 @@ A photo (**P**) is the frame without the panels, drawn again at twice the size a
 | An endless road of segments, built in sections that ease in and out | `eu.amadeos.gameengine.drive` (`Road`, `Segment`, `RoadBuilder`) | Every road game: racing, driving, flying low over a track |
 | The pseudo-3D view: projection, curves, hills, walls, tunnels, water, scenery, cars, fog, night, headlights | `drive` (`RoadRenderer`, `RoadCamera`, `RoadLook`, `Wall`, `Scenery`) | The same |
 | Sprites at every size, tinted in steps, under one budget | `drive` (`RoadSprite`) | Any game that draws many scaled pictures |
+| A frame drawn in memory, as sharp as the computer manages | `swing` (`RenderMode.AUTO`, `AutoResolution`) | Any game that is too slow in full screen |
 | Driving with the pull of curves; traffic that follows, overtakes and comes the other way | `drive` (`Car`, `Driving`, `Traffic`) | Road games with cars, bikes or anything on lanes |
 | Mountains, clouds and tree lines made in code, wrapping around | `drive` (`Panorama`, `Noise`) | Backgrounds for any game with a horizon |
 | Loops whose sound, speed and loudness change while they play; music streamed while it is decoded; a music volume of its own | `audio` (`Mixer.Bed`, `SampleStream`, `Mixer.setMusicVolume`) | Engines, wind, rain; the player's own music in any game |
