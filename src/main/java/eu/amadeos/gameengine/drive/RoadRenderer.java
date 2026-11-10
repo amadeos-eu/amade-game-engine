@@ -328,48 +328,26 @@ public final class RoadRenderer {
 
     // --8<-- [start:wall]
     /**
-     * A wall's face towards the road, in bands of its colours from the bottom up. The bands are filled
-     * without smoothing: a canyon has seven thousand of them in a frame, they meet edge to edge, and a
-     * smoothed shape costs several times as much as a plain one. Only the lines on top of them are smooth.
+     * A wall's face towards the road. Its pieces are filled without smoothing: a canyon has thousands of
+     * them in a frame, they meet edge to edge, and a smoothed shape costs several times as much as a plain
+     * one. Only the lines on top of them are smooth.
      */
     private void wall(Graphics2D g, Proj p, Wall w, int side) {
         double hw = Road.HALF_WIDTH;
         double latN = p.cxN + side * w.offset() * hw, latF = p.cxF + side * w.offset() * hw;
-        double hN = w.heightAt(p.seg.index), hF = w.heightAt(p.seg.index + 1);
-        double xN = sx(p.sN, latN), xF = sx(p.sF, latF);
         boolean near = p.zN < 1;
         double f = fog(p.seg.look, (p.zN + p.zF) / 2);
         Color fogC = w.kind() == Wall.Kind.TUNNEL ? TUNNEL_DARK : fogColour(p.seg.look);
+        if (w.kind() == Wall.Kind.CLIFF) {
+            cliff(g, p, w, side, fogC, f, near);
+            return;
+        }
+        double hN = w.heightAt(p.seg.index), hF = w.heightAt(p.seg.index + 1);
+        double xN = sx(p.sN, latN), xF = sx(p.sF, latF);
         // the light comes from the left: the right wall's face, turned to the left, is lit
         double sun = side > 0 ? 1.0 : 0.66;
         switch (w.kind()) {
-            case CLIFF -> {
-                Color[] strata = w.colours();
-                double maxH = w.height() * 1.3;
-                int bands = 14;
-                for (int b = 0; b < bands; b++) {
-                    double a0 = maxH * b / bands, a1 = maxH * (b + 1) / bands;
-                    double n0 = Math.min(a0, hN), n1 = Math.min(a1, hN), f0 = Math.min(a0, hF), f1 = Math.min(a1, hF);
-                    if (n0 >= n1 && f0 >= f1) continue;
-                    Color c = strata[(b + (int) (Noise.hash(b, w.seed()) * 2)) % strata.length];
-                    double streak = 0.9 + 0.2 * Noise.fbm(p.seg.index * 0.18 + b * 3.7, w.seed() + 5, 3);
-                    double up = 0.78 + 0.3 * b / bands;
-                    quad(rough, xN, near ? viewHeight + 400 : sy(p.sN, p.yN + n0), xF, sy(p.sF, p.yF + f0),
-                            xF, sy(p.sF, p.yF + f1), xN, near ? -400 : sy(p.sN, p.yN + n1),
-                            tint(scale(c, sun * streak * up), fogC, f));
-                }
-                if (!near) {
-                    double gN = sy(p.sN, p.yN), tN = sy(p.sN, p.yN + hN);
-                    if (Noise.hash(p.seg.index, w.seed() + 9) < 0.18) {
-                        g.setColor(tint(new Color(40, 15, 10), fogC, f));
-                        g.setStroke(new BasicStroke((float) Math.max(0.5, p.sN * 14 * scale)));
-                        g.draw(new Line2D.Double(xN, gN, xN, tN));
-                    }
-                    g.setColor(tint(scale(strata[strata.length - 1], 1.25), fogC, f));
-                    g.setStroke(new BasicStroke((float) Math.max(0.5, p.sN * 50 * scale)));
-                    g.draw(new Line2D.Double(xN, tN, xF, sy(p.sF, p.yF + hF)));
-                }
-            }
+            case CLIFF -> throw new AssertionError();
             case TUNNEL -> {
                 double split = w.height() * 0.45;
                 double gN = near ? viewHeight + 400 : sy(p.sN, p.yN), gF = sy(p.sF, p.yF);
@@ -392,6 +370,141 @@ public final class RoadRenderer {
         }
     }
     // --8<-- [end:wall]
+
+    // --8<-- [start:cliff]
+    /** The layers a cliff's face is banded in. */
+    private static final int LAYERS = 16;
+    /** How high the scree at the foot of a cliff lies against it, in world units, and how far it reaches out. */
+    private static final double SCREE = 480, SCREE_OUT = 0.55;
+
+    /**
+     * A cliff beside one segment: a piece of its second step, further out and higher, then a piece of its
+     * face, then the scree at its foot. The face runs from the wall's distance at the near end of the
+     * segment to its distance at the far end. Where the rock steps towards the road within one segment,
+     * that piece stands almost across the view, the end of a buttress, and takes other light than the
+     * face along the road: this is what makes the cliff a body.
+     *
+     * <p>Far away a segment is a pixel wide or less, and its pieces would cost more to begin than to fill:
+     * there one piece stands for two or four segments, the second step earlier than the face.
+     */
+    private void cliff(Graphics2D g, Proj p, Wall w, int side, Color fogC, double f, boolean near) {
+        long i = p.seg.index;
+        int n = (int) (i - projections.getFirst().seg.index);
+        double top = w.height() * 2.35;
+        int back = own(pieces(i, n, 16, 48), n, w, side);
+        if (back > 0) {
+            Proj q = end(n, back, w, side);
+            long j = q.seg.index + 1;
+            // the second step is hidden behind the first up to the lowest head of the first: plain below that
+            rock(p, q, w, side, w.backOffsetAt(i), w.backOffsetAt(j), w.backHeightAt(i), w.backHeightAt(j), top,
+                    w.height() * 0.5 * Math.min(w.risen(i), w.risen(j)), 0.84, fogC, f, near);
+        }
+        int front = own(pieces(i, n, 100, 170), n, w, side);
+        if (front == 0) return;
+        Proj q = end(n, front, w, side);
+        long j = q.seg.index + 1;
+        double hw = Road.HALF_WIDTH;
+        double oN = w.offsetAt(i), oF = w.offsetAt(j), hN = w.heightAt(i), hF = w.heightAt(j);
+        rock(p, q, w, side, oN, oF, hN, hF, top, 0, 1, fogC, f, near);
+        if (near || hN <= 0 && hF <= 0) return;
+        double xN = sx(p.sN, p.cxN + side * oN * hw), xF = sx(q.sF, q.cxF + side * oF * hw);
+        Color[] strata = w.colours();
+        if (oF <= oN + 0.3) {
+            // a slope of fallen stones against the foot; a piece that turns away has it behind its corner
+            Color scree = RoadLook.mix(strata[0], p.seg.look.grass(), 0.45);
+            quad(rough, sx(p.sN, p.cxN + side * (oN - SCREE_OUT) * hw), sy(p.sN, p.yN) + 0.6,
+                    sx(q.sF, q.cxF + side * (oF - SCREE_OUT) * hw), sy(q.sF, q.yF), xF, sy(q.sF, q.yF + SCREE * w.risen(j)),
+                    xN, sy(p.sN, p.yN + SCREE * w.risen(i)), tint(scale(scree, side > 0 ? 1.06 : 0.84), fogC, f));
+        }
+        if (oN - oF > 0.3 && front == 1) {
+            // the corner where a niche ends against the next buttress lies in the dark
+            g.setColor(tint(scale(strata[0], 0.32), fogC, f));
+            g.setStroke(new BasicStroke((float) Math.max(0.5, p.sN * 34 * scale)));
+            g.draw(new Line2D.Double(xN, sy(p.sN, p.yN), xN, sy(p.sN, p.yN + hN)));
+        }
+    }
+
+    /**
+     * How many segments the piece of rock that begins at segment {@code i} stands for, {@code n} segments
+     * from the first one drawn: 1 near the camera, 2 from {@code two} segments on, 4 from {@code four} on,
+     * and, if a piece that began {@code k} segments before {@code i} covers it, {@code -k}. A piece of two
+     * begins at an even segment, a piece of four at every fourth, whatever the camera does: so the pieces
+     * do not jump as it moves.
+     */
+    static int pieces(long i, int n, int two, int four) {
+        int in4 = (int) Math.floorMod(i, 4), in2 = (int) Math.floorMod(i, 2);
+        if (n - in4 >= four) return in4 == 0 ? 4 : -in4;
+        if (n - in2 >= two) return in2 == 0 ? 2 : -in2;
+        return 1;
+    }
+
+    /** A segment covered by an earlier piece draws nothing, unless the wall only begins after that piece began. */
+    private int own(int pieces, int n, Wall w, int side) {
+        if (pieces > 0) return pieces;
+        Proj start = projections.get(n + pieces);
+        return (side < 0 ? start.seg.left : start.seg.right) == w ? 0 : 1;
+    }
+
+    /** The last segment of a piece of {@code count} segments that begins with drawn segment {@code n}, with the same wall. */
+    private Proj end(int n, int count, Wall w, int side) {
+        Proj q = projections.get(n);
+        for (int k = 1; k < count && n + k < projections.size(); k++) {
+            Proj next = projections.get(n + k);
+            if ((side < 0 ? next.seg.left : next.seg.right) != w) break;
+            q = next;
+        }
+        return q;
+    }
+
+    /**
+     * One piece of rock, from the near end of {@code p} to the far end of {@code q}: {@code oN} half-widths
+     * from the centre and {@code hN} high there, {@code oF} and {@code hF} here, in the layers of the wall.
+     * Below {@code plain} it is one colour.
+     */
+    private void rock(Proj p, Proj q, Wall w, int side, double oN, double oF, double hN, double hF, double top,
+                      double plain, double shade, Color fogC, double f, boolean near) {
+        if (hN <= 0 && hF <= 0) return;
+        double hw = Road.HALF_WIDTH;
+        long i = p.seg.index, j = q.seg.index + 1;
+        double xN = sx(p.sN, p.cxN + side * oN * hw), xF = sx(q.sF, q.cxF + side * oF * hw);
+        // The light comes from the left and a little from ahead: the right cliff's face is lit and the ends
+        // of its buttresses, which look back at the driver, are in the shade; on the left it is the other
+        // way round. A piece that turns away from the driver lies in the shadow of its own corner.
+        double turned = Math.max(-1, Math.min(1, (oN - oF) / 0.7));
+        double sun = side > 0 ? 1.0 - 0.3 * Math.max(0, turned) : 0.6 + 0.34 * Math.max(0, turned);
+        if (turned < 0) sun *= 1 + 0.3 * turned;
+        sun *= shade * (0.91 + 0.18 * Noise.hash(Math.floorDiv(i, 6), w.seed() + 5));
+        Color[] strata = w.colours();
+        double shiftN = w.faultAt(i), shiftF = w.faultAt(j);
+        if (plain > 0) {
+            quad(rough, xN, edge(p, near, true, 0), xF, sy(q.sF, q.yF), xF, sy(q.sF, q.yF + Math.min(plain, hF)),
+                    xN, edge(p, near, true, Math.min(plain, hN)), tint(scale(strata[0], sun * 0.8), fogC, f));
+        }
+        // far away two layers together are not a pixel high: they are filled as one
+        int stride = p.sN * scale * top < 3.0 * LAYERS ? 2 : 1;
+        for (int b = 0; b < LAYERS; b += stride) {
+            double a0 = b == 0 ? 0 : top * w.layer(b, LAYERS), a1 = top * w.layer(b + stride, LAYERS);
+            double n0 = b == 0 ? plain : within(a0 + shiftN, plain, hN), f0 = b == 0 ? plain : within(a0 + shiftF, plain, hF);
+            double n1 = b + stride >= LAYERS ? hN : within(a1 + shiftN, plain, hN);
+            double f1 = b + stride >= LAYERS ? hF : within(a1 + shiftF, plain, hF);
+            if (n0 >= n1 && f0 >= f1) continue;
+            Color c = strata[(b + (int) (Noise.hash(b, w.seed()) * 2)) % strata.length];
+            double up = 0.8 + 0.28 * b / LAYERS;
+            quad(rough, xN, edge(p, near, false, n0), xF, sy(q.sF, q.yF + f0), xF, sy(q.sF, q.yF + f1),
+                    xN, edge(p, near, false, n1), tint(scale(c, sun * up), fogC, f));
+        }
+    }
+
+    private static double within(double v, double low, double high) {
+        return Math.max(low, Math.min(high, v));
+    }
+
+    /** The height on the screen of a point of a wall at the near end of a segment; beside the camera it lies off the screen. */
+    private double edge(Proj p, boolean near, boolean ground, double h) {
+        if (!near) return sy(p.sN, p.yN + h);
+        return ground || p.yN + h < camY ? viewHeight + 400 : -400;
+    }
+    // --8<-- [end:cliff]
 
     private void houses(Graphics2D g, Proj p, Wall w, int side, double xN, double xF, double hN, double hF, double sun,
                         Color fogC, double f, boolean near) {

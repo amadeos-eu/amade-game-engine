@@ -274,6 +274,8 @@ The words this book uses for the ideas of game programming, each with a short ex
 
 **State machine.** Something that is always in exactly one of a few states and changes between them only along ways allowed in advance, such as a ghost that waits, hunts, flees or flies home. [Maze](25-maze.md#step-3-ghosts-as-state-machines), [manual](46-paths-and-decisions.md#one-state-at-a-time-statemachine).
 
+**Stepped noise.** Smooth noise cut into a few flat levels: long stretches of one value and sudden changes between them. It gives rock its outline, seen from the side and from above: flat heads, niches and buttresses. [Cruise](61-cruise.md#a-cliff-is-a-body-not-a-curtain), [manual](45-maps.md#a-road-into-the-distance-road-roadbuilder-and-roadrenderer).
+
 **Substeps.** Cutting one step of the rules into several smaller ones for the physics, so a fast ball cannot pass through a thin part between two looks. [Pinball](70-pinball.md#step-2-physics-in-small-steps), [manual](44-movement.md#a-ball-on-a-table-playfield-and-its-parts).
 
 **Supply network.** Tiles that carry something from where it is made to where it is used, such as power from plants through lines to homes. [Town](33-town.md#step-4-power-through-the-town), [manual](45-maps.md#networks-that-carry-supplygrid).

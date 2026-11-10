@@ -30,7 +30,7 @@ The complete game is in [amade-cruise-game](https://github.com/amadeos-eu/amade-
 1. The title shows a car driving by itself. **Journey** starts the endless drive, **Race** the race setup, **Garage** chooses the car and its colour.
 2. **Up** is the gas, **down** the brake, **left** and **right** steer. On grass the car slows down; against a cliff or a wall of houses it stops short.
 3. A car ahead in the same lane is **overtaken** when the player passes it; the count is shown. Touching a car breaks nothing: it holds the player's car back.
-4. At the end of a stretch a **fork sign** names two regions; the lane the car keeps to under the sign chooses the next one.
+4. Every four to six kilometres the road forks: a **fork sign** names two regions, and the lane the car keeps to under the sign chooses the next one. The display at the top right says how far the fork still is.
 5. **C** lets the car drive itself, **P** saves a photo, **J** shows the journal: the regions found, the kilometres, the cars overtaken.
 6. **Ctrl+R** silences the music, **R** changes the station, **N** plays the next track.
 7. A **race** is a route of six to ten kilometres against five computer cars that drive *Relaxed*, *Keen* or *Fierce*. Two players share the keyboard (the second with **W A S D**), each with half of the screen. Whoever crosses the finish first wins.
@@ -106,7 +106,7 @@ A test draws a straight road and a bend and checks where the asphalt lands:
 
 ## Step 3: Walls, tunnels and things beside the road
 
-A segment can have a `Wall` on either side: the cliff of a canyon, a row of houses, the wall of a tunnel. A wall stands at a fixed distance from the centre and faces the road; it is drawn as a quad from the segment's near to its far end, banded like rock or windowed like a street. Two tunnel walls with `tunnel` set get a ceiling between them, and the first segment of a tunnel its portal:
+A segment can have a `Wall` on either side: the cliff of a canyon, a row of houses, the wall of a tunnel. A row of houses and a tunnel wall stand at a fixed distance from the centre and face the road; they are drawn as a quad from the segment's near to its far end, windowed like a street or tiled like a tunnel. Two tunnel walls with `tunnel` set get a ceiling between them, and the first segment of a tunnel its portal:
 
 ```java title="amade-game-engine · drive/Wall.java"
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/drive/Wall.java:wall"
@@ -115,6 +115,43 @@ A segment can have a `Wall` on either side: the cliff of a canyon, a row of hous
 ```java title="amade-game-engine · drive/RoadRenderer.java"
 --8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/drive/RoadRenderer.java:wall"
 ```
+
+### A cliff is a body, not a curtain
+
+A cliff drawn the same way, a banded sheet at a fixed distance, looks like a curtain hung beside the road: nothing in the picture says that there is rock behind it. Four things say it, and none of them needs a third dimension in the data. They all follow from the number of the segment and the wall's seed:
+
+- **It steps.** `offsetAt` gives the wall's distance from the road at every segment: smooth noise cut into a few flat steps. For a long stretch the face runs along the road, then within one segment it jumps a few metres back into a niche, or forward into a buttress.
+- **It has heads.** `heightAt` is cut into steps in the same way: flat tops of different heights instead of a fringe.
+- **It has a second step.** Further from the road and always higher stands a second wall of the same rock, `backOffsetAt` and `backHeightAt`. It shows above the first one and moves more slowly, as distant things do.
+- **Its bands break.** The layers are thick and thin, and every few segments a fault shifts them up or down.
+
+```java title="amade-game-engine · drive/Wall.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/drive/Wall.java:cliff"
+```
+
+The renderer still draws one quad per layer and segment, but from the wall's distance at the segment's near end to its distance at the far end. Where the rock steps towards the road, that quad stands almost across the view: the end of a buttress. It takes other light than the face along the road, lit on one side of the canyon and shaded on the other, and that difference is what the eye reads as a corner. The corner behind it, where the niche ends, gets a dark line, and a slope of scree lies against the foot.
+
+```java title="amade-game-engine · drive/RoadRenderer.java"
+--8<-- "amade-game-engine/src/main/java/eu/amadeos/gameengine/drive/RoadRenderer.java:cliff"
+```
+
+Because every piece is computed from the same wall and the numbers of its two ends, the pieces of neighbouring segments meet exactly. The first version of the game gave every segment a wall of its own with a slightly different distance; between those pieces a line of sky showed, one pixel wide. One wall for the whole gorge is both simpler and right. A cliff `between` two segments rises out of the ground at its ends and sinks into it again.
+
+A second step doubles the pieces, and most of them are far away, where a segment is a pixel wide. There one piece stands for two or four segments (`pieces`): the pieces begin at even segments or at every fourth, whatever the camera does, so nothing jumps while the car moves. With that a frame in a gorge takes about a millisecond longer than with the curtain: 17 instead of 16 ms at 1920 × 1200 without a graphics card.
+
+```java title="amade-game-engine · test/drive/WallTest.java"
+--8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/drive/WallTest.java:test-wall"
+```
+
+```java title="amade-game-engine · test/drive/RoadRendererTest.java"
+--8<-- "amade-game-engine/src/test/java/eu/amadeos/gameengine/drive/RoadRendererTest.java:test-cliff"
+```
+
+<figure markdown>
+![High Pass: grey rock in steps, firs in the niches](images/cruise/high-pass-gorge.jpg){ width="400" }
+![Ember Canyon: a gorge with buttresses and a second step](images/cruise/ember-gorge.jpg){ width="400" }
+<figcaption>Rock on both sides: the ends of the buttresses catch other light than the faces, the second step shows above the first, and trees and boulders stand in the niches.</figcaption>
+</figure>
 
 Trees, rocks, houses, signs are `Scenery`: a `RoadSprite` at an offset from the centre and a place along the segment.
 
@@ -187,16 +224,26 @@ The cars of the traffic are homages with names of their own: a little round *Bub
 
 ## Step 5: A world made on the way
 
-The `World` builds the road ahead of the player and dresses it. It is a chain of **stints**, a few kilometres of one `Region` each. Within a stint the road comes in sections, and the region's rules decide each one: how sharply it bends, how much it climbs, and whether it runs between cliffs, through a row of houses, through a tunnel or along a lake:
+The `World` builds the road ahead of the player and dresses it. It is a chain of **stints**, four to six and a half kilometres of one `Region` each: two to four minutes, long enough to settle in a landscape and short enough that the next one comes. Within a stint the road comes in sections, and the region's rules decide each one: how sharply it bends, how much it climbs, and whether it runs between cliffs, through a row of houses, through a tunnel or along a lake:
 
 ```java title="amade-cruise-game · domain/World.java"
 --8<-- "amade-cruise-game/src/main/java/eu/amadeos/games/cruise/domain/World.java:section"
 ```
 
-Then every new segment is dressed: walls for the feature, water for the coast, and the region's props, each with its own density, distance from the road and chance of being mirrored:
+A gorge is one cliff on each side for the whole section, twice as long as other sections, and one gorge in three has rock on one side only:
+
+```java title="amade-cruise-game · domain/World.java"
+--8<-- "amade-cruise-game/src/main/java/eu/amadeos/games/cruise/domain/World.java:cliffs"
+```
+
+Then every new segment is dressed: walls for the feature, water for the coast, and the region's props, each with its own density, distance from the road and chance of being mirrored. Beside a cliff a prop stands before the scree, wherever the rock is at that segment: so trees and boulders fill the niches.
 
 ```java title="amade-cruise-game · domain/World.java"
 --8<-- "amade-cruise-game/src/main/java/eu/amadeos/games/cruise/domain/World.java:dress"
+```
+
+```java title="amade-cruise-game · test/domain/WorldTest.java"
+--8<-- "amade-cruise-game/src/test/java/eu/amadeos/games/cruise/domain/WorldTest.java:test-gorge"
 ```
 
 Each step of the game, the world follows the player. It builds ahead, forgets what lies far behind (in a race behind the last car, not the first), and reports what happened: a fork passed and the region chosen, a new region reached. The journey shows a card with the name of each new region; the journal remembers it.
@@ -205,7 +252,7 @@ Each step of the game, the world follows the player. It builds ahead, forgets wh
 --8<-- "amade-cruise-game/src/main/java/eu/amadeos/games/cruise/domain/World.java:update"
 ```
 
-A stint ends at a fork. A sign over the road names two regions, and the lane the car keeps to when it passes under it chooses the next. Until then the world does not build beyond the end of the stint: it does not know yet which region comes. The props of both regions are drawn on a thread of their own while the player drives towards the sign, so the new trees are ready when the road needs them.
+A stint ends at a fork. A small display under the clock names the region and the kilometres to the fork (`forkAhead`), so the driver knows that the land will change and when. A sign over the road names two regions, and the lane the car keeps to when it passes under it chooses the next. Until then the world does not build beyond the end of the stint: it does not know yet which region comes. The props of both regions are drawn on a thread of their own while the player drives towards the sign, so the new trees are ready when the road needs them.
 
 Everything comes from the seed and the choices: the same seed and the same forks give the same road with the same trees in the same places. A seed can be a word, typed in the settings:
 
