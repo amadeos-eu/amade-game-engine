@@ -151,6 +151,16 @@ A build on your own machine has the version `0.0.0-dev.0` (`0.0.0~dev.0` in the 
 
 The game then appears in the desktop's menu under *Games*, and `amade-mines-game` starts it from a terminal. `sudo apt remove amade-mines-game` removes it again.
 
+To play the released games instead of your own builds: the amadeOS image brings only Mines and Solitaire. Every other game of this book is a package in the amadeOS package repository (`apt.amadeos.eu`); install it in Software, or in a terminal, one game or all of them:
+
+```bash
+sudo apt install amade-snake-game
+sudo apt install amadeos-games
+```
+
+!!! info "Behind the scenes"
+    Which programs the image brings is decided in `repositories.list` of the amadeos repository. A game marked `# optional` there is released and published like any other, but the image leaves it out; the meta package `amadeos-games` recommends every game. A new game of your own is optional, too: add its repository to that list with `# optional` after the name. The Application Developer's Handbook has the details in its chapter on packaging.
+
 ## When something goes wrong
 
 | Symptom | Cause and fix |
