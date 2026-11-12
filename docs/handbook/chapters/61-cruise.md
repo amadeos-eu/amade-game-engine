@@ -514,7 +514,7 @@ Memory needed the same care. All pictures of the props and cars take about 180 m
 
 ## The scenes
 
-The scenes are the familiar ones: the title with the car driving by itself, the journey, the pause, the garage, the journal, the race setup, the race and its results. In the garage each player chooses a car and its colour; the side picture and three ratings show what it is:
+The scenes are the familiar ones: the title with the car driving by itself, the journey, the pause, the garage, the journal, the race setup, the race and its results. In the garage each player chooses a car and its colour; the side picture and three ratings show what it is. Until then the first player drives the Kestrel and the second the Roadster:
 
 ```java title="amade-cruise-game · ui/game/CruiseGame.java"
 --8<-- "amade-cruise-game/src/main/java/eu/amadeos/games/cruise/ui/game/CruiseGame.java:garage"
